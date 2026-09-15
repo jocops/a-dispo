@@ -244,6 +244,43 @@ input:disabled,select:disabled{background:var(--surface-2);color:var(--cream-dim
 .compte:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px}
 .legende{font-size:12px;color:var(--cream-dim);margin:16px 0 0;line-height:1.55}
 
+/* ====================== LES ECRANS D'EXEMPLE ======================
+   UN SEUL BLOC, ET LA MENTION DEDANS. C'est la seule disposition qui tienne :
+   si la phrase vit au-dessus du bloc, on peut faire defiler six fausses fiches
+   sans jamais revoir ce qui les qualifie. Elle est donc le toit du conteneur,
+   collee aux cartes, et elle part avec elles.
+
+   LE BANDEAU EST EN ENCRE, PAS EN ACCENT, et c'est mesure : le papier sur
+   l'encre rend 18,46, ce qui est le plus fort contraste dont la charte
+   dispose. L'accent est deja pris par les six pastilles ; un bandeau rouge
+   par-dessus six disques rouges ferait disparaitre exactement la ligne qu'il
+   faut lire. L'accent reste rare pour rester lisible.
+
+   TRAIT DISCONTINU : le meme signe que `.carte.eteinte` plus haut. Dans ce
+   fichier, un contour pointille veut dire « ceci n'est pas une donnee ». */
+.exemples{border:1px dashed var(--line);border-radius:18px;background:var(--bg-2);
+  margin:18px 0 0;padding:0 0 14px}
+.exemples-note{margin:0;background:var(--cream);color:var(--bg-2);
+  font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:13.5px;line-height:1.45;
+  padding:11px clamp(12px,3.5vw,16px);border-radius:17px 17px 0 0}
+.exemples-quoi{margin:13px clamp(10px,3.5vw,16px) 0;font-size:12.5px;
+  color:var(--cream-mut);line-height:1.5}
+/* Les marges laterales se resserrent avec l'ecran plutot que de comprimer la
+   carte : a 320 px, `--gut` prend deja 17,6 px de chaque cote de la page. */
+.exemples .res{margin:12px clamp(8px,3vw,14px) 0}
+/* Deux lettres dans un disque de 44 px : a 19 px elles touchaient le bord. */
+.mono.deux{font-size:15px;letter-spacing:.01em}
+/* Le QUAND, jamais le mot seul. Vert sur voile vert : 5,46 sur la carte. */
+.libre{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:11.5px;
+  color:var(--vert);background:var(--vert-soft);border-radius:5px;padding:3px 9px;
+  margin:9px 0 0;max-width:100%;overflow-wrap:anywhere}
+/* Le SIRET verifie : en vert de texte, 6,87 sur la carte. La coche est un
+   dessin, pas une lettre : elle est cachee aux lecteurs d'ecran. */
+.siret{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:var(--vert);
+  margin:7px 0 0;line-height:1.45}
+.siret svg{width:13px;height:13px;flex:none;margin-top:3px;fill:none;stroke:currentColor;
+  stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
 .etat{border-radius:12px;padding:13px 16px;margin:18px 0 0;font-size:14.2px;display:none}
 .etat.vu{display:block}
 /* Les bordures d'etat sont RECONSTRUITES sur les couleurs sombres : le vert vif
@@ -318,7 +355,7 @@ input:disabled,select:disabled{background:var(--surface-2);color:var(--cream-dim
     width:248px;padding:18px 14px;background:var(--bg-2);border-right:1px solid var(--line);
     overflow-y:auto;z-index:20}
 }
-.menu-c .marque-c{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--cream);
+.menu-c .marque-c{display:flex;align-items:center;gap:.5em;min-height:44px;text-decoration:none;color:var(--cream);
   font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;padding:2px 10px 0;margin-bottom:24px}
 .menu-c .marque-c .a{color:var(--accent-texte)}
 .menu-c .marque-c svg{height:1.2em;width:auto;color:var(--accent-texte);flex:none}
@@ -337,7 +374,7 @@ input:disabled,select:disabled{background:var(--surface-2);color:var(--cream-dim
 .menu-c .aide-c b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--cream)}
 .menu-c .aide-c b i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
 .menu-c .aide-c p{margin:6px 0 0;font-size:12.5px;color:var(--cream-mut);line-height:1.5}
-.menu-c .aide-c a{color:var(--accent-texte)}
+.menu-c .aide-c a{color:var(--accent-texte);display:inline-flex;align-items:center;min-height:44px}
 
 .barre-app{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 var(--gut);
   border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;z-index:19;
@@ -354,7 +391,7 @@ input:disabled,select:disabled{background:var(--surface-2);color:var(--cream-dim
   overflow-y:auto;transform:translateX(-100%);transition:transform .22s ease}
 .tiroir.vu{transform:none}
 @media (prefers-reduced-motion:reduce){ .tiroir{transition:none} }
-.tiroir .fermer{position:absolute;top:14px;right:12px;min-width:40px;min-height:40px;
+.tiroir .fermer{position:absolute;top:10px;right:10px;min-width:44px;min-height:44px;
   background:none;border:0;color:var(--cream-mut);font-size:22px;line-height:1;cursor:pointer;border-radius:8px}
 .tiroir .fermer:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
 .nav-note{margin:0 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
@@ -510,6 +547,80 @@ const COLONNES = "id,prenom,denomination,metier,presentation,commune,departement
    « je me deplace a 50 km » retrouve ses reperes. */
 const RAYONS = [10, 20, 30, 50, 80, 120, 200];
 
+/* ==================== LES SIX CONFRERES D'EXEMPLE ====================
+   POURQUOI ILS EXISTENT. Aucune fiche n'est publiee (releve du 13/09/2026 :
+   `fiches_publiques` rend zero ligne). Un ecran de recherche vide ne montre
+   pas le produit, il montre son absence. Ces six-la le montrent en service.
+
+   CE QU'ILS NE FONT JAMAIS. Ils ne sont pas ecrits en base, ils ne sont pas
+   lus depuis la base, ils ne partent nulle part. Ils vivent dans cette
+   constante, ils meurent avec l'onglet. Ils ne s'affichent QUE la ou la base
+   ne rend rien : des qu'une seule vraie fiche descend, `baseRend` passe a
+   vrai, le bloc disparait, et sa mention avec lui.
+
+   CE QUI EST ECRIT ET CE QUI EST CALCULE, parce que la difference se voit :
+     · le prenom, la raison sociale, le metier, la commune, la note et le
+       nombre d'avis sont ECRITS. Ils sont donc faux, et la mention le dit ;
+     · les jours libres sont CALCULES a partir d'aujourd'hui. Une date en dur
+       serait vraie une semaine puis fausse pour toujours, et un exemple qui
+       annonce un jeudi deja passe apprend a se mefier de l'ecran. `libre`
+       compte en JOURS OUVRES a partir de demain : [2,3] veut dire le
+       deuxieme et le troisieme, jamais un samedi ;
+     · la distance n'est PAS ecrite. Elle ne s'affiche que si un point de
+       depart existe pour de vrai, c'est-a-dire si une commune a pu etre
+       choisie, donc si la table des communes est chargee. Elle est vide
+       aujourd'hui : aucun kilometre ne s'affiche, et c'est correct. Inventer
+       « 4 km » sans point de depart serait la seule vraie faute du lot.
+
+   LE VOCABULAIRE. Ce sont des entreprises qui se sous-traitent des lots entre
+   elles. Rien ici ne parle d'embauche, et c'est délibéré : l'article L8241-1
+   punit le pret de main d'oeuvre a but lucratif. Un exemple mal ecrit
+   apprendrait le mauvais mot a celui qui le lit. */
+const MENTION_EXEMPLE = "Écrans d'exemple. Les noms, les notes et les dates sont fictifs.";
+
+const EXEMPLES = [
+  { initiales: "DL", prenom: "Damien", denomination: "DL Plomberie",
+    metier: "Plombier chauffagiste", commune: "Villeurbanne", departement: "69",
+    distance_km: 4.2, note: 4.8, avis: 12, libre: [2, 3],
+    presentation: "Remplacement de chaudière et reprise de réseau en logement occupé. "
+      + "Je prends de la sous-traitance sur le Grand Lyon, un chantier à la fois." },
+
+  { initiales: "SR", prenom: "Sébastien", denomination: "Rolland Électricité",
+    metier: "Électricien", commune: "Annecy", departement: "74",
+    distance_km: 2.6, note: 4.6, avis: 9, libre: [1, 2],
+    presentation: "Tableaux, mise aux normes, tirage de câbles. Je me déplace sur le bassin "
+      + "annécien et je monte sur Rumilly si le lot le justifie." },
+
+  { initiales: "MR", prenom: "Mathieu", denomination: "Atelier du Semnoz",
+    metier: "Menuisier", commune: "Seynod", departement: "74",
+    distance_km: 5.1, note: 4.9, avis: 7, libre: [4],
+    presentation: "Escaliers, parquets et agencement sur mesure. Je chiffre à l'atelier "
+      + "et je pose moi-même." },
+
+  { initiales: "YD", prenom: "Yann", denomination: "Toitures Delorme",
+    metier: "Couvreur", commune: "Cran-Gevrier", departement: "74",
+    distance_km: 3.4, note: 4.4, avis: 21, libre: [3, 4],
+    presentation: "Zinc et tuile sur bâti ancien. J'amène mon échafaudage, ce qui évite "
+      + "de le compter deux fois sur le devis." },
+
+  { initiales: "LV", prenom: "Lucie", denomination: "Vernet Carrelage",
+    metier: "Carreleur", commune: "Bron", departement: "69",
+    distance_km: 7.8, note: 4.7, avis: 15, libre: [1], demi: true,
+    presentation: "Grands formats et faïence de salle de bains. Je reprends volontiers "
+      + "un lot laissé en plan par quelqu'un d'autre." },
+
+  { initiales: "AM", prenom: "Antoine", denomination: "Maçonnerie du Rhône",
+    metier: "Maçon", commune: "Caluire-et-Cuire", departement: "69",
+    distance_km: 6.3, note: 4.5, avis: 18, libre: [5, 6],
+    presentation: "Ouvertures, reprises en sous-œuvre, dallage extérieur. Je passe voir "
+      + "le chantier avant de chiffrer, jamais sur photo." }
+];
+
+/* Mesure, jamais supposition : ce drapeau ne passe a vrai qu'apres une reponse
+   de la base qui contient au moins une fiche. Tant qu'il est faux, la base ne
+   rend rien et les exemples ont le droit d'exister. */
+let baseRend = false;
+
 const $ = (i) => document.getElementById(i);
 const echapper = (s) => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -604,6 +715,43 @@ function laPeriode() {
   return d === f ? "le " + enClair(d) : "du " + enClair(d) + " au " + enClair(f);
 }
 
+/* ---- LE QUAND DES EXEMPLES. « Libre » tout seul n'est pas une disponibilite :
+   c'est une affiche. Un jour nomme, toujours, et un jour qui n'est pas passe.
+   D'ou un calcul plutot qu'une date en dur. ---- */
+const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+/* Le n-ieme jour OUVRE a partir de demain. Samedi et dimanche sautent : un
+   exemple qui propose un chantier le dimanche se disqualifie tout seul. */
+function jourOuvre(n) {
+  const d = new Date();
+  let k = 0;
+  while (k < n) {
+    d.setDate(d.getDate() + 1);
+    const j = d.getDay();
+    if (j !== 0 && j !== 6) k++;
+  }
+  return d;
+}
+const nomme = (d) => JOURS[d.getDay()] + " " + d.getDate();
+function libreQuand(e, demande) {
+  /* Si une periode a ete DEMANDEE, l'exemple repond a CETTE question-la : deux
+     dates a l'ecran et une troisieme dans la carte se liraient comme un defaut.
+     Mais « demandee » ne veut pas dire « presente dans le champ » : les deux
+     champs s'ouvrent pre-remplis a aujourd'hui, et s'y fier faisait dire la
+     MEME date aux six confreres des l'ouverture, celle du jour, sans que
+     personne ait rien demande. On ne s'y fie donc qu'apres une recherche. */
+  if (demande && mode === "complet" && $("debut").value && $("fin").value)
+    return "Libre " + laPeriode();
+  const a = jourOuvre(e.libre[0]);
+  if (e.demi) return "Libre " + nomme(a) + " " + MOIS[a.getMonth()] + ", la demi-journée du matin";
+  if (e.libre.length < 2) return "Libre " + nomme(a) + " " + MOIS[a.getMonth()];
+  const b = jourOuvre(e.libre[1]);
+  /* Le mois ne s'ecrit qu'une fois quand les deux jours le partagent :
+     « jeudi 17 et vendredi 18 septembre », pas « jeudi 17 septembre et
+     vendredi 18 septembre ». Il se repete quand on change de mois. */
+  return "Libre " + nomme(a) + (a.getMonth() === b.getMonth() ? "" : " " + MOIS[a.getMonth()])
+       + " et " + nomme(b) + " " + MOIS[b.getMonth()];
+}
+
 /* ------------------------------------------------------- ce que la page dit d'elle
    UN SEUL ENDROIT POUR ETEINDRE LES CHAMPS. Les deux raisons se ressemblent
    trop pour etre ecrites a deux endroits : elles divergeraient a la premiere
@@ -693,10 +841,16 @@ function nombre(n, singulier, pluriel) {
 (async () => {
   /* Trois questions posees EN MEME TEMPS : la liste des metiers, et l'existence
      des deux pages voisines. Les enchainer ferait attendre l'artisan pour rien. */
-  const [rep, f, l] = await Promise.all([
+  /* La quatrieme question est la SONDE : une seule ligne demandee a la vue
+     publique, juste pour savoir si la base a quoi que ce soit a rendre. Elle
+     part en meme temps que les trois autres, donc elle ne coute pas un aller
+     de plus a l'artisan. C'est elle qui decide si les exemples ont le droit de
+     s'afficher a l'ouverture : on MESURE le vide, on ne le suppose pas. */
+  const [rep, f, l, sonde] = await Promise.all([
     lire("metiers?select=code,libelle&actif=eq.true&order=ordre"),
     existe(PAGE_FICHE),
-    existe(PAGE_LEGAL)
+    existe(PAGE_LEGAL),
+    lire("fiches_publiques?select=id&limit=1")
   ]);
   ficheEnLigne = f; legalEnLigne = l;
 
@@ -762,7 +916,7 @@ function nombre(n, singulier, pluriel) {
   $("lien-haut").hidden = false;
   if (session) {
     $("lien-haut").href = PAGE_ESPACE;
-    $("lien-haut").textContent = "Mon espace";
+    $("lien-haut").textContent = "Ton espace";
   }
 
   if (!session) {
@@ -776,7 +930,7 @@ function nombre(n, singulier, pluriel) {
       + "agendas demande donc une session ouverte.",
       'Tu peux chercher par métier dès maintenant. <a href="' + PAGE_CONNEXION
       + '" style="color:var(--accent-texte)">Se connecter</a> ouvre les dates, le rayon '
-      + "et la mise en relation.");
+      + "et la demande.");
   } else {
     /* UNE SESSION NE SUFFIT PAS : la fonction doit exister. On le demande a
        `etat_recherche()`, qui ne fait que compter et n'ecrit rien. Sonder avec
@@ -811,12 +965,24 @@ function nombre(n, singulier, pluriel) {
     }
   }
 
+  /* LA BASE REND-ELLE QUELQUE CHOSE ? Deux mesures, dans cet ordre de
+     confiance : le compte de `etat_recherche()` quand la session l'a rendu,
+     sinon la sonde d'une ligne sur la vue publique. Si l'une des deux voit au
+     moins une fiche, `baseRend` passe a vrai et les exemples ne paraissent
+     pas : de vraies donnees existent, ce sont elles qu'il faut montrer. */
+  if (etatBase) baseRend = +etatBase.publies > 0;
+  else baseRend = sonde.ok && sonde.lignes.length > 0;
+
   $("chercher").disabled = false;
   $("resultats").setAttribute("aria-busy", "false");
   $("resultats").innerHTML = '<p class="vide">Lance une recherche : '
     + (mode === "complet"
         ? "le métier, les dates, et la commune du chantier si tu la connais."
-        : "le métier suffit.") + "</p>";
+        : "le métier suffit.") + "</p>"
+    /* L'ecran est plein des l'ouverture, au lieu d'attendre un premier clic
+       pour montrer ce qu'il sait faire. Le bloc se rend vide tout seul quand
+       `baseRend` est vrai : aucun test a repeter ici. */
+    + blocExemples(mode === "complet", false);
 })();
 
 /* --------------------------------------------------------- la commune du chantier */
@@ -1039,6 +1205,9 @@ async function chercherPublic(code, libelle) {
 /* ------------------------------------------------------------------- l'affichage */
 function rendre(liste, complet) {
   const zone = $("resultats");
+  /* La base vient de rendre de vraies fiches : a partir d'ici les exemples
+     n'ont plus lieu d'etre, et la mention part avec eux. */
+  if (liste.length) baseRend = true;
   if (!liste.length) { zone.innerHTML = vide(complet); ancrer(); return; }
 
   const classe = complet && commune
@@ -1060,12 +1229,12 @@ function rendre(liste, complet) {
 
   h += '<p class="legende">Le téléphone, le nom de famille et le SIRET ne sortent pas '
      + "d'ici : ils ne sont pas dans ce qu'on lit. Le contact passe par une demande de "
-     + "mise en relation, depuis la fiche, et les coordonnées ne circulent qu'une fois "
+     + "demande, depuis la fiche, et les coordonnées ne circulent qu'une fois "
      + "la demande acceptée.";
   if (!session) {
     /* Il regarde sans compte, et c'est permis. On lui dit ou s'arrete ce qu'il
        peut faire, sans lui fermer la porte au nez. */
-    h += "<br>Regarder ne demande pas de compte. Demander une mise en relation, si : "
+    h += "<br>Regarder ne demande pas de compte. Envoyer une demande, si : "
        + 'c\'est le SIRET vérifié qui garantit à chacun qu\'en face il y a une entreprise. '
        + '<a href="' + PAGE_CONNEXION + '" style="color:var(--accent-texte)">Se connecter</a>.';
   }
@@ -1087,7 +1256,15 @@ function ancrer() {
   if (t) t.focus();
 }
 
+/* La recherche n'a rien rendu. On dit d'abord la verite mesuree, avec les
+   nombres de la base, ET SEULEMENT ENSUITE on montre a quoi ressemblerait un
+   resultat. Jamais l'inverse : l'exemple ne remplace pas l'explication, il
+   vient apres elle. */
 function vide(complet) {
+  return texteVide(complet) + blocExemples(complet, true);
+}
+
+function texteVide(complet) {
   let h = '<h2 class="compte" id="vide-titre" tabindex="-1">Personne pour l\'instant.</h2>';
   if (!complet) {
     h += '<p class="vide">Aucune fiche publiée ne correspond. Une fiche n\'apparaît ici '
@@ -1163,6 +1340,57 @@ function carte(v, complet) {
   }
 
   h += '<div class="pied-actions">' + versFiche(v) + "</div></div></div>";
+  return h;
+}
+
+/* ----------------------------------------------------- le bloc d'exemple
+   LA MENTION EST LE TOIT DU BLOC, pas une note posee a cote. Elle est dans le
+   meme conteneur que les six cartes, au-dessus d'elles, du meme trait
+   discontinu : on ne peut pas voir les fausses fiches sans elle. C'est la
+   contrepartie de l'exemple, elle ne se detache pas de lui.
+
+   Rend une chaine vide si la base a rendu quelque chose : dans ce cas les
+   vraies fiches sont a l'ecran et l'exemple n'aurait plus rien a montrer. */
+function blocExemples(complet, demande) {
+  if (baseRend) return "";
+  return '<section class="exemples" aria-label="Écrans d\'exemple">'
+       + '<p class="exemples-note">' + MENTION_EXEMPLE + "</p>"
+       + '<p class="exemples-quoi">Voilà ce que rend cet écran quand des confrères ont '
+       + "publié leur fiche. Aucune des six entreprises ci-dessous n'existe, et aucune "
+       + "n'est écrite en base : elles disparaissent d'elles-mêmes dès la première "
+       + "vraie fiche publiée.</p>"
+       + EXEMPLES.map((e) => carteExemple(e, complet, demande)).join("")
+       + "</section>";
+}
+
+/* La coche du SIRET. Un dessin, donc `aria-hidden` : le lecteur d'ecran doit
+   entendre la phrase, pas « image ». */
+const COCHE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+
+/* La carte d'exemple reprend le dessin de `carte()` a une difference pres, et
+   elle est volontaire : PAS DE BOUTON « Voir sa fiche ». Derriere ces six noms
+   il n'y a aucun identifiant, donc aucune fiche. Un bouton qui menerait a une
+   page introuvable est exactement le defaut que le reste de cet ecran evite. */
+function carteExemple(e, complet, demande) {
+  /* La distance ne s'affiche que si un point de depart existe VRAIMENT. Sans
+     commune choisie, la table des communes est vide ou muette : on n'ecrit
+     aucun kilometre, comme pour une vraie fiche. */
+  const loin = complet && commune ? e.distance_km : null;
+  const sous = [e.denomination, e.metier, e.commune + " (" + e.departement + ")"];
+
+  let h = '<div class="res"><span class="mono deux" aria-hidden="true">'
+        + echapper(e.initiales) + "</span>"
+        + '<div class="res-corps"><div class="res-tete"><h3>' + echapper(e.prenom) + "</h3>";
+  if (loin != null) h += '<span class="km">' + km(loin) + "</span>";
+  h += "</div>"
+     + '<p class="meta">' + echapper(sous.join(" · ")) + "</p>"
+     + '<p class="libre">' + echapper(libreQuand(e, demande)) + "</p>"
+     + '<p class="siret">' + COCHE + "<span>SIRET vérifié à l'annuaire officiel</span></p>"
+     + '<p class="note">' + note(e.note) + " sur 5 · " + nombre(e.avis, "avis", "avis") + "</p>"
+     + '<p class="pres">' + echapper(e.presentation) + "</p>"
+     + '<div class="pied-actions"><span class="vide">Exemple : il n\'y a pas de fiche '
+     + "derrière ce nom.</span></div>"
+     + "</div></div>";
   return h;
 }
 

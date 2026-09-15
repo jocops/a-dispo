@@ -1,4 +1,4 @@
-<title>Messages - À dispo</title>
+<title>Tes messages - À dispo</title>
 <!--
   LA MESSAGERIE INTERNE.
   Devis N°2, NON SIGNE, ligne « messagerie entre artisans ». La base qui la
@@ -78,9 +78,10 @@
        pas de photo de chantier, pas de devis en PDF. Ce n'est pas un oubli de
        la page, c'est le perimetre du lot, et la duree de conservation d'une
        photo n'est pas tranchee.
-    4. LA PAGE EST EMBALLEE. Releve du 14/09/2026 : `outils/build.py` porte
-       bien l'entree `messages/index.html` vers `dist/messages/index.html`.
-       Ce point disait le contraire, c'etait vrai le 13/09 et faux depuis.
+    4. LA PAGE EST EMBALLEE. Releve du 15/09/2026 : l'assembleur du depot est
+       `outils/construire.mjs`, et son tableau ECRANS porte bien l'entree
+       { dossier: "messages", url: "/messages" }. Ce point nommait
+       `outils/build.py`, qui n'existe plus dans ce depot.
        Emballee n'est pas deployee : l'adresse ne repond qu'apres une mise en
        ligne.
 
@@ -89,10 +90,12 @@
   moderation, duree de conservation des messages, delai de relance, fournisseur
   d'envoi. Aucune de ces cinq valeurs n'est inventee ici.
 
-  LE VOCABULAIRE. « A dispo » met en relation des ENTREPRISES INDEPENDANTES en
-  sous-traitance : on parle de confrere, de professionnel, de chantier. Jamais
-  d'embauche, de recrutement, de personnel ni d'interim, que l'article L8241-1
-  interdit entre entreprises a but lucratif.
+  LE VOCABULAIRE. « A dispo » met des ENTREPRISES INDEPENDANTES en sous-traitance :
+  on parle de confrere, de chantier, de lot, de demi-journee, de demande. Le
+  vocabulaire d'EMPLOI est proscrit sur tout l'ecran, y compris dans les exemples :
+  l'article L8241-1 punit le pret de main d'oeuvre a but lucratif de 150 000 euros
+  pour une personne morale. La page est ecrite au TUTOIEMENT, titres compris, comme
+  le reste du produit.
 
   POUR LES AUTRES PAGES : le compteur global de non-lus tient en un appel,
   `select public.mes_messages_non_lus()`, soit en JavaScript
@@ -256,7 +259,7 @@ ul.messages>li{scroll-margin-bottom:118px}
   box-shadow:inset 3px 0 0 var(--accent),var(--ombre-1)}
 /* Une non-lue. La couleur ne dit jamais rien toute seule : elle est doublee
    par la pastille chiffree et par le nom en gras. */
-.fil-item.non-lu{border-color:rgba(118,90,14,.45)}
+.fil-item.non-lu{border-color:rgba(225,33,84,.45)}
 .fil-item.non-lu .fil-nom{font-weight:700}
 .fil-txt{min-width:0;flex:1}
 .fil-haut{display:flex;align-items:baseline;gap:8px}
@@ -281,10 +284,12 @@ ul.messages>li{scroll-margin-bottom:118px}
 .photo,.mono{width:42px;height:42px;flex:none;border-radius:12px;
   border:1px solid var(--line);background:var(--surface)}
 .photo{object-fit:cover;display:block}
-/* L'AMBRE EN APLAT, L'ENCRE DESSUS : 10,06:1. En lettre ambre sur le puits,
-   l'initiale tombait a 1,53:1, c'est-a-dire nulle part. */
+/* L'APLAT D'ACCENT PORTE DU BLANC, JAMAIS L'ENCRE. Formule WCAG appliquee sur
+   #E12154 le 15/09/2026 : encre #191512 dessus vaut 3,93:1, sous le seuil de
+   4,5 ; le blanc vaut 4,62:1. Le commentaire precedent annoncait 10,06:1, une
+   valeur heritee de l'ancien ambre et fausse depuis le passage au rouge. */
 .mono{display:grid;place-items:center;background:var(--accent);border-color:var(--accent-2);
-  font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;color:var(--encre)}
+  font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;color:#fff}
 .tete-fil .photo,.tete-fil .mono{width:52px;height:52px;border-radius:15px;font-size:21px}
 
 /* ----------------------------------------------------------------- le fil */
@@ -323,7 +328,7 @@ ul.messages>li{scroll-margin-bottom:118px}
    que 1,17:1, deux bulles qui se ressemblent. La bulle « moi » prend donc le
    voile d'ambre, qui est un REMPLISSAGE et non une lettre, avec l'encre
    dessus. La bulle « lui » reste le papier blanc, filet plus ombre douce. */
-.msg.moi{margin-left:auto;background:var(--accent-soft);border:1px solid rgba(118,90,14,.22);
+.msg.moi{margin-left:auto;background:var(--accent-soft);border:1px solid rgba(225,33,84,.22);
   border-bottom-right-radius:5px}
 .msg.lui{margin-right:auto;background:var(--bg-2);border:1px solid var(--line);
   border-bottom-left-radius:5px;box-shadow:var(--ombre-1)}
@@ -469,7 +474,7 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
    l'ambre en lettre vaut 1,84:1 : il passe a l'ambre de texte, 5,69:1 sur son
    propre voile, avec un cerne de la meme famille. */
 .acompleter{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--accent-texte);
-  background:var(--accent-soft);border:1px solid rgba(118,90,14,.3);border-radius:5px;
+  background:var(--accent-soft);border:1px solid rgba(225,33,84,.3);border-radius:5px;
   padding:1px 7px;display:inline-block;overflow-wrap:anywhere}
 
 .pied{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
@@ -484,6 +489,35 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
 .sq{background:var(--agenda-fond);border-radius:10px;animation:respire 1.4s ease-in-out infinite}
 .sq.rond{width:42px;height:42px;border-radius:12px;flex:none}
 @keyframes respire{0%,100%{opacity:.55}50%{opacity:.85}}
+/* LA MENTION D'EXEMPLE. Elle n'est pas un ornement : elle est la contrepartie
+   des fausses donnees, et elle se pose DANS LE MEME BLOC qu'elles. Trait
+   discontinu et puits neutre, jamais l'accent : l'accent est rare sur cet
+   ecran, et il est deja pris par la pastille des non-lus. */
+/* ELLE RESTE SOUS LES YEUX PENDANT QU'ON LIT. Mesure au navigateur le
+   15/09/2026 : a l'ouverture d'un fil, la page se place toute seule sur le
+   dernier message (volet-fil a scrollTop 842 sur un document de 2 738 px), et
+   une mention posee en haut du volet etait deja sortie de l'ecran avant
+   d'avoir ete lue. Une mention qu'on ne lit pas ne vaut pas mieux qu'une
+   mention absente. Elle colle donc en haut de son propre bloc : sous 900 px au
+   ras de la barre de l'espace, qui fait 56 px ; au-dessus, au ras du volet,
+   qui est alors son propre conteneur de defilement. Fond opaque, sinon les
+   bulles defilent au travers. */
+.exemple-note{border:1px dashed var(--line);background:var(--surface);border-radius:12px;
+  padding:10px 13px;margin:0 0 10px;font-size:12.5px;line-height:1.5;color:var(--cream-mut);
+  position:sticky;top:56px;z-index:5}
+@media (min-width:900px){ .exemple-note{top:0} }
+.exemple-note.haut{margin:12px 0 0}
+.exemple-note b{font-family:"Space Grotesk",sans-serif;font-weight:600;color:var(--cream)}
+/* LES COMMANDES ETEINTES EN MODE EXEMPLE. Pas d'opacite : sur du clair, l'encre
+   la plus forte tombe a 3,49:1 des la demi-opacite. Le gris terne sur le puits
+   est mesure a 5,15:1, et `-webkit-text-fill-color` est indispensable, sinon
+   Safari repeint tout seul le texte d'un champ desactive. */
+.mini:disabled{background:var(--surface-2);color:var(--cream-dim);border-color:var(--line);
+  cursor:not-allowed}
+.mini:disabled:hover{border-color:var(--line);color:var(--cream-dim);background:var(--surface-2)}
+textarea:disabled{background:var(--surface-2);color:var(--cream-dim);
+  -webkit-text-fill-color:var(--cream-dim);opacity:1;cursor:not-allowed}
+textarea:disabled::placeholder{color:var(--cream-dim);-webkit-text-fill-color:var(--cream-dim)}
 .hors-ecran{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
 /* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE : le squelette cesse de respirer
@@ -536,7 +570,7 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
     width:248px;padding:18px 14px;background:var(--bg-2);border-right:1px solid var(--line);
     overflow-y:auto;z-index:20}
 }
-.menu-c .marque-c{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--cream);
+.menu-c .marque-c{display:flex;align-items:center;gap:.5em;min-height:44px;text-decoration:none;color:var(--cream);
   font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;padding:2px 10px 0;margin-bottom:24px}
 .menu-c .marque-c .a{color:var(--accent-texte)}
 .menu-c .marque-c svg{height:1.2em;width:auto;color:var(--accent-texte);flex:none}
@@ -555,7 +589,7 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
 .menu-c .aide-c b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--cream)}
 .menu-c .aide-c b i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
 .menu-c .aide-c p{margin:6px 0 0;font-size:12.5px;color:var(--cream-mut);line-height:1.5}
-.menu-c .aide-c a{color:var(--accent-texte)}
+.menu-c .aide-c a{color:var(--accent-texte);display:inline-flex;align-items:center;min-height:44px}
 
 .barre-app{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 var(--gut);
   border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;z-index:19;
@@ -572,7 +606,7 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
   overflow-y:auto;transform:translateX(-100%);transition:transform .22s ease}
 .tiroir.vu{transform:none}
 @media (prefers-reduced-motion:reduce){ .tiroir{transition:none} }
-.tiroir .fermer{position:absolute;top:14px;right:12px;min-width:40px;min-height:40px;
+.tiroir .fermer{position:absolute;top:10px;right:10px;min-width:44px;min-height:44px;
   background:none;border:0;color:var(--cream-mut);font-size:22px;line-height:1;cursor:pointer;border-radius:8px}
 .tiroir .fermer:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
 .nav-note{margin:0 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
@@ -589,7 +623,7 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
       <span><span class="a">à</span> dispo</span>
     </a>
     <nav class="haut-liens" aria-label="Aller à">
-      <a class="retour" href="/espace">Mon espace</a>
+      <a class="retour" href="/espace">Ton espace</a>
       <a class="retour" href="/aide">Des questions&nbsp;?</a>
     </nav>
   </div>
@@ -632,8 +666,8 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
   <p class="hors-ecran" id="annonce" role="status" aria-live="polite"></p>
 
   <div id="ecran">
-    <h1 tabindex="-1" id="t">Mes <span class="em">messages</span>.</h1>
-    <p class="lead" id="chargement-lead">Chargement de vos conversations…</p>
+    <h1 tabindex="-1" id="t">Tes <span class="em">messages</span>.</h1>
+    <p class="lead" id="chargement-lead">Chargement de tes conversations…</p>
     <div class="app" aria-busy="true">
       <div class="volet liste">
         <ul class="fils">
@@ -652,14 +686,14 @@ label.champ{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600
   </div>
 
   <div class="pied" id="pied">
-    Les messages échangés ici restent entre les deux professionnels concernés. La modération ne peut
+    Les messages échangés ici restent entre les deux confrères concernés. La modération ne peut
     lire un fil que s'il a été signalé, et rien d'autre. Un message envoyé ne se modifie ni ne
     s'efface, pour personne&nbsp;: c'est ce qui permet de s'y référer plus tard.
     <br>
     Combien de temps les conservons-nous&nbsp;? Ce n'est pas encore arrêté&nbsp;:
     <span class="acompleter">[A COMPLETER : durée de conservation des messages]</span>. Aucun
     effacement automatique n'est programmé tant que la réponse n'est pas écrite, parce qu'effacer
-    sur une durée inventée détruirait des échanges dont vous pourriez avoir besoin.
+    sur une durée inventée détruirait des échanges dont tu pourrais avoir besoin.
   </div>
 </div>
 
@@ -688,6 +722,103 @@ const PAGE = 60;
 const RYTHME = 25000;
 const MAX_CORPS = 4000;   /* contrainte `corps_utile` de la base, recopiee ici */
 
+/* ====================================================================
+   LES EXEMPLES
+   ====================================================================
+   POURQUOI. Sans session et sans une seule ligne en base, cet ecran ne montre
+   rien : on ne peut ni le juger, ni le montrer. EXEMPLES tient trois
+   conversations inventees, et elles NE SERVENT QUE quand la base ne rend rien.
+   Des qu'une vraie conversation existe, ce bloc n'est plus lu.
+
+   QUATRE REGLES TIENNENT CE BLOC, ET AUCUNE N'EST DECORATIVE :
+
+   1. RIEN N'EST ECRIT EN BASE. Aucune de ces lignes ne part vers Supabase. En
+      mode exemple la zone de saisie et les trois actions sont eteintes, elles
+      ne portent plus d'identifiant, donc plus aucun gestionnaire ne s'y
+      accroche, et envoyer(), bloquer(), clore(), debloquer() et
+      envoyerSignalement() refusent en plus des le premier mot. Deux verrous
+      pour la meme porte, parce qu'un exemple qui ecrit dans la base salirait
+      des donnees vraies.
+
+   2. LA MENTION EST DANS LE MEME BLOC VISUEL QUE LES FAUSSES DONNEES, dans la
+      LISTE et dans le FIL, pas seulement en haut de page. Sous 900 px un seul
+      des deux volets est a l'ecran : une mention posee dans l'autre ne serait
+      jamais lue. Un produit qui montre de faux chiffres sans le dire apprend a
+      son utilisateur qu'il ne peut pas le croire.
+
+   3. LES DATES SE CALCULENT A L'OUVERTURE. Un exemple date en dur vieillit :
+      « du 3 au 5 septembre » lu en decembre se lit comme un defaut du produit.
+      Les deux chantiers a venir sont donc ancres sur le LUNDI qui vient, et
+      les jours nommes dans les messages (lundi, mercredi, jeudi, vendredi)
+      sont ceux que ce calcul produit. Le chantier termine, lui, ne nomme aucun
+      jour dans ses messages : il n'a donc rien a faire correspondre.
+
+   4. LE VOCABULAIRE DES MESSAGES EST CELUI DU PRODUIT. Des entreprises
+      independantes qui se sous-traitent un lot parlent d'acces, de materiel et
+      d'heure d'arrivee. Aucun de ces messages ne parle d'emploi, et toute
+      disponibilite y est nommee avec son jour : « libre jeudi et vendredi »,
+      jamais « libre ».
+
+   `il` est l'age du message en minutes, du plus ancien au plus recent, dans
+   l'ordre ou le fil les peint. `nonLu` ne vaut que pour des messages recus.
+*/
+const EXEMPLES = [
+  {
+    id: "exemple-couverture",
+    prenom: "Karim", entreprise: "Benali Couverture",
+    metier: "Couvreur", commune: "Aix-les-Bains",
+    /* `duree` est un ECART, pas un compte : lundi + 1 fait deux jours a
+       l'ecran, ce que le premier message annonce. */
+    chantier: { libelle: "Couverture", commune: "Saint-Alban-Leysse",
+                ancre: "venir", depart: 0, duree: 1 },
+    messages: [
+      { de: "lui", il: 3480, corps: "Salut. 90 m² de toiture, tuiles plates, deux pans. Deux jours à deux, ça le fait ?" },
+      { de: "moi", il: 3450, corps: "Oui. J'amène mon échafaudage, il est monté en une heure." },
+      { de: "lui", il: 1920, corps: "Le camion passe par le chemin du bas. Portail de 2,40 m, ton fourgon passe ?" },
+      { de: "moi", il: 1870, corps: "2,10 m rétros compris. Ça passe." },
+      { de: "lui", il:  180, corps: "Je suis sur place lundi à 7 h 30. La clé du portail est chez le voisin du 12.", nonLu: true },
+      { de: "lui", il:   35, corps: "Prends tes crochets, il n'y a pas d'ancrage sur le faîtage.", nonLu: true }
+    ]
+  },
+  {
+    id: "exemple-platrerie",
+    prenom: "Sofiane", entreprise: "Vidal Plâtrerie",
+    metier: "Plaquiste", commune: "Aix-les-Bains",
+    chantier: { libelle: "Plâtrerie", commune: "Grésy-sur-Aix",
+                ancre: "venir", depart: 3, duree: 1 },
+    messages: [
+      { de: "moi", il: 5940, corps: "Salut Sofiane. 120 m² de BA13 sur rails, plafond à 2,60 m. Tu es libre jeudi et vendredi ?" },
+      { de: "lui", il: 5880, corps: "Jeudi et vendredi, c'est bon. Les plaques sont déjà sur place ?" },
+      { de: "moi", il: 4620, corps: "Livraison mercredi après-midi. Elles seront au rez-de-chaussée, sous bâche." },
+      { de: "lui", il: 4560, corps: "Ok. Je passe prendre les côtes mercredi soir, le temps que ce soit rentré." },
+      { de: "lui", il: 1640, corps: "Je serai là jeudi à 8 h avec le lève-plaque." },
+      { de: "moi", il: 1590, corps: "Le portail s'ouvre avec le code 1947. Le parking est derrière, côté rue Basse." }
+    ]
+  },
+  {
+    id: "exemple-electricite",
+    prenom: "Élodie", entreprise: "Ferrand Électricité",
+    metier: "Électricienne", commune: "Le Bourget-du-Lac",
+    ferme: true,
+    /* Le chantier clos part d'un lundi PASSE : compte en jours calendaires,
+       il tombait un samedi deux fois sur sept. Et lundi + 2 fait les trois
+       jours que les deux artisans se sont dits. */
+    chantier: { libelle: "Électricité", commune: "Voglans",
+                ancre: "passe", depart: 0, duree: 2 },
+    messages: [
+      { de: "moi", il: 23220, corps: "Salut Élodie. Tableau à reprendre, 14 modules, plus 6 points lumineux. Trois jours ?" },
+      { de: "lui", il: 23160, corps: "Trois jours oui, si le maçon a fini les saignées. Je passe voir avant." },
+      { de: "moi", il: 19020, corps: "Saignées finies. Le compteur est dans le garage, la clé est sous la jardinière." },
+      { de: "lui", il: 16240, corps: "Tableau posé, consuel passé. Je te laisse le plan dans la gaine technique." },
+      { de: "moi", il: 16190, corps: "Reçu, merci. Je clos le fil, on se rappelle pour la suite." }
+    ]
+  }
+];
+
+/* L'identifiant de secours quand il n'y a pas de session du tout : il ne sert
+   qu'a distinguer mes bulles des siennes a l'ecran, et ne part nulle part. */
+const MOI_EXEMPLE = "exemple-moi";
+
 let sb = null;
 let moi = null;            /* l'identifiant de session, qui est aussi artisans.id */
 let fils = [];             /* ce que rend mes_conversations() */
@@ -710,6 +841,11 @@ let chantiersAbsents = false; /* public.demandes pas encore jouee */
    sur un chantier. Il est garde ici, et la zone de saisie le reprend a chaque
    fois qu'elle est reconstruite. */
 let brouillon = "";
+/* Le mode exemple. Il ne s'allume que quand la base ne rend rien, et il
+   s'eteint tout seul des qu'elle rend une conversation. */
+let modeExemple = false;
+let exempleMessages = new Map();  /* conversation_id -> messages inventes */
+let blocAvant = "";               /* ce qui se glisse entre le chapeau et la grille */
 
 /* ------------------------------------------------------------ le client
    Charge a la demande : le module pese quelques dizaines de kilo-octets, et
@@ -804,6 +940,101 @@ function periode(debut, fin) {
        + " au " + b.getDate() + " " + MOIS[b.getMonth()] + " " + b.getFullYear();
 }
 
+/* ------------------------------------------------- les dates des exemples
+   Midi plutot que minuit : a minuit, un changement d'heure d'ete fait basculer
+   la date d'un jour dans un sens ou dans l'autre. */
+function aujourdhui() { const d = new Date(); d.setHours(12, 0, 0, 0); return d; }
+function plusJours(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+/* Le lundi QUI VIENT, jamais celui d'aujourd'hui : un chantier d'exemple qui
+   commence le jour meme se lit comme un chantier deja commence. */
+function prochainLundi() {
+  const d = aujourdhui();
+  let ecart = (1 - d.getDay() + 7) % 7;
+  if (ecart === 0) ecart = 7;
+  return plusJours(d, ecart);
+}
+/* Le lundi le plus recent a au moins dix-huit jours d'ici. Le fil clos se
+   termine sur « tableau pose, consuel passe » : ce message doit venir APRES la
+   fin du chantier, sinon le fil annonce un travail fait sur un chantier qui
+   n'a pas commence. */
+function lundiPasse() {
+  const d = plusJours(aujourdhui(), -18);
+  while (d.getDay() !== 1) d.setDate(d.getDate() - 1);
+  return d;
+}
+function isoJour(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+       + "-" + String(d.getDate()).padStart(2, "0");
+}
+
+/* Fabrique les trois conversations d'exemple dans les memes formes que la base :
+   `fils` prend ce que rendrait mes_conversations(), `chantiers` ce que rendrait
+   public.demandes, `exempleMessages` ce que rendrait public.messages. Le reste
+   de la page n'a donc AUCUN cas particulier a connaitre pour les afficher. */
+function entrerExemples() {
+  modeExemple = true;
+  if (!moi) moi = MOI_EXEMPLE;
+  const maintenant = Date.now();
+  const lundi = prochainLundi();
+  fils = [];
+  exempleMessages = new Map();
+  EXEMPLES.forEach((e) => {
+    const c = e.chantier;
+    const base = c.ancre === "passe" ? lundiPasse()
+               : c.ancre ? lundi : aujourdhui();
+    const debut = plusJours(base, c.depart);
+    const demandeId = e.id + "-demande";
+    chantiers.set(demandeId, {
+      id: demandeId, metier: c.libelle, chantier_commune: c.commune,
+      debut: isoJour(debut), fin: isoJour(plusJours(debut, c.duree)), etat: "acceptee"
+    });
+    const msgs = e.messages.map((m, i) => {
+      const quand = new Date(maintenant - m.il * 60000).toISOString();
+      return { id: e.id + "-m" + i, corps: m.corps,
+               auteur_id: m.de === "moi" ? moi : e.id,
+               envoye_le: quand, lu_le: m.nonLu ? null : quand };
+    });
+    exempleMessages.set(e.id, msgs);
+    const dernier = msgs[msgs.length - 1];
+    fils.push({
+      conversation_id: e.id, interlocuteur_id: e.id,
+      interlocuteur_prenom: e.prenom, interlocuteur_entreprise: e.entreprise,
+      interlocuteur_metier: e.metier, interlocuteur_commune: e.commune,
+      interlocuteur_photo: null, demande_id: demandeId,
+      dernier_le: dernier.envoye_le,
+      dernier_extrait: dernier.corps.slice(0, 120),
+      dernier_de_moi: dernier.auteur_id === moi,
+      non_lus: e.messages.filter((m) => m.nonLu).length,
+      ferme: !!e.ferme, bloque_par_moi: false
+    });
+  });
+}
+
+/* ON QUITTE LES EXEMPLES DES QU'UNE VRAIE CONVERSATION EXISTE, et par un seul
+   chemin. Deux endroits y menent : le rafraichissement qui voit enfin des
+   lignes, et `?demande=` qui vient d'en faire ouvrir une. Les fausses donnees
+   ne doivent jamais se melanger aux vraies, ni la mention rester affichee
+   au-dessus de vrais noms : ce serait le mensonge inverse. */
+function sortirExemples() {
+  if (!modeExemple) return;
+  modeExemple = false;
+  blocAvant = "";
+  exempleMessages = new Map();
+  ouvert = null; messages = [];
+  chantiers = new Map();   /* les faux chantiers partent avec eux */
+}
+
+/* LA MENTION. Elle se pose dans le volet de la liste ET dans celui du fil :
+   sous 900 px, un seul des deux est a l'ecran a la fois. La phrase exacte tient
+   en un seul morceau de texte, pour qu'elle se releve telle quelle dans le
+   fichier comme dans la page. */
+function noteExemple(haut) {
+  return '<p class="exemple-note' + (haut ? " haut" : "") + '">'
+    + "<b>Écrans d'exemple. Les noms, les notes et les dates sont fictifs.</b> "
+    + "Dès qu'une vraie conversation s'ouvre, elle prend leur place et cette mention "
+    + "disparaît.</p>";
+}
+
 /* --------------------------------------------------------- petites briques */
 function avatar(f, gros) {
   const nom = f.interlocuteur_prenom || f.interlocuteur_entreprise || "";
@@ -819,7 +1050,7 @@ function nomDe(f) {
   if (!f.interlocuteur_id) return "Compte supprimé";
   return f.interlocuteur_prenom
     ? (f.interlocuteur_prenom + (f.interlocuteur_entreprise ? " · " + f.interlocuteur_entreprise : ""))
-    : (f.interlocuteur_entreprise || "Professionnel sans fiche publiée");
+    : (f.interlocuteur_entreprise || "Confrère sans fiche publiée");
 }
 function sousTitreDe(f) {
   const bouts = [];
@@ -847,14 +1078,16 @@ function chantierDe(f) {
    ==================================================================== */
 function peindre() {
   const total = fils.reduce((n, f) => n + (f.non_lus || 0), 0);
-  document.title = total ? "(" + total + ") " + motDeLaPage : motDeLaPage;
+  /* JAMAIS DE COMPTEUR D'ONGLET SUR DES EXEMPLES : « (2) » dans l'onglet, c'est
+     la promesse que deux vrais messages attendent. */
+  document.title = (total && !modeExemple) ? "(" + total + ") " + motDeLaPage : motDeLaPage;
   /* On note ce qui est a l'ecran : le rafraichissement ne repeindra que si
      quelque chose a change pour de bon. */
   empreinte = signature();
 
-  let h = '<h1 tabindex="-1" id="t">Mes <span class="em">messages</span>.</h1>';
+  let h = '<h1 tabindex="-1" id="t">Tes <span class="em">messages</span>.</h1>';
   if (!fils.length) {
-    h += '<p class="lead">Vos conversations s\'ouvrent quand une mise en relation est acceptée.</p>'
+    h += '<p class="lead">Tes conversations s\'ouvrent quand une demande est acceptée.</p>'
        + ecranVide()
        + carteNonBranche();
     ecran.innerHTML = h;
@@ -862,20 +1095,27 @@ function peindre() {
     return;
   }
 
-  h += '<p class="lead">' + (total
-        ? "<b>" + total + " message" + (total > 1 ? "s" : "") + " non lu"
-          + (total > 1 ? "s" : "") + ".</b> "
-        : "")
+  h += '<p class="lead">' + (modeExemple
+        ? "Voici à quoi ressemble la messagerie une fois en service. "
+        : (total
+            ? "<b>" + total + " message" + (total > 1 ? "s" : "") + " non lu"
+              + (total > 1 ? "s" : "") + ".</b> "
+            : ""))
      + "Chaque conversation reste attachée au chantier pour lequel elle a été ouverte.</p>"
+     + blocAvant
      + '<div class="app" data-vue="' + (ouvert ? "fil" : "liste") + '" id="app">'
      +   '<div class="volet liste">'
      +     '<div class="titre-volet"><h2>Conversations</h2>'
      +       '<span class="compte">' + fils.length + (fils.length > 1 ? " fils" : " fil") + "</span></div>"
+     +     (modeExemple ? noteExemple() : "")
      +     '<ul class="fils">' + fils.map(ligneListe).join("") + "</ul>"
      +     boutonBloques()
      +   "</div>"
      +   '<div class="volet fil" id="volet-fil">' + (ouvert ? volet() : accueilFil()) + "</div>"
-     + "</div>";
+     + "</div>"
+     /* Ce qui n'est pas raccorde reste dit, exemples ou pas : montrer le produit
+        plein ne doit pas faire oublier ce qui ne marche pas encore. */
+     + (modeExemple ? carteNonBranche() : "");
   ecran.innerHTML = h;
   brancher();
 }
@@ -893,8 +1133,8 @@ function ligneListe(f) {
     +   (ch ? '<span class="fil-chantier">' + echapper(ch) + "</span>" : "")
     +   '<span class="fil-extrait">'
     +     (f.dernier_extrait
-        ? (f.dernier_de_moi ? "Vous : " : "") + echapper(f.dernier_extrait)
-        : "Aucun message pour l'instant. À vous d'écrire le premier.")
+        ? (f.dernier_de_moi ? "Toi : " : "") + echapper(f.dernier_extrait)
+        : "Aucun message pour l'instant. À toi d'écrire le premier.")
     +   "</span>"
     +   (f.ferme ? '<span class="fil-etiq">Close</span>' : "")
     +   (f.bloque_par_moi ? '<span class="fil-etiq bloque">Bloqué</span>' : "")
@@ -907,13 +1147,14 @@ function ligneListe(f) {
 function ecranVide() {
   return '<div class="vide"><h3>Aucune conversation pour l\'instant.</h3>'
     + "<p>C'est l'état normal d'un compte neuf, pas une panne. Une conversation s'ouvre "
-    + "quand un confrère accepte votre demande, ou quand vous acceptez la sienne.</p>"
+    + "quand un confrère accepte ta demande, ou quand tu acceptes la sienne.</p>"
     + '<div class="pied-actions" id="vers-demandes"></div></div>';
 }
 
 /* L'ecran d'accueil du volet de droite sur grand ecran : jamais un blanc. */
 function accueilFil() {
-  return '<div class="vide"><h3>Choisissez une conversation.</h3>'
+  return (modeExemple ? noteExemple() : "")
+    + '<div class="vide"><h3>Choisis une conversation.</h3>'
     + "<p>Le fil s'affiche ici, avec le rappel du chantier auquel il se rattache.</p></div>";
 }
 
@@ -924,6 +1165,9 @@ function volet() {
   const f = ouvert, ch = chantierDe(f), d = f.demande_id ? chantiers.get(f.demande_id) : null;
   let h = '<button class="retour mini retour-fil" id="retour" type="button">'
         + '<span aria-hidden="true">‹</span> Conversations</button>'
+        /* LA MENTION AVANT LES FAUX NOMS, pas apres : elle doit etre lue avant
+           ce qu'elle qualifie. */
+        + (modeExemple ? noteExemple(true) : "")
         + '<div class="tete-fil" style="margin-top:12px">' + avatar(f, true)
         + '<div class="tete-txt"><h2 class="tete-nom" tabindex="-1" id="tete-nom">'
         + echapper(nomDe(f)) + "</h2>"
@@ -935,16 +1179,16 @@ function volet() {
   if (ch) {
     h += '<div class="bandeau"><span class="quoi">Chantier rattaché</span><b>' + echapper(ch) + "</b>"
        + (d && d.etat && d.etat !== "acceptee"
-          ? "<br>État de la mise en relation : " + echapper(d.etat) + "." : "")
+          ? "<br>État de la demande : " + echapper(d.etat) + "." : "")
        + "</div>";
   } else if (f.demande_id && chantiersAbsents) {
     h += '<div class="bandeau"><span class="quoi">Chantier rattaché</span>'
-       + "Le rappel du chantier ne peut pas être affiché&nbsp;: la table des mises en relation "
+       + "Le rappel du chantier ne peut pas être affiché&nbsp;: la table des demandes "
        + "n'est pas encore jouée sur la base.<br>"
        + "<code>Côté technique : jouer crm/supabase/migration-recherche-relations.sql.</code></div>";
   } else if (f.demande_id) {
     h += '<div class="bandeau"><span class="quoi">Chantier rattaché</span>'
-       + "Cette demande ne vous est plus lisible&nbsp;: elle a pu être supprimée avec le compte "
+       + "Cette demande ne t'est plus lisible&nbsp;: elle a pu être supprimée avec le compte "
        + "de son auteur. La conversation, elle, reste lisible.</div>";
   }
 
@@ -955,8 +1199,8 @@ function volet() {
   if (!f.interlocuteur_id) {
     h += '<div class="carte eteinte"><h3>Ce compte a été supprimé'
        + '<span class="quand">lecture seule</span></h3>'
-       + "<p>Le professionnel avec qui vous parliez a supprimé son compte. Vos échanges restent "
-       + "lisibles ici, parce qu'ils sont aussi les vôtres, mais plus personne ne les lira de "
+       + "<p>Le confrère avec qui tu parlais a supprimé son compte. Tes échanges restent "
+       + "lisibles ici, parce qu'ils sont aussi les tiens, mais plus personne ne les lira de "
        + "l'autre côté.</p></div>";
   }
 
@@ -967,13 +1211,27 @@ function volet() {
        + "celui qui l'a close.</p></div>";
   }
   if (f.bloque_par_moi) {
-    h += '<div class="carte eteinte"><h3>Vous avez bloqué ce professionnel'
-       + '<span class="quand">à votre initiative</span></h3>'
-       + "<p>Vous ne pouvez plus lui écrire, et il ne peut plus vous écrire. Il n'en a pas été "
+    h += '<div class="carte eteinte"><h3>Tu as bloqué ce confrère'
+       + '<span class="quand">à ton initiative</span></h3>'
+       + "<p>Tu ne peux plus lui écrire, et il ne peut plus t'écrire. Il n'en a pas été "
        + "informé.</p>"
        + '<div class="pied-actions"><button class="bouton creux" id="debloquer">Retirer le blocage</button></div></div>';
   }
 
+  /* EN MODE EXEMPLE, LES TROIS ACTIONS SONT LA MAIS ETEINTES, et elles ne
+     portent AUCUN identifiant : brancherFil() ne trouve rien a quoi s'accrocher,
+     donc rien ne peut partir vers la base. Les montrer eteintes plutot que les
+     retirer garde la forme reelle de l'ecran sous les yeux. */
+  if (modeExemple) {
+    h += '<div class="actions-fil">'
+       + '<button class="mini" type="button" disabled>Signaler</button>'
+       + '<button class="mini danger" type="button" disabled>Bloquer</button>'
+       + (f.ferme ? "" : '<button class="mini danger" type="button" disabled>Clore</button>')
+       + "</div>"
+       + '<p class="aide">Ces trois actions écriraient dans la base&nbsp;: sur une conversation '
+       + "d'exemple, elles ne font rien.</p>"
+       + '<div id="panneau"></div>';
+  } else {
   h += '<div class="actions-fil">'
      + (choixMessage
         ? '<button class="mini" id="annuler-choix" type="button">Annuler le choix</button>'
@@ -983,10 +1241,11 @@ function volet() {
      + (f.ferme ? "" : '<button class="mini danger" id="a-clore" type="button">Clore</button>')
      + "</div>"
      + '<div id="panneau"></div>';
+  }
 
   if (choixMessage) {
-    h += '<div class="bandeau" role="status">Touchez le message à signaler. '
-       + "Seuls les messages de votre interlocuteur peuvent être signalés.</div>";
+    h += '<div class="bandeau" role="status">Touche le message à signaler. '
+       + "Seuls les messages de ton interlocuteur peuvent être signalés.</div>";
   }
 
   /* PAS D'`aria-live` SUR LE FIL LUI-MEME. Le fil est reconstruit en entier a
@@ -998,20 +1257,35 @@ function volet() {
   /* LA ZONE DE SAISIE N'EXISTE QUE SI L'ENVOI EST POSSIBLE. Un champ qui
      refuse a chaque frappe est pire qu'un champ absent accompagne de la
      raison. */
-  if (f.ferme) {
+  if (modeExemple && !f.ferme) {
+    /* La zone de saisie reste VISIBLE et eteinte : c'est elle qu'on vient
+       regarder, et un champ absent ne montrerait pas l'ecran tel qu'il sera.
+       Ni `id="corps"` ni `id="envoyer"` ici : sans eux, aucun gestionnaire. */
+    h += '<div class="saisie"><div class="saisie-boite">'
+       + '<label class="hors-ecran" for="corps-ex">Ton message</label>'
+       + '<textarea id="corps-ex" rows="1" disabled '
+       +   'placeholder="Conversation d\'exemple : on n\'y écrit pas."></textarea>'
+       + '<button class="envoyer" type="button" disabled aria-label="Envoyer le message">'
+       +   '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
+       +   'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+       +   '<path d="M4 12h15M13 6l6 6-6 6"/></svg></button>'
+       + "</div>"
+       + '<div class="sous-saisie"><span>Ta vraie conversation, elle, s\'écrira ici.</span>'
+       + "</div></div>";
+  } else if (f.ferme) {
     h += '<p class="aide" style="margin-top:16px">Cette conversation est close&nbsp;: '
        + "on ne peut plus y écrire.</p>";
   } else if (!f.interlocuteur_id) {
     h += '<p class="aide" style="margin-top:16px">Il n\'y a plus personne à qui écrire dans '
        + "cette conversation.</p>";
   } else if (f.bloque_par_moi) {
-    h += '<p class="aide" style="margin-top:16px">Retirez le blocage ci-dessus pour pouvoir '
+    h += '<p class="aide" style="margin-top:16px">Retire le blocage ci-dessus pour pouvoir '
        + "écrire à nouveau.</p>";
   } else {
     h += '<div class="saisie"><div class="saisie-boite">'
-       + '<label class="hors-ecran" for="corps">Votre message</label>'
+       + '<label class="hors-ecran" for="corps">Ton message</label>'
        + '<textarea id="corps" rows="1" maxlength="' + MAX_CORPS + '" '
-       +   'placeholder="Votre message…" aria-describedby="aide-corps e-corps"></textarea>'
+       +   'placeholder="Ton message…" aria-describedby="aide-corps e-corps"></textarea>'
        + '<button class="envoyer" id="envoyer" type="button" aria-label="Envoyer le message">'
        +   '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
        +   'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
@@ -1038,8 +1312,8 @@ function listeMessages() {
       + "</div></div></li>";
   if (!messages.length)
     return '<li><div class="vide"><h3>Rien n\'a encore été écrit.</h3>'
-      + "<p>Dites en deux lignes ce dont il s'agit&nbsp;: le chantier, les dates, ce que vous "
-      + "attendez. Un premier message précis reçoit une réponse plus vite.</p></div></li>";
+      + "<p>Dis en deux lignes ce dont il s'agit&nbsp;: le chantier, les dates, ce que tu "
+      + "attends. Un premier message précis reçoit une réponse plus vite.</p></div></li>";
 
   let h = "";
   if (encorePlusVieux)
@@ -1077,8 +1351,8 @@ function listeMessages() {
    ==================================================================== */
 function carteNonBranche() {
   return '<div class="carte eteinte"><h3>Personne n\'est prévenu par mail'
-    + '<span class="quand">pas encore branché</span></h3>'
-    + "<p>Tant que ce point n'est pas réglé, votre confrère ne verra votre message qu'en ouvrant "
+    + '<span class="quand">pas encore raccordé</span></h3>'
+    + "<p>Tant que ce point n'est pas réglé, ton confrère ne verra ton message qu'en ouvrant "
     + "cette page. Il n'en est averti par rien.</p>"
     + "<p>Le message type est écrit, la base sait déjà qui relancer. Ce qui manque&nbsp;: "
     + "le service d'envoi n'est pas choisi, et le délai avant la relance n'est pas arrêté.</p>"
@@ -1089,7 +1363,7 @@ function carteNonBranche() {
     + "clé publique.</code></p></div>"
     + '<div class="carte eteinte"><h3>Ni photo ni document<span class="quand">hors lot</span></h3>'
     + "<p>On n'échange ici que du texte. Pour envoyer une photo de chantier ou un devis, passez "
-    + "par vos moyens habituels en attendant&nbsp;: le stockage des pièces et leur durée de "
+    + "par tes moyens habituels en attendant&nbsp;: le stockage des pièces et leur durée de "
     + "conservation restent à décider.</p></div>";
 }
 
@@ -1097,12 +1371,12 @@ function carteNonBranche() {
    LES PANNEAUX : signaler, bloquer, clore, personnes bloquées
    ==================================================================== */
 const MOTIFS = [
-  ["demarchage", "Démarchage", "Il propose autre chose que du travail entre professionnels."],
+  ["demarchage", "Démarchage", "Il propose autre chose que du travail entre confrères."],
   ["insultes",   "Insultes ou menaces", "Propos agressifs, injurieux ou menaçants."],
   ["hors_sujet", "Hors sujet", "Sans rapport avec le chantier ni avec le métier."],
   ["arnaque",    "Tentative d'arnaque", "Demande d'argent, de coordonnées bancaires, pression."],
   ["usurpation", "Usurpation d'identité", "Il se présente comme une entreprise qui n'est pas la sienne."],
-  ["autre",      "Autre", "Dites-nous en deux lignes ce qui se passe."]
+  ["autre",      "Autre", "Dis-nous en deux lignes ce qui se passe."]
 ];
 
 function ouvrirPanneau(quoi, m) {
@@ -1124,7 +1398,7 @@ function fermerPanneau() {
 
 function panneauSignaler() {
   return '<div class="panneau" role="group" aria-labelledby="p-titre">'
-    + '<h3 id="p-titre">Signaler' + (cible ? " ce message" : " ce professionnel") + "</h3>"
+    + '<h3 id="p-titre">Signaler' + (cible ? " ce message" : " ce confrère") + "</h3>"
     + (cible ? '<div class="cite">' + echapper(cible.corps) + "</div>" : "")
     /* LA CONSEQUENCE N'EST PAS LA MEME DANS LES DEUX CAS, et la dire de travers
        serait pire que de se taire. Le droit de lecture de la moderation
@@ -1136,24 +1410,24 @@ function panneauSignaler() {
           + "modération obtient le droit de lire cette conversation. Aujourd'hui, personne chez "
           + "«&nbsp;à dispo&nbsp;» ne peut la lire&nbsp;; signaler un message ouvre ce droit sur "
           + "ce fil, et sur lui seul.</p>"
-        : "<p><b>Ce que ça déclenche&nbsp;:</b> la modération reçoit votre signalement, mais "
+        : "<p><b>Ce que ça déclenche&nbsp;:</b> la modération reçoit ton signalement, mais "
           + "elle <b>ne pourra pas lire cette conversation</b>. Ce droit ne s'ouvre qu'en "
-          + "signalant un message précis. Si vous voulez qu'elle voie ce qui a été écrit, "
-          + "revenez en arrière et désignez le message.</p>")
-    + "<p>Le signalement est conservé, même si vous supprimez votre compte plus tard. "
+          + "signalant un message précis. Si tu veux qu'elle voie ce qui a été écrit, "
+          + "reviens en arrière et désigne le message.</p>")
+    + "<p>Le signalement est conservé, même si tu supprimes ton compte plus tard. "
     + "C'est ce qui permet de repérer quelqu'un qui recommence.</p>"
     + '<div class="motifs" role="radiogroup" aria-labelledby="p-titre" aria-describedby="e-motif">'
     + MOTIFS.map(([code, titre, quoi]) =>
         '<label class="motif"><input type="radio" name="motif" value="' + code + '">'
         + "<span><b>" + titre + "</b><span>" + quoi + "</span></span></label>").join("")
     + "</div>"
-    + '<p class="err" id="e-motif" role="alert">Choisissez un motif : c\'est lui qui oriente le traitement.</p>'
+    + '<p class="err" id="e-motif" role="alert">Choisis un motif : c\'est lui qui oriente le traitement.</p>'
     + '<label class="champ" for="detail">En deux lignes, ce qui s\'est passé '
     +   '<span style="font-family:Karla,sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px">facultatif</span></label>'
     + '<textarea id="detail" rows="3" maxlength="2000" aria-describedby="aide-detail e-detail" '
     +   'placeholder="Il m\'a redemandé mes coordonnées bancaires après le premier refus."></textarea>'
     + '<p class="err" id="e-detail" role="alert"></p>'
-    + '<p class="aide" id="aide-detail">2 000 caractères au maximum. N\'y mettez pas de mot de passe '
+    + '<p class="aide" id="aide-detail">2 000 caractères au maximum. N\'y mets pas de mot de passe '
     + "ni de numéro de carte&nbsp;: la modération lira ce texte.</p>"
     + '<p class="aide">Délai de traitement&nbsp;: <span class="acompleter">[A COMPLETER : délai de '
     + "traitement d'un signalement]</span>. Nous ne nous engageons pas sur un délai que personne "
@@ -1167,24 +1441,24 @@ function panneauBloquer() {
   return '<div class="panneau" role="group" aria-labelledby="p-titre">'
     + '<h3 id="p-titre">Bloquer ' + echapper(nomDe(f)) + "&nbsp;?</h3>"
     + "<p><b>Ce que ça change, tout de suite&nbsp;:</b></p>"
-    + "<p>· Il ne pourra plus vous écrire, dans cette conversation ni dans aucune autre.<br>"
-    + "· Vous ne pourrez plus lui écrire non plus&nbsp;: un blocage coupe les deux sens, sinon il "
+    + "<p>· Il ne pourra plus t'écrire, dans cette conversation ni dans aucune autre.<br>"
+    + "· Tu ne pourras plus lui écrire non plus&nbsp;: un blocage coupe les deux sens, sinon il "
     + "suffirait de bloquer quelqu'un pour l'empêcher de répondre tout en continuant à lui "
     + "écrire.<br>"
-    + "· Aucune conversation ne pourra s'ouvrir entre vous, même après une nouvelle mise en "
-    + "relation.<br>"
+    + "· Aucune conversation ne pourra s'ouvrir entre vous, même après une nouvelle demande "
+    + "acceptée.<br>"
     + "· <b>Il n'en est pas informé.</b> Il lira seulement, s'il essaie d'écrire, que la "
     + "conversation est fermée.<br>"
     + "· Les messages déjà échangés restent lisibles par vous deux.</p>"
-    + "<p>Vous pouvez retirer ce blocage quand vous voulez, depuis cette conversation ou depuis "
+    + "<p>Tu peux retirer ce blocage quand tu veux, depuis cette conversation ou depuis "
     + "«&nbsp;Personnes bloquées&nbsp;» au bas de la liste.</p>"
-    + '<label class="champ" for="motif-bloc">Pourquoi, pour vous en souvenir '
+    + '<label class="champ" for="motif-bloc">Pourquoi, pour t\'en souvenir '
     +   '<span style="font-family:Karla,sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px">facultatif</span></label>'
     + '<input id="motif-bloc" maxlength="200" aria-describedby="aide-bloc" '
     +   'placeholder="Relances incessantes" '
     +   'style="width:100%;font:inherit;color:var(--cream);background:var(--surface);'
     +   'border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none;min-height:48px">'
-    + '<p class="aide" id="aide-bloc">Vous seul le voyez. La modération le voit si un signalement suit.</p>'
+    + '<p class="aide" id="aide-bloc">Toi seul le vois. La modération le voit si un signalement suit.</p>'
     + '<div class="pied-actions"><button class="bouton rouge" id="p-ok">Bloquer</button>'
     + '<button class="bouton creux" id="p-non">Annuler</button></div></div>';
 }
@@ -1193,10 +1467,10 @@ function panneauClore() {
   return '<div class="panneau" role="group" aria-labelledby="p-titre">'
     + '<h3 id="p-titre">Clore cette conversation&nbsp;?</h3>'
     + "<p>Le chantier est terminé, ou la discussion n'a plus lieu d'être.</p>"
-    + "<p><b>Ce que ça change&nbsp;:</b> plus personne ne peut écrire dans ce fil, vous non plus. "
+    + "<p><b>Ce que ça change&nbsp;:</b> plus personne ne peut écrire dans ce fil, toi non plus. "
     + "Il reste lisible par vous deux, et il ne se rouvre pas&nbsp;: rouvrir un fil clos par "
     + "l'autre reviendrait à revenir sur sa décision.</p>"
-    + "<p>Ce n'est pas un blocage&nbsp;: votre confrère pourra toujours vous contacter pour un "
+    + "<p>Ce n'est pas un blocage&nbsp;: ton confrère pourra toujours te contacter pour un "
     + "autre chantier.</p>"
     + '<div class="pied-actions"><button class="bouton rouge" id="p-ok">Clore la conversation</button>'
     + '<button class="bouton creux" id="p-non">Annuler</button></div></div>';
@@ -1219,7 +1493,7 @@ function boutonBloques() {
           ? blocages.map((b) => {
               const f = fils.find((x) => x.interlocuteur_id === b.bloque_id);
               const nom = b.nom_public || (f ? nomDe(f) : null);
-              return '<div class="carte"><h3>' + echapper(nom || "Professionnel bloqué") + "</h3>"
+              return '<div class="carte"><h3>' + echapper(nom || "Confrère bloqué") + "</h3>"
                 + "<p>Bloqué le " + echapper(new Date(b.cree_le).toLocaleDateString("fr-FR")) + "."
                 + (b.motif ? " Motif noté : " + echapper(b.motif) + "." : "")
                 + (nom ? "" : " Sa fiche n'est pas publiée : son nom ne nous est pas lisible d'ici.")
@@ -1227,7 +1501,7 @@ function boutonBloques() {
                 + '<div class="pied-actions"><button class="bouton creux" data-deb="'
                 + echapper(b.bloque_id) + '">Retirer le blocage</button></div></div>';
             }).join("")
-          : "<p>Vous n'avez bloqué personne.</p>")
+          : "<p>Tu n'as bloqué personne.</p>")
        + "</div>";
   }
   return h;
@@ -1238,7 +1512,7 @@ function boutonBloques() {
    ==================================================================== */
 function brancherVide() {
   const z = $("vers-demandes");
-  if (z) lienVivant(z, "/demandes", "Voir mes demandes",
+  if (z) lienVivant(z, "/demandes", "Voir tes demandes",
     "La page des demandes n'est pas encore publiée : elle est construite par un autre chantier.");
   const t = $("t"); if (t) t.focus();
 }
@@ -1277,8 +1551,8 @@ function brancherFil() {
     const visable = !!ouvert.interlocuteur_id;
     if (!desLui && !visable) {
       dire("ko", "Il n'y a rien à signaler dans cette conversation.",
-        "Aucun message de votre interlocuteur, et son compte n'existe plus.",
-        "Si le problème vient d'ailleurs, écrivez-nous : "
+        "Aucun message de ton interlocuteur, et son compte n'existe plus.",
+        "Si le problème vient d'ailleurs, écris-nous : "
         + '<span class="acompleter">[A COMPLETER : adresse de contact de la modération]</span>');
       return;
     }
@@ -1286,7 +1560,7 @@ function brancherFil() {
     choixMessage = true; fermerPanneau(); redessinerFil();
     const z = $("panneau");
     if (z) {
-      z.innerHTML = '<div class="panneau"><p>Touchez le message à signaler'
+      z.innerHTML = '<div class="panneau"><p>Touche le message à signaler'
         + (visable ? ", ou signalez le comportement d'ensemble." : ".") + "</p>"
         + '<div class="pied-actions">'
         + (visable ? '<button class="bouton creux" id="sig-global">'
@@ -1313,7 +1587,7 @@ function brancherFil() {
   const cl = $("a-clore");
   if (cl) cl.addEventListener("click", () => ouvrirPanneau("clore"));
 
-  const t = $("corps");
+  const t = modeExemple ? null : $("corps");
   if (t) {
     /* La zone de saisie reprend le brouillon : elle vient d'etre reconstruite,
        et le texte en cours ne doit pas disparaitre avec l'ancien noeud. */
@@ -1451,6 +1725,15 @@ async function ouvrirFil(id, pousser) {
   ouvert = f; messages = []; encorePlusVieux = false; choixMessage = false; panneau = null;
   erreurMessages = null;
   taire();
+  if (modeExemple) {
+    /* Aucune requete : les messages sont deja en memoire, et rien ne part. */
+    messages = (exempleMessages.get(id) || []).slice();
+    peindre();
+    placerEnBas();
+    const te = $("tete-nom"); if (te) te.focus();
+    if (pousser) history.pushState({ fil: id }, "", "?fil=" + encodeURIComponent(id));
+    return;
+  }
   peindre();
   const z = $("volet-fil");
   if (z) z.innerHTML = '<p class="lead" role="status">Chargement de la conversation…</p>';
@@ -1484,7 +1767,7 @@ function fermerFil() {
    personne. `marquer_lu()` rend le nombre de messages passes en lu, ce qui
    permet de rafraichir la pastille sans relire la base. */
 async function marquerLu() {
-  if (!ouvert) return;
+  if (!ouvert || modeExemple) return;
   if (document.visibilityState !== "visible") return;
   const aLire = (ouvert.non_lus || 0) > 0
     || messages.some((m) => !m.lu_le && m.auteur_id && m.auteur_id !== moi);
@@ -1514,17 +1797,18 @@ async function marquerLu() {
 }
 
 async function envoyer() {
+  if (modeExemple) return;
   const t = $("corps"), err = $("e-corps"), b = $("envoyer");
   if (!t) return;
   const corps = t.value.trim();
   err.classList.remove("vu"); t.setAttribute("aria-invalid", "false");
   if (!corps) {
-    err.textContent = "Écrivez votre message avant de l'envoyer.";
+    err.textContent = "Écris ton message avant de l'envoyer.";
     err.classList.add("vu"); t.setAttribute("aria-invalid", "true"); t.focus(); return;
   }
   if (corps.length > MAX_CORPS) {
     err.textContent = "Ce message fait " + corps.length + " caractères. Le maximum est de "
-      + MAX_CORPS + " : coupez-le en deux.";
+      + MAX_CORPS + " : coupe-le en deux.";
     err.classList.add("vu"); t.setAttribute("aria-invalid", "true"); t.focus(); return;
   }
   b.disabled = true; t.disabled = true;
@@ -1566,7 +1850,7 @@ async function envoyer() {
         + (e.hint ? '<span class="geste"> ' + echapper(e.hint) + "</span>" : "");
       e2.classList.add("vu");
     } else {
-      ko("Votre message n'est pas parti.", e);
+      ko("Ton message n'est pas parti.", e);
     }
   }
 }
@@ -1604,6 +1888,7 @@ function versLeBas(anime) {
    SIGNALER, BLOQUER, DEBLOQUER, CLORE
    ==================================================================== */
 async function envoyerSignalement() {
+  if (modeExemple) return;
   const choisi = ecran.querySelector('input[name="motif"]:checked');
   const eMotif = $("e-motif"), detail = $("detail"), eDetail = $("e-detail");
   eMotif.classList.remove("vu"); eDetail.classList.remove("vu");
@@ -1633,9 +1918,9 @@ async function envoyerSignalement() {
     dire("ok", "Signalement envoyé.",
       (visait
         ? "La modération peut désormais lire cette conversation, et elle seule. "
-        : "La modération a reçu votre signalement. Elle ne peut pas lire cette conversation, "
+        : "La modération a reçu ton signalement. Elle ne peut pas lire cette conversation, "
           + "puisque aucun message n'a été désigné. ")
-      + "Vous retrouverez ce signalement si vous nous écrivez.",
+      + "Tu retrouveras ce signalement si tu nous écris.",
       'Pour ajouter quelque chose : <span class="acompleter">[A COMPLETER : adresse de contact '
       + "de la modération]</span>");
   } catch (e) {
@@ -1645,6 +1930,7 @@ async function envoyerSignalement() {
 }
 
 async function bloquer() {
+  if (modeExemple) return;
   const b = $("p-ok"); b.disabled = true; b.textContent = "Un instant…";
   const m = $("motif-bloc");
   try {
@@ -1660,8 +1946,9 @@ async function bloquer() {
     fermerPanneau();
     await chargerBlocages();
     peindre();
-    dire("ok", "Ce professionnel est bloqué.",
-      "Vous ne pouvez plus vous écrire, ni l'un ni l'autre. Il n'en a pas été informé.",
+    dire("ok", "Ce confrère est bloqué.",
+      "Plus aucun message ne passe entre vous deux, dans un sens comme dans l'autre. "
+      + "Il n'en a pas été informé.",
       "Pour revenir en arrière : « Retirer le blocage », dans cette conversation.");
   } catch (e) {
     b.disabled = false; b.textContent = "Bloquer";
@@ -1670,7 +1957,7 @@ async function bloquer() {
 }
 
 async function debloquer(qui) {
-  if (!qui) return;
+  if (!qui || modeExemple) return;
   try {
     /* Pas de `bloqueur_id` dans la condition : la politique « ses blocages »
        la pose deja, et elle seule fait foi. Cette suppression ne peut donc
@@ -1681,11 +1968,12 @@ async function debloquer(qui) {
     fils.forEach((f) => { if (f.interlocuteur_id === qui) f.bloque_par_moi = false; });
     await chargerBlocages();
     peindre();
-    dire("ok", "Blocage retiré.", "Vous pouvez de nouveau vous écrire.");
+    dire("ok", "Blocage retiré.", "Les messages repassent entre vous deux.");
   } catch (e) { ko("Le blocage n'a pas pu être retiré.", e); }
 }
 
 async function clore() {
+  if (modeExemple) return;
   const b = $("p-ok"); b.disabled = true; b.textContent = "Un instant…";
   try {
     /* La seule mise a jour qu'une partie ait le droit de faire. Le declencheur
@@ -1714,6 +2002,10 @@ async function depuisDemande(id) {
   try {
     const { data, error } = await sb.rpc("ouvrir_conversation", { p_demande: id });
     if (error) throw error;
+    /* Celle-la est vraie : les exemples tombent AVANT le rechargement de la
+       liste, sinon ouvrirFil chercherait ce fil parmi les faux et ne
+       trouverait rien a afficher. */
+    sortirExemples();
     const fil = Array.isArray(data) ? data[0] : data;
     await chargerListe();
     peindre();
@@ -1723,7 +2015,7 @@ async function depuisDemande(id) {
   } catch (e) {
     history.replaceState({}, "", location.pathname);
     if (baseAbsente(e)) {
-      dire("ko", "La messagerie n'est pas encore branchée sur la base.",
+      dire("ko", "La messagerie n'est pas encore raccordée à la base.",
         "Les tables et les fonctions de la messagerie ne sont pas jouées.",
         "<code>Côté technique : jouer crm/supabase/migration-messagerie-rgpd.sql, "
         + "puis crm/supabase/migration-recherche-relations.sql si ce n'est pas déjà fait.</code>");
@@ -1764,6 +2056,18 @@ async function rafraichir() {
      rempli. Le rafraichissement attend, l'action de l'artisan passe d'abord. */
   if (panneau || choixMessage) return;
   try {
+    if (modeExemple) {
+      /* On continue d'interroger : le jour ou la base rend une vraie
+         conversation, les exemples s'effacent d'eux-memes, et la mention avec.
+         Une seule requete, et aucune ecriture. */
+      const { data, error } = await sb.rpc("mes_conversations");
+      if (error || !data || !data.length) return;
+      sortirExemples();
+      fils = data;
+      await chargerChantiers();
+      peindre();
+      return;
+    }
     const avant = ouvert ? ouvert.conversation_id : null;
     await chargerListe();
     if (avant) {
@@ -1811,15 +2115,23 @@ function peindreListeSiBesoin() {
 /* ====================================================================
    DEMARRAGE
    ==================================================================== */
+/* PAS DE SESSION. La verite d'abord : tes conversations ne sont pas lisibles
+   sans compte. Les exemples viennent ENSUITE, pour montrer a quoi ressemble
+   l'ecran une fois connecte, et ils portent leur mention dans leur bloc. */
 function ecranHorsSession() {
-  ecran.innerHTML = '<h1 tabindex="-1" id="t">Mes <span class="em">messages</span>.</h1>'
-    + '<p class="lead">Vos conversations sont privées&nbsp;: il faut être connecté pour les lire.</p>'
-    + '<div class="carte"><h3>Vous n\'êtes pas connecté</h3>'
-    + "<p>La page de connexion vous ramène ensuite à votre espace&nbsp;: revenez ici par "
-    + "«&nbsp;Messages&nbsp;» une fois connecté. On ne vous fait pas croire que le lien sera "
-    + "gardé, il ne l'est pas.</p>"
+  blocAvant = '<div class="carte"><h3>Tu n\'es pas connecté</h3>'
+    + "<p>La page de connexion te ramène ensuite à ton espace&nbsp;: reviens ici par "
+    + "«&nbsp;Tes messages&nbsp;» une fois connecté. On ne te fait pas croire que le lien "
+    + "sera gardé, il ne l'est pas.</p>"
     + '<div class="pied-actions"><a class="bouton plein" href="/connexion">Se connecter</a>'
     + '<a class="bouton creux" href="/aide">Voir l\'aide</a></div></div>';
+  entrerExemples();
+  peindre();
+  /* Un lien vers un fil d'exemple doit s'ouvrir meme sans session, sinon
+     l'adresse qu'on vient de copier depuis cet ecran ne rend plus ce qu'elle
+     montrait. Rien n'est lu en base : le fil est deja en memoire. */
+  const vise = new URLSearchParams(location.search).get("fil");
+  if (vise && fils.some((f) => f.conversation_id === vise)) { ouvrirFil(vise, false); return; }
   const t = $("t"); if (t) t.focus();
 }
 
@@ -1828,9 +2140,9 @@ function ecranHorsSession() {
   try {
     c = await client();
   } catch (e) {
-    ecran.innerHTML = '<h1>Mes <span class="em">messages</span>.</h1>'
+    ecran.innerHTML = '<h1>Tes <span class="em">messages</span>.</h1>'
       + '<p class="lead">La messagerie n\'a pas pu se charger&nbsp;: il manque le réseau. '
-      + "Réessayez quand vous avez du signal.</p>";
+      + "Réessaie quand tu as du signal.</p>";
     return;
   }
 
@@ -1846,19 +2158,28 @@ function ecranHorsSession() {
     await Promise.all([chargerMetiers(), chargerBlocages()]);
     await chargerListe();
   } catch (e) {
-    ecran.innerHTML = '<h1 tabindex="-1" id="t">Mes <span class="em">messages</span>.</h1>';
+    ecran.innerHTML = '<h1 tabindex="-1" id="t">Tes <span class="em">messages</span>.</h1>';
     if (baseAbsente(e)) {
       dire("ko", "La messagerie n'est pas encore ouverte.",
         "Les tables et les fonctions qui la portent ne sont pas encore jouées sur la base. "
         + "Ce n'est pas une panne&nbsp;: rien n'a encore été mis en service.",
         "<code>Côté technique : jouer crm/supabase/migration-messagerie-rgpd.sql.</code>");
-      ecran.innerHTML += carteNonBranche();
+      /* La base ne rend rien, et c'est justement le cas ou l'ecran vide
+         n'apprend rien. On montre le produit en service, et on le dit. */
+      entrerExemples();
+      peindre();
     } else {
-      ko("Vos conversations n'ont pas pu être chargées.", e);
+      ko("Tes conversations n'ont pas pu être chargées.", e);
     }
     const t = $("t"); if (t) t.focus();
     return;
   }
+
+  /* ZERO CONVERSATION N'EST PAS UNE PANNE, c'est l'etat d'un compte neuf. Mais
+     un ecran vide ne montre pas le produit : on peint des exemples, avec leur
+     mention, et le rafraichissement les effacera des qu'une vraie conversation
+     existera. */
+  if (!fils.length) entrerExemples();
 
   peindre();
 
@@ -1868,9 +2189,9 @@ function ecranHorsSession() {
        plus : on le DIT. Sans ce mot, la page affiche la liste et on croit
        s'etre trompe de lien. */
     if (fils.some((f) => f.conversation_id === filDemande)) await ouvrirFil(filDemande, false);
-    else dire("ko", "Cette conversation n'est pas dans votre liste.",
-      "Le lien pointe vers un fil qui ne vous concerne pas, ou qui n'existe plus.",
-      "Vos conversations sont juste en dessous.");
+    else dire("ko", "Cette conversation n'est pas dans ta liste.",
+      "Le lien pointe vers un fil qui ne te concerne pas, ou qui n'existe plus.",
+      "Tes conversations sont juste en dessous.");
   }
 
   /* Le bouton « retour » du telephone doit refermer le fil, pas quitter le

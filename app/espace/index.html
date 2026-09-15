@@ -1,4 +1,4 @@
-<title>Mon espace - À dispo</title>
+<title>Ton espace - À dispo</title>
 <!--
   L'ESPACE ARTISAN ET SON ACCOMPAGNEMENT.
   Devis N°2, NON SIGNE, sauf la verification du SIRET qui est au devis N°1.
@@ -246,6 +246,22 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
   padding:12px 14px;cursor:pointer;white-space:nowrap;margin-bottom:-1px;min-height:44px}
 .onglet.ici{color:var(--cream);border-bottom-color:var(--accent-texte);border-bottom-width:3px}
 .onglet:focus-visible{outline:2px solid var(--accent-texte);outline-offset:-2px}
+/* SOUS 560 PX, LA BANDE D'ONGLETS CHANGE DE FORME, elle ne se comprime pas et
+   elle ne part pas non plus sur le cote. Mesure a 320 px, l'arrivee ajoutee :
+   430 px d'onglets pour 285 px de bande, soit « Tes agendas » ENTIEREMENT hors
+   de l'ecran et « Ta fiche » coupe au milieu. Un onglet qu'il faut deviner
+   pour le faire venir n'existe pas. Ils passent donc en pastilles qui vont a
+   la ligne : deux rangs de deux, 44 px chacun, tout est visible d'un coup.
+   L'onglet courant est un SURLIGNAGE, pas un aplat d'encre : le seul bloc a
+   contraste inverse de l'ecran est reserve au chiffre. L'encre sur ce voile
+   d'accent vaut 14,55 : 1. */
+@media(max-width:559px){
+  .onglets{flex-wrap:wrap;gap:6px;overflow-x:visible;padding-bottom:16px}
+  .onglet{border:1px solid var(--line);border-radius:999px;padding:0 15px;
+    margin-bottom:0;display:inline-flex;align-items:center}
+  .onglet.ici{background:var(--accent-soft);border-color:var(--accent-texte);
+    color:var(--cream)}
+}
 
 /* ==========================================================================
    L'AGENDA.
@@ -451,7 +467,7 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
     width:248px;padding:18px 14px;background:var(--bg-2);border-right:1px solid var(--line);
     overflow-y:auto;z-index:20}
 }
-.menu-c .marque-c{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--cream);
+.menu-c .marque-c{display:flex;align-items:center;gap:.5em;min-height:44px;text-decoration:none;color:var(--cream);
   font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;padding:2px 10px 0;margin-bottom:24px}
 .menu-c .marque-c .a{color:var(--accent-texte)}
 .menu-c .marque-c svg{height:1.2em;width:auto;color:var(--accent-texte);flex:none}
@@ -470,7 +486,7 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
 .menu-c .aide-c b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--cream)}
 .menu-c .aide-c b i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
 .menu-c .aide-c p{margin:6px 0 0;font-size:12.5px;color:var(--cream-mut);line-height:1.5}
-.menu-c .aide-c a{color:var(--accent-texte)}
+.menu-c .aide-c a{color:var(--accent-texte);display:inline-flex;align-items:center;min-height:44px}
 
 .barre-app{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 var(--gut);
   border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;z-index:19;
@@ -487,10 +503,129 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
   overflow-y:auto;transform:translateX(-100%);transition:transform .22s ease}
 .tiroir.vu{transform:none}
 @media (prefers-reduced-motion:reduce){ .tiroir{transition:none} }
-.tiroir .fermer{position:absolute;top:14px;right:12px;min-width:40px;min-height:40px;
+.tiroir .fermer{position:absolute;top:10px;right:10px;min-width:44px;min-height:44px;
   background:none;border:0;color:var(--cream-mut);font-size:22px;line-height:1;cursor:pointer;border-radius:8px}
 .tiroir .fermer:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
 .nav-note{margin:0 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
+
+/* =================== PAS ENCORE RACCORDE, l'ecran partage ===================
+   Un seul dialogue pour TOUTES les fonctions non branchees du produit. Il dit
+   trois choses, dans cet ordre : ce qui ne marche pas encore, POURQUOI en
+   clair (jamais un message de developpeur), et ce qu'on peut faire a la place
+   des maintenant. Une fonction eteinte qui n'offre pas d'issue fait sortir
+   l'artisan du produit.
+
+   C'est la regle 2 de la charte de voix : une fonction non branchee ne s'ecrit
+   jamais au present. */
+dialog.raccord{border:0;padding:0;background:transparent;max-width:min(92vw,430px)}
+dialog.raccord::backdrop{background:rgba(25,21,18,.5)}
+dialog.raccord .boite{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;
+  padding:26px 24px;box-shadow:var(--ombre-3)}
+dialog.raccord h2{font-family:"Space Grotesk",sans-serif;font-size:21px;font-weight:700;
+  margin:0 0 4px;line-height:1.2}
+dialog.raccord .quoi{font-size:13px;color:var(--cream-dim);margin:0 0 18px}
+dialog.raccord .cause{background:var(--surface);border-radius:12px;padding:14px 16px;margin:0 0 16px}
+dialog.raccord .cause b{display:block;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--cream-mut);margin-bottom:5px}
+dialog.raccord .cause p{margin:0;font-size:14.5px;line-height:1.55}
+dialog.raccord .issue{border-left:3px solid var(--accent);padding-left:14px;margin:0 0 22px}
+dialog.raccord .issue b{display:block;font-size:14.5px;margin-bottom:3px}
+dialog.raccord .issue p{margin:0;font-size:14px;color:var(--cream-mut);line-height:1.55}
+dialog.raccord .fermer{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--cream);
+  background:var(--cream);color:var(--bg-2);font-family:inherit;font-weight:600;font-size:15px;cursor:pointer}
+dialog.raccord .fermer:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px}
+
+/* Les cartes de raccordement deviennent des BOUTONS : elles repondent au clic
+   au lieu de rester inertes. Une carte qui ne fait rien se touche deux fois,
+   puis on croit l'application cassee. */
+button.carte{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+button.carte:hover{border-color:var(--cream-dim)}
+button.carte:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px}
+
+/* Le tarif. Un seul endroit du produit ecrit un montant : celui-ci. */
+.tarif{font-size:var(--t3);margin:10px 0 4px}
+.tarif b{font-family:"Space Grotesk",sans-serif;font-size:var(--t2);font-weight:700;color:var(--cream)}
+
+/* ==================== L'ECRAN D'ARRIVEE : « AUJOURD'HUI » ====================
+   POURQUOI IL EXISTE. Le parcours fini, on tombait sur une grille de mois :
+   un outil de saisie, pas une arrivee. Une grille ne dit pas ce qu'il faut
+   faire ce matin. Cet ecran pose UNE decision, montre la journee, donne LE
+   chiffre, et s'arrete la.
+
+   POURQUOI LA MENTION D'EXEMPLE EST LE BANDEAU DU CADRE, ET PAS UNE NOTE EN
+   BAS DE PAGE. Un produit qui montre de faux chiffres sans le dire apprend a
+   son utilisateur qu'il ne peut pas le croire, et cette defiance ne se rattrape
+   plus. La mention est donc DANS le cadre qui contient toutes les donnees
+   inventees : impossible de lire l'une sans voir l'autre. Le jour ou la base
+   rend quelque chose, le cadre et son bandeau tombent ensemble.
+
+   L'ACCENT EST RARE, ET ON LE COMPTE : le surlignage du titre, le filet de la
+   demi-journee encore libre, le bouton plein. Trois aplats, aucune lettre.
+   Le chiffre qui compte ne prend PAS l'accent : il prend l'aplat d'encre,
+   mesure a 17,71 : 1, seul bloc a contraste inverse de l'ecran. Deux blocs
+   inverses, et aucun des deux ne ressort. */
+.auj-cadre{border:1px solid var(--line);background:var(--bg-2);border-radius:20px;
+  box-shadow:var(--ombre-2);overflow:hidden}
+/* La mention. Sur le puits clair, le secondaire vaut 5,74 : 1. */
+.auj-dit{margin:0;padding:12px clamp(15px,4.4vw,22px);background:var(--surface);
+  border-bottom:1px solid var(--line);font-size:var(--t5);color:var(--cream-mut);
+  line-height:1.45}
+.auj-part{padding:clamp(16px,4.4vw,22px)}
+.auj-part+.auj-part{border-top:1px solid var(--line)}
+.auj-titre{font-family:"JetBrains Mono",monospace;font-size:var(--t6);
+  text-transform:uppercase;letter-spacing:.08em;color:var(--cream-dim);margin:0 0 12px}
+.auj-quoi{color:var(--cream-mut);font-size:var(--t4);margin:12px 0 0;max-width:44ch;
+  line-height:1.55}
+/* LE SURLIGNAGE NE DOIT JAMAIS SE COUPER EN DEUX LIGNES. Mesure a 800 px :
+   « jeudi 17 » passait a la ligne entre les deux mots, et comme la bande est
+   posee a 86 % de la HAUTEUR TOTALE du span, elle barrait « jeudi » au milieu
+   et soulignait « 17 ». Le nom du jour tient d'un bloc ou il descend entier :
+   « mercredi 31 », le plus long, mesure 165 px pour 253 px disponibles a
+   320 px de large. */
+.auj-part h1 .em{white-space:nowrap}
+
+/* La journee. Sous 470 px l'heure passe AU-DESSUS du libelle : la mise en page
+   change, elle ne comprime pas une colonne de mono a trente pixels. */
+.auj-lignes{display:grid;gap:7px;margin:0}
+.auj-l{display:grid;gap:3px 14px;grid-template-columns:minmax(0,1fr);
+  background:var(--surface);border-radius:12px;padding:12px 14px;
+  border-left:4px solid transparent}
+@media(min-width:470px){.auj-l{grid-template-columns:106px minmax(0,1fr);align-items:start}}
+.auj-hh{font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-mut);
+  letter-spacing:.02em;line-height:1.5;padding-top:2px;white-space:nowrap}
+.auj-t{font-size:var(--t4);color:var(--cream);font-weight:600;margin:0;line-height:1.4}
+.auj-s{font-size:var(--t5);color:var(--cream-mut);margin:3px 0 0;line-height:1.5}
+/* La demi-journee encore libre. Le filet est un APLAT d'accent, jamais une
+   lettre : pose sur le papier, l'accent vaut 4,21 et ne peut rien porter. Le
+   voile d'accent derriere garde l'encre a plus de 15 : 1. */
+.auj-l.libre{background:var(--accent-soft);border-left-color:var(--accent)}
+
+/* LE SEUL BLOC A CONTRASTE INVERSE. Papier sur encre : 17,71 : 1. La ligne des
+   jours descend au filet de la charte, #D8D4CC, mesure a 12,28 : 1 sur le meme
+   aplat : assez d'ecart pour faire une hierarchie, assez de contraste pour
+   etre lue. */
+.auj-chiffre{background:var(--cream);border-radius:16px;padding:18px 20px}
+.auj-n{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:var(--t1);
+  line-height:1;color:var(--bg-2);display:block;letter-spacing:-.02em}
+.auj-n-quoi{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:var(--t4);
+  color:var(--bg-2);margin:9px 0 0;line-height:1.35}
+.auj-n-jours{font-size:var(--t5);color:var(--line);margin:6px 0 0;line-height:1.5}
+
+/* La reputation. Le chiffre est en mono, comme toute date et tout nombre. */
+.auj-note{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0}
+.auj-note b{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:var(--t2);
+  color:var(--cream);line-height:1}
+.auj-note span{font-size:var(--t4);color:var(--cream-mut)}
+
+/* Le geste de la decision est un LIEN, pas un bouton : il change d'ecran, et
+   un <button> qui navigue prive le clic du milieu, le « ouvrir dans un onglet »
+   et le lecteur d'ecran de ce qu'ils savent tous faire d'un lien. Il lui faut
+   donc les deux choses qu'une balise <a> n'herite pas de `.bouton` : la
+   couleur du texte, et l'absence de soulignement. Le blanc sur l'aplat
+   d'accent vaut 4,62 : 1, l'encre y serait tombee a 3,93. */
+a.bouton{text-decoration:none}
+a.bouton.plein{color:#fff}
+a.bouton.creux{color:var(--cream)}
 </style>
 
 <div class="wrap">
@@ -555,6 +690,64 @@ const DUREE  = { identite: "30 secondes", entreprise: "1 minute", metier: "2 min
                  abonnement: "1 minute", agenda: "3 minutes" };
 
 let sb = null, fiche = null, metiers = [], atouts = [];
+
+/* ==========================================================================
+   LES EXEMPLES, ET LES QUATRE REGLES QUI LES TIENNENT.
+
+   1. ILS NE TOUCHENT JAMAIS LA BASE. Ni lecture, ni ecriture : des chaines et
+      des nombres, ici, en tete de fichier. Ils ne servent QUE quand la base ne
+      rend rien, et ils disparaissent avec leur mention des qu'elle rend
+      quelque chose.
+
+   2. ILS NE PROMETTENT RIEN QUE LE PRODUIT N'AIT. Chaque libelle sort d'un
+      champ qui existe : le texte que le confrere a ecrit dans sa demande
+      (`demandes.message`), son metier et sa commune (`demandes.metier`,
+      `demandes.chantier_commune`), sa note (`evaluations.note`). L'agenda, LUI,
+      ne stocke aucun titre et n'en stockera pas : une demi-journee venue d'un
+      .ics se dit « pris », jamais « reunion de chantier ». Un exemple qui
+      montre ce que le produit ne saura jamais faire est un mensonge a retard.
+
+   3. LES DATES SE CALCULENT, ELLES NE SE TAPENT PAS. « jeudi 17 » tape en dur
+      devient faux le 18. On garde des ECARTS en jours ouvres, et le jour se
+      nomme au moment de l'affichage. Un exemple qui montre une date passee
+      apprend la meme defiance qu'un faux chiffre.
+
+   4. LE CHIFFRE SE COMPTE A PARTIR DE LA LISTE. Le nombre de demi-journees
+      libres n'est ecrit nulle part ici : il est additionne depuis `journee` et
+      `semaine`. Un nombre tape a la main finit toujours par contredire la
+      ligne qu'il surplombe.
+   ========================================================================== */
+const MENTION_EXEMPLE = "Écrans d'exemple. Les noms, les notes et les dates sont fictifs.";
+const EXEMPLES = {
+  /* Le prenom ne sert que si la fiche n'en porte aucun : un artisan dont on
+     connait le prenom est salue par le sien, meme sur un ecran d'exemple. */
+  prenom: "Alice",
+
+  /* LA DECISION. Une demande qui attend, et une seule : deux demandes, c'est
+     deja une liste, et une liste ne se decide pas, elle se trie. */
+  demande: { confrere: "Karim Benali", metier: "Couverture", commune: "Aix-les-Bains",
+             dansJours: 2, jours: 3 },
+
+  /* LA JOURNEE, en trois lignes horaires. Les deux premieres sont prises, la
+     troisieme est la demi-journee encore libre : c'est elle qui porte le filet. */
+  journee: [
+    { de: "08:00", a: "10:30", quoi: "Remplacement de chaudière",
+      sous: "Chantier avec Thomas Rey, plomberie à Annecy-le-Vieux." },
+    { de: "11:00", a: "12:00", quoi: "Visite de chantier",
+      sous: "Rue des Marquisats, avec Sonia Delmas." },
+    { de: "13:00", a: "18:00", libre: true, demi: "apres" }
+  ],
+
+  /* LES TROIS JOURS OUVRES SUIVANTS, et ce qui y reste libre. */
+  semaine: [ { dansOuvres: 1, demis: ["apres"] },
+             { dansOuvres: 2, demis: ["matin", "apres"] },
+             { dansOuvres: 3, demis: ["matin"] } ],
+
+  /* LA REPUTATION. Note sur 5, nombre d'avis, et le dernier recu, date par un
+     ecart en jours pour qu'il reste toujours dans le passe. */
+  avis: { note: 4.8, combien: 12, ilYA: 13,
+          dernier: "Sonia Delmas, électricienne à Cran-Gevrier" }
+};
 
 function dire(quel, titre, corps) {
   for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
@@ -642,7 +835,7 @@ function ecranEntreprise() {
   ecran.innerHTML = barre("entreprise")
     + '<h1>Ton <span class="em">entreprise</span>.</h1>'
     + '<p class="lead">On le vérifie à l\'annuaire officiel : c\'est ce qui garantit '
-    + 'à tout le monde qu\'on est entre professionnels.</p>'
+    + 'à tout le monde qu\'on est entre confrères.</p>'
     + '<div class="champ"><label for="siret">Numéro SIRET</label>'
     +   '<input id="siret" inputmode="numeric" maxlength="20" placeholder="123 456 789 00012" value="'
     +   echapper(fiche.siret) + '">'
@@ -1035,9 +1228,15 @@ function rendreAbonnement(paiement, abo, mois) {
   let h = '<div class="carte"><h3>Offre unique<span class="quand">' + badge + "</span></h3>"
         + '<p>Accès à tout : tes disponibilités, la recherche, les fiches, la messagerie.</p>'
         + (essai ? "<p>" + essai + "</p>" : "")
-        /* LE PRIX N'EST PAS ECRIT, ET C'EST VOULU. Il n'est pas arrete. */
-        + '<p><b>Le tarif est en cours d\'arbitrage.</b> Tant qu\'il n\'est pas fixé, '
-        + 'rien ne t\'est demandé et rien ne te sera prélevé.</p></div>';
+        /* LE PRIX, arrete le 15/09/2026 : 29,90 euros HT par mois. HT parce que
+           la cible est professionnelle et qu'un micro-entrepreneur ne recupere
+           pas la TVA : lui annoncer un TTC qu'il ne deduira pas serait un
+           faux prix. Le premier mois est offert, et la duree de l'essai vient
+           de `reglages.essai_mois`, pas d'un nombre ecrit ici. */
+        + '<p class="tarif"><b>29,90 € HT</b> par mois, sans engagement. '
+        + 'Tu arrêtes quand tu veux, depuis cette page.</p>'
+        + '<p class="aide">Aucun pourcentage n\'est prélevé sur tes chantiers. '
+        + 'Ta facture reste la tienne.</p></div>';
 
   /* L'etat de l'abonnement, quand il y en a un. Le message vient de la base
      (`abonnement_etats`), source unique : la page ne reecrit pas les six cas
@@ -1070,7 +1269,7 @@ function rendreAbonnement(paiement, abo, mois) {
   } else if (paiement.etat === "non_branche") {
     /* Le motif est dit en clair, dans la langue de l'artisan. Le detail
        technique est deja parti dans la console pour nous. */
-    h += '<div class="carte eteinte"><h3>Paiement en ligne<span class="quand">bientôt</span></h3>'
+    h += '<div class="carte eteinte"><h3>Paiement en ligne<span class="quand">pas encore</span></h3>'
        + '<p>Le prestataire de paiement n\'est pas encore raccordé. '
        + 'Tu n\'as aucune carte à saisir aujourd\'hui.</p>'
        + '<p class="mono">Pas encore raccordé : le prestataire n\'est pas choisi.</p></div>';
@@ -1165,12 +1364,16 @@ function ecranAgenda() {
     +   '<input type="file" id="ics" accept=".ics,text/calendar" '
     +     'aria-label="Fichier de calendrier .ics">'
     +   '<p class="aide" id="ics-etat" role="status" aria-live="polite"></p></div>';
-  AGENDAS.forEach((a) => {
-    h += '<div class="carte' + (a.pret ? "" : " eteinte") + '"><h3>' + a.nom
-       + '<span class="quand">' + (a.pret ? "disponible" : "bientôt") + "</span></h3>"
+  AGENDAS.forEach((a, i) => {
+    /* Un BOUTON, pas une carte inerte : il repond, il dit pourquoi, et il
+       renvoie vers la voie qui marche. Une carte qui ne fait rien se touche
+       deux fois, puis on croit l'application cassee. */
+    h += '<button type="button" class="carte' + (a.pret ? "" : " eteinte")
+       + '" data-raccord="' + i + '"><h3>' + a.nom
+       + '<span class="quand">' + (a.pret ? "disponible" : "pas encore") + "</span></h3>"
        + "<p>" + a.quoi + "</p>"
-       + (a.pret ? "" : '<p class="mono">Pas encore raccordé : ' + a.manque + ".</p>")
-       + "</div>";
+       + (a.pret ? "" : '<p class="mono">Touche pour savoir ce qui manque.</p>')
+       + "</button>";
   });
   h += '<div class="pied-actions">'
      + '<button class="bouton plein" id="suite">Terminer</button></div>'
@@ -1179,6 +1382,18 @@ function ecranAgenda() {
   ecran.innerHTML = h;
   $("ics").addEventListener("change", (ev) => {
     if (ev.target.files && ev.target.files[0]) importerIcs(ev.target.files[0]);
+  });
+  ecran.querySelectorAll("[data-raccord]").forEach((b) => {
+    b.addEventListener("click", () => {
+      const a = AGENDAS[+b.dataset.raccord];
+      if (a.pret) return;
+      pasRaccorde(a.nom, a.manque + ".", {
+        titre: "Ce que tu peux faire maintenant",
+        texte: "Exporte ton agenda en fichier .ics depuis ton téléphone ou ton "
+             + "ordinateur, et dépose-le juste au-dessus. Tes jours occupés "
+             + "remontent tout de suite, sans rien brancher."
+      });
+    });
   });
   $("suite").addEventListener("click", async () => {
     $("suite").disabled = true;
@@ -1189,10 +1404,14 @@ function ecranAgenda() {
 
 /* ==========================================================================
    L'ESPACE, UNE FOIS L'ACCOMPAGNEMENT FINI.
-   Trois volets, et le premier est le produit : poser ses disponibilites.
+   Quatre volets, et le premier est l'arrivee : « Aujourd'hui ». On ouvrait
+   jusqu'ici sur la grille du mois, c'est-a-dire sur un outil de saisie. Un
+   produit qui accueille par un formulaire laisse son utilisateur chercher ce
+   qu'il a a faire ; celui-ci le lui dit en une phrase, puis lui laisse UN
+   geste. La grille reste, elle passe en deuxieme.
    ========================================================================== */
 
-let volet = "dispos";
+let volet = "aujourdhui";
 let occupations = [];
 let agendas = [];
 
@@ -1364,6 +1583,32 @@ function ditPlage(cases) {
     return "du " + a.getDate() + " au " + b.getDate() + " " + MOIS[b.getMonth()];
   return "du " + a.getDate() + " " + MOIS_C[a.getMonth()]
        + " au " + b.getDate() + " " + MOIS_C[b.getMonth()];
+}
+/* Un jour nomme, jamais un jour seul : « libre » sans un QUAND dans la meme
+   phrase n'est pas une information, c'est une promesse. */
+const ditJour = (d) => JOURS_L[indexJour(d)] + " " + d.getDate();
+const ditJourMois = (d) => ditJour(d) + " " + MOIS[d.getMonth()];
+const hhmm = (d) => String(d.getHours()).padStart(2, "0") + ":"
+                  + String(d.getMinutes()).padStart(2, "0");
+/* Le n-ieme jour OUVRE a partir d'aujourd'hui. n = 0 rend aujourd'hui s'il est
+   ouvre, sinon le lundi suivant. Sans cela, l'ecran d'exemple ouvert un
+   dimanche poserait un remplacement de chaudiere le dimanche matin, et tout le
+   reste de la page perdrait sa credibilite avec lui. */
+function jourOuvre(n) {
+  let d = jour0(new Date());
+  while (indexJour(d) > 4) d = plusJours(d, 1);
+  for (let k = 0; k < n; ) { d = plusJours(d, 1); if (indexJour(d) <= 4) k++; }
+  return d;
+}
+/* Le debut du chantier annonce dans la demande d'exemple. MEME REGLE que
+   `debutCourt` dans l'ecran des demandes, et pour la meme raison : trois jours
+   de chantier doivent tenir dans la semaine, sinon « 3 jours » et la periode
+   affichee la-bas se contredisent. Les deux ecrans tombent donc sur le meme
+   jour, et le bouton « Voir la demande » mene bien a la demande annoncee. */
+function debutChantier(mini) {
+  let d = plusJours(jour0(new Date()), mini);
+  while (indexJour(d) > 2) d = plusJours(d, 1);
+  return d;
 }
 
 /* -------------------------------------------------------- la selection */
@@ -1952,7 +2197,228 @@ async function debrancher(id) {
   } catch (e) { dire("ko", "Impossible de débrancher.", e.message || ""); }
 }
 
-/* ----------------------------------------------------------- les trois volets */
+/* ==========================================================================
+   L'ECRAN D'ARRIVEE « AUJOURD'HUI ».
+
+   IL DIT QUATRE CHOSES, DANS CET ORDRE, ET S'ARRETE LA :
+   1. une phrase adressee a quelqu'un, qui pose UNE decision, avec UN bouton.
+      Trois boutons, c'est un menu : on repousse, on ne decide pas ;
+   2. la journee, en trois lignes horaires, filet d'accent sur la demi-journee
+      encore libre. C'est la seule ligne sur laquelle on peut encore agir ;
+   3. LE chiffre : les demi-journees encore libres d'ici la fin de la semaine.
+      Aplat d'encre, papier dessus, 17,71 : 1. Un seul bloc inverse par ecran ;
+   4. la reputation : la note et le nombre d'avis, rien de plus.
+   Puis la porte de l'agenda. Un ecran d'arrivee qui propose huit gestes ne
+   fait prendre aucune decision.
+
+   CE QU'ON N'INVENTE PAS, MEME EN EXEMPLE : ni le nombre de gens qui ont
+   cherche, ni les demandes manquees. Ces nombres n'existent nulle part, et un
+   exemple qui les montre engage a les produire un jour.
+
+   VRAI OU EXEMPLE, JAMAIS LES DEUX MELANGES. Des que la base rend UNE demande,
+   UNE occupation ou UN avis, tout l'ecran est vrai et la mention tombe. Sinon
+   tout est exemple, et la mention est dans le meme cadre. Un ecran a moitie
+   faux obligerait a dire, ligne par ligne, ce qui est vrai : personne ne lit
+   ca, et la mention ne protegerait plus rien.
+   ========================================================================== */
+
+const majuscule = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const deDateSql = (s) => { const [A, M, J] = String(s).slice(0, 10).split("-").map(Number);
+                           return new Date(A, M - 1, J); };
+
+/* Les demi-journees encore libres sur aujourd'hui et les trois jours ouvres
+   suivants. Le compte SORT de la liste affichee, il n'est ecrit nulle part. */
+function libresVisibles(estLibre) {
+  const noms = []; let n = 0, dernier = null;
+  for (let i = 0; i <= 3; i++) {
+    const d = jourOuvre(i), demis = ["matin", "apres"].filter((x) => estLibre(d, x));
+    if (!demis.length) continue;
+    n += demis.length; dernier = d;
+    noms.push(ditJour(d) + (demis.length === 2 ? " en entier" : " " + ditDemi(demis[0])));
+  }
+  return { n, noms, dernier };
+}
+
+/* Ce que la base rend vraiment. Trois questions, et aucune n'est bloquante :
+   si l'une echoue, on ne punit pas l'ecran, on bascule sur l'exemple et on le
+   dit. Aucune de ces lignes n'ecrit : cet ecran ne fait que lire. */
+async function lireAujourdhui() {
+  const v = { demande: null, avis: null };
+  const auj = jour0(new Date());
+  try {
+    const [rd, re] = await Promise.all([
+      sb.from("demandes")
+        .select("id,metier,chantier_commune,debut,fin,message,etat")
+        .eq("destinataire_id", fiche.id).in("etat", ["envoyee", "vue"])
+        .gte("fin", cle(auj)).order("debut", { ascending: true }).limit(1),
+      sb.from("evaluations").select("note,cree_le")
+        .eq("cible_id", fiche.id).not("publie_le", "is", null).is("masquee_le", null)
+    ]);
+    if (rd && !rd.error && rd.data && rd.data.length) v.demande = rd.data[0];
+    if (re && !re.error && re.data && re.data.length) {
+      const n = re.data.length;
+      v.avis = { note: re.data.reduce((s, x) => s + (x.note || 0), 0) / n, combien: n,
+                 quand: re.data.map((x) => x.cree_le).sort().pop() };
+    }
+  } catch (e) { /* la base n'a pas repondu : l'exemple prend la place, et le dit */ }
+  await chargerOccupations();
+  return v;
+}
+
+/* La journee d'un vrai agenda. On ne montre QUE ce qu'on sait : l'heure, et
+   d'ou vient l'occupation. Aucun titre, aucun lieu, aucun participant : le
+   produit ne les lit pas, et cet ecran ne fera pas croire le contraire. */
+function journeeVraie(d) {
+  const a = jour0(d), b = plusJours(a, 1);
+  const lignes = occupations
+    .filter((o) => new Date(o.debut) < b && new Date(o.fin) > a)
+    .sort((x, y) => new Date(x.debut) - new Date(y.debut))
+    .map((o) => {
+      const d1 = new Date(Math.max(new Date(o.debut).getTime(), a.getTime()));
+      const d2 = new Date(Math.min(new Date(o.fin).getTime(), b.getTime()));
+      return { de: hhmm(d1), a: d2.getTime() >= b.getTime() ? "minuit" : hhmm(d2),
+               quoi: o.saisie ? "Bloqué par toi" : "Pris, venu de ton agenda",
+               sous: o.saisie ? "Tu as posé cette plage à la main."
+                 : "On ne lit que le libre et l'occupé : ni le titre, ni le lieu." };
+    });
+  for (const x of ["matin", "apres"]) {
+    if (estOccupe(d, x) || estPasse(d, x)) continue;
+    const [h1, h2] = creneau(d, x);
+    lignes.push({ de: hhmm(h1), a: hhmm(h2), libre: true, demi: x });
+  }
+  return lignes.sort((x, y) => x.de.localeCompare(y.de));
+}
+
+/* ------------------------------------------------- le rendu, en quatre temps */
+function rendreAujourdhui(v) {
+  const z = $("auj"); if (!z || volet !== "aujourdhui") return;
+  const exemple = !v.demande && !v.avis && !occupations.length;
+  const prenom = echapper(fiche.prenom || (exemple ? EXEMPLES.prenom : "")).trim();
+  const jourVu = exemple ? jourOuvre(0) : jour0(new Date());
+
+  /* 1. LA DECISION. Une phrase, et un seul geste. */
+  let titre, quoi, geste = null;
+  if (exemple) {
+    const e = EXEMPLES.demande, j = debutChantier(e.dansJours);
+    titre = (prenom ? "Bonjour " + prenom + ".<br>" : "")
+          + 'Une demande pour <span class="em">' + echapper(ditJour(j)) + "</span>.";
+    quoi = echapper(e.confrere) + ", " + echapper(e.metier.toLowerCase()) + " à "
+         + echapper(e.commune) + ", te demande " + e.jours
+         + " jours de chantier à partir du " + echapper(ditJourMois(j)) + ".";
+    geste = { texte: "Voir la demande", ou: "/demandes" };
+  } else if (v.demande) {
+    const d = v.demande, j = deDateSql(d.debut), f = deDateSql(d.fin);
+    const nb = Math.round((f - j) / 86400000) + 1;
+    const lib = (metiers.find((m) => m.code === d.metier) || {}).libelle;
+    titre = (prenom ? "Bonjour " + prenom + ".<br>" : "")
+          + 'Une demande pour <span class="em">' + echapper(ditJour(j)) + "</span>.";
+    quoi = (lib ? echapper(lib) : "Un chantier")
+         + (d.chantier_commune ? " à " + echapper(d.chantier_commune) : "")
+         + ", " + nb + (nb > 1 ? " jours" : " jour") + " à partir du "
+         + echapper(ditJourMois(j)) + "."
+         + (d.message ? " « " + echapper(d.message) + " »" : "");
+    geste = { texte: "Voir la demande", ou: "/demandes" };
+  } else {
+    titre = (prenom ? "Bonjour " + prenom + ".<br>" : "")
+          + 'Aucune demande <span class="em">en attente</span>.';
+    quoi = "Les demi-journées que tu laisses ouvertes restent visibles des confrères "
+         + "qui cherchent quelqu'un près de chez toi.";
+  }
+
+  /* 2. LA JOURNEE. Trois lignes horaires, filet sur ce qui reste libre. */
+  const lignes = exemple ? EXEMPLES.journee : journeeVraie(jourVu);
+  let hJournee = "";
+  if (!lignes.length) {
+    hJournee = '<p class="auj-s">La journée est finie : plus rien à prendre '
+             + "aujourd'hui.</p>";
+  } else {
+    hJournee = '<div class="auj-lignes">' + lignes.map((l) => {
+      const t = l.libre
+        ? "Ton " + ditDemi(l.demi) + " du " + ditJour(jourVu) + " est libre."
+        : l.quoi;
+      const s = l.libre ? "Aucune demande posée dessus pour l'instant." : l.sous;
+      return '<div class="auj-l' + (l.libre ? " libre" : "") + '">'
+           + '<span class="auj-hh">' + echapper(l.de) + " - " + echapper(l.a) + "</span>"
+           + '<div><p class="auj-t">' + echapper(t) + "</p>"
+           + (s ? '<p class="auj-s">' + echapper(s) + "</p>" : "") + "</div></div>";
+    }).join("") + "</div>";
+  }
+
+  /* 3. LE CHIFFRE. Le seul bloc a contraste inverse de l'ecran. */
+  let estLibre;
+  if (exemple) {
+    const s = new Set();
+    EXEMPLES.journee.forEach((l) => { if (l.libre) s.add(cleCase(jourOuvre(0), l.demi)); });
+    EXEMPLES.semaine.forEach((x) => x.demis.forEach((demi) =>
+      s.add(cleCase(jourOuvre(x.dansOuvres), demi))));
+    estLibre = (d, demi) => s.has(cleCase(d, demi));
+  } else {
+    estLibre = (d, demi) => !estOccupe(d, demi) && !estPasse(d, demi);
+  }
+  const L = libresVisibles(estLibre);
+  /* Le jour nomme vient de la FENETRE, pas du dernier jour trouve : le compte
+     peut tomber a zero, la phrase doit rester une phrase. « libre » sans un
+     jour nomme dans la meme phrase n'est pas une information. */
+  const hChiffre = '<div class="auj-chiffre">'
+    + '<span class="auj-n">' + L.n + "</span>"
+    + '<p class="auj-n-quoi">' + (L.n > 1 ? "demi-journées libres" : "demi-journée libre")
+    + " d'ici " + echapper(ditJour(jourOuvre(3))) + "</p>"
+    + (L.noms.length ? '<p class="auj-n-jours">' + echapper(majuscule(L.noms.join(", ")))
+        + ".</p>" : '<p class="auj-n-jours">Tout est pris jusque-là.</p>') + "</div>";
+
+  /* 4. LA REPUTATION. */
+  const a = exemple ? EXEMPLES.avis : v.avis;
+  let hNote;
+  if (!a) {
+    hNote = '<p class="auj-s">Pas encore d\'avis : le premier arrivera après ton '
+          + "premier chantier avec un confrère.</p>";
+  } else {
+    const quand = exemple ? plusJours(jour0(new Date()), -EXEMPLES.avis.ilYA)
+                          : (a.quand ? new Date(a.quand) : null);
+    hNote = '<p class="auj-note"><b>' + a.note.toFixed(1).replace(".", ",") + "</b>"
+          + "<span>sur 5</span><span>" + a.combien
+          + (a.combien > 1 ? " avis de confrères" : " avis d'un confrère") + "</span></p>"
+          + (exemple
+              ? '<p class="auj-s">Le dernier, de ' + echapper(EXEMPLES.avis.dernier)
+                + ", le " + quand.getDate() + " " + MOIS[quand.getMonth()] + ".</p>"
+              : (quand ? '<p class="auj-s">Le dernier, le ' + quand.getDate() + " "
+                  + MOIS[quand.getMonth()] + ".</p>" : ""));
+  }
+
+  /* LE CADRE. Quand l'ecran est d'exemple, il porte la mention en bandeau et
+     tout ce qui est invente vit A L'INTERIEUR. Quand il est vrai, ni cadre ni
+     bandeau : juste les quatre parties. */
+  const dedans =
+      '<div class="auj-part"><h1>' + titre + "</h1>"
+    + '<p class="auj-quoi">' + quoi + "</p>"
+    + (geste ? '<div class="pied-actions"><a class="bouton plein" href="'
+        + geste.ou + '">' + geste.texte + "</a></div>" : "")
+    + "</div>"
+    + '<div class="auj-part"><p class="auj-titre">'
+    + echapper(majuscule(ditJourMois(jourVu))) + "</p>" + hJournee + "</div>"
+    + '<div class="auj-part"><p class="auj-titre">Ce que les confrères voient</p>'
+    + hChiffre + "</div>"
+    + '<div class="auj-part"><p class="auj-titre">Ta réputation</p>' + hNote + "</div>";
+
+  z.innerHTML =
+      (exemple
+        ? '<div class="auj-cadre"><p class="auj-dit">' + echapper(MENTION_EXEMPLE) + "</p>"
+          + dedans + "</div>"
+        : '<div class="auj-cadre">' + dedans + "</div>")
+    + '<div class="pied-actions"><button type="button" class="bouton '
+    + (geste ? "creux" : "plein") + '" id="vers-dispos">Ouvrir tes disponibilités</button></div>'
+    + '<p class="aide">Tu y bloques une plage en deux gestes : le début du chantier, '
+    + "puis sa fin.</p>";
+
+  $("vers-dispos").addEventListener("click", () => { volet = "dispos"; taire(); ecranFini(); });
+}
+
+function ecranAujourdhui(z) {
+  z.innerHTML = '<div class="mesure" id="auj"><p class="chargement">Un instant…</p></div>';
+  lireAujourdhui().then(rendreAujourdhui).catch(() => rendreAujourdhui({ demande: null, avis: null }));
+}
+
+/* ----------------------------------------------------------- les quatre volets */
 function ecranFini() {
   const nom = [fiche.prenom, fiche.nom].filter(Boolean).join(" ");
   /* L'espace termine respire plus large que l'accompagnement : une grille de
@@ -1961,17 +2427,22 @@ function ecranFini() {
   const w = document.querySelector(".wrap"); if (w) w.classList.add("large");
   ecran.innerHTML =
     '<div class="onglets">'
-    + ['dispos','fiche','agendas'].map((v) =>
+    /* Les onglets et les titres parlent a la MEME personne. « Mes agendas »
+       au-dessus d'un titre « Tes agendas » fait deux voix dans un seul ecran. */
+    + ['aujourdhui','dispos','fiche','agendas'].map((v) =>
         '<button class="onglet' + (volet === v ? " ici" : "") + '" data-v="' + v + '"'
         + (volet === v ? ' aria-current="true"' : "") + ">"
-        + (v === "dispos" ? "Disponibilités" : v === "fiche" ? "Ma fiche" : "Mes agendas")
+        + (v === "aujourdhui" ? "Aujourd'hui" : v === "dispos" ? "Disponibilités"
+           : v === "fiche" ? "Ta fiche" : "Tes agendas")
         + "</button>").join("")
     + "</div><div id='volet'></div>";
   ecran.querySelectorAll(".onglet").forEach((b) =>
     b.addEventListener("click", () => { volet = b.dataset.v; taire(); ecranFini(); }));
 
   const z = $("volet");
-  if (volet === "dispos") {
+  if (volet === "aujourdhui") {
+    ecranAujourdhui(z);
+  } else if (volet === "dispos") {
     /* UNE SEULE CHOSE IMPORTANTE SUR CET ECRAN : la plage qu'on bloque.
        Un titre, une phrase, le calendrier, et un seul bouton plein, qui
        n'apparait qu'une fois qu'il y a quelque chose a ecrire. */
@@ -2003,7 +2474,7 @@ function ecranFini() {
       + '<p class="aide">Ton agenda est ailleurs&nbsp;? '
       + '<button type="button" class="lien" id="vers-agendas">Dépose ton fichier .ics</button> '
       + ': il se lit ici, sans rien créer nulle part. Le raccordement automatique à Google, '
-      + 'Outlook et Apple, lui, n\'est pas encore branché.</p>';
+      + 'Outlook et Apple, lui, n\'est pas encore raccordé.</p>';
     brancherGrille($("zone-cal"));
     $("vers-agendas").addEventListener("click", () => { volet = "agendas"; taire(); ecranFini(); });
     etatCal = "chargement"; dessinerCalendrier();
@@ -2041,7 +2512,7 @@ function ecranFini() {
       +   '<input type="file" id="ics" accept=".ics,text/calendar" aria-label="Fichier de calendrier .ics">'
       +   '<p class="aide" id="ics-etat" role="status" aria-live="polite"></p></div>'
       + AGENDAS.map((a) =>
-          '<div class="carte eteinte"><h3>' + a.nom + '<span class="quand">bientôt</span></h3>'
+          '<div class="carte eteinte"><h3>' + a.nom + '<span class="quand">pas encore</span></h3>'
           + "<p>" + a.quoi + '</p><p class="mono">Pas encore raccordé : '
           + a.manque + ".</p></div>").join("")
       + "</div>";
@@ -2065,6 +2536,28 @@ function rendre() {
   if (e === "abonnement") return ecranAbonnement();
   if (e === "agenda") return ecranAgenda();
   return ecranFini();
+}
+
+
+/* L'ecran partage des fonctions non branchees. Un seul dialogue pour tout le
+   produit : on lui passe ce qui manque et ce qu'on peut faire a la place. */
+function pasRaccorde(nom, cause, issue) {
+  let dlg = document.getElementById("dlg-raccord");
+  if (!dlg) {
+    dlg = document.createElement("dialog");
+    dlg.id = "dlg-raccord"; dlg.className = "raccord";
+    document.body.appendChild(dlg);
+  }
+  dlg.innerHTML =
+    '<div class="boite">'
+    + '<h2>Pas encore raccordé</h2>'
+    + '<p class="quoi">' + echapper(nom) + "</p>"
+    + '<div class="cause"><b>Ce qui manque</b><p>' + echapper(cause) + "</p></div>"
+    + '<div class="issue"><b>' + echapper(issue.titre) + "</b><p>" + echapper(issue.texte) + "</p></div>"
+    + '<button class="fermer" type="button" autofocus>J\'ai compris</button>'
+    + "</div>";
+  dlg.querySelector(".fermer").addEventListener("click", () => dlg.close());
+  dlg.showModal();
 }
 
 /* ---------------------------------------------------------------- demarrage */
