@@ -1,0 +1,309 @@
+<title>Aide - À dispo</title>
+<!--
+  LA PAGE D'AIDE, ET LE SOCLE DE L'AGENT DE REPONSE.
+  Ligne du devis N°20260910-1 : « Agent de reponse aux questions courantes »,
+  1 j, 240 €. Micro-taches 1 a 3 du plan d'action.
+
+  POURQUOI CETTE PAGE SERT TROIS FOIS.
+    1. C'est la page d'aide publique, celle qu'un artisan lit a 21 h sans
+       vouloir ecrire a personne.
+    2. C'est le SOCLE de l'agent de reponse : les memes questions, les memes
+       reponses. Ecrire deux fois la meme reponse, c'est en avoir deux
+       differentes six mois plus tard.
+    3. C'est du referencement naturel. Les artisans tapent leurs questions
+       dans Google, pas dans un moteur de recherche interne. Avec les fiches
+       materiel, c'est le seul canal d'acquisition gratuit du projet.
+
+  LA LANGUE. Tutoiement, phrases courtes, zero jargon. La cible lit parfois
+  mal le francais et consulte sur un telephone, souvent dans un camion. Une
+  reponse qu'il faut relire deux fois est une reponse ratee.
+
+  CE QUI ENGAGE, ET CE QUI N'ENGAGE PAS. Certaines reponses touchent au droit :
+  responsabilite sur un chantier, nature de la relation entre artisans,
+  assurance. Elles sont marquees « a valider par l'avocat » et NE DOIVENT PAS
+  etre publiees en l'etat. Le reste est factuel et se publie tel quel.
+
+  CE QUI RESTE EN ATTENTE. La reponse sur le prix ne porte aucun chiffre :
+  le prix de l'offre unique n'est pas fixe. Ecrire un montant plausible ici
+  reviendrait a l'inventer, et il se retrouverait cite par un artisan.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE, MEMES NOMS, VALEURS CLAIRES ---
+     Valeurs relevees sur les douze ecrans deja passes en clair (source :
+     CHARTE-CLAIRE.md). Cette page etait restee sombre alors qu'on y arrive
+     depuis des pages claires : le saut se voyait. */
+
+  /* Verrouille les controles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Sans cette ligne, un navigateur en
+     theme sombre repeint les champs et toute mesure devient fausse. */
+  color-scheme:light;
+
+  --bg:#F6F3EC;--bg-2:#FFFFFF;--surface:#FBF8F2;--surface-2:#EFEADF;
+  --cream:#0C1421;--cream-mut:#3C4A62;--cream-dim:#546279;
+  --accent:#E8B93E;--accent-2:#D9A72E;--accent-soft:rgba(232,185,62,.22);
+  --vert:#196740;--vert-soft:rgba(79,208,138,.16);
+  --alerte:#A93C24;--alerte-soft:rgba(240,160,138,.16);
+  --line:rgba(12,20,33,.14);
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre */
+  --line-2:rgba(12,20,33,.07);
+  --r:16px;--gut:clamp(1.1rem,4.5vw,3rem);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 420px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding:clamp(28px,6vw,64px) var(--gut) 80px}
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(28px,5.5vw,42px);line-height:1.12}
+h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
+  background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
+  padding:0 .05em}
+.lead{color:var(--cream-mut);font-size:clamp(16px,2.2vw,18px);margin:14px 0 0;max-width:56ch}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:clamp(18px,2.6vw,22px);
+  margin:44px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+h2 .n{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:400;
+  color:var(--cream-dim);display:block;margin-bottom:3px;letter-spacing:.04em}
+
+.cherche{margin:26px 0 0;position:sticky;top:0;z-index:9;
+  background:linear-gradient(180deg,var(--bg-2) 70%,transparent);padding:12px 0 14px}
+.cherche input{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:12px 20px;outline:none}
+.cherche input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.cherche input::placeholder{color:var(--cream-dim)}
+.compte{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-dim);
+  margin-top:8px;padding-left:4px}
+
+details{border:1px solid var(--line);border-radius:12px;margin:9px 0;background:var(--bg-2);
+  overflow:hidden}
+details[open]{border-color:var(--line);background:var(--surface)}
+summary{cursor:pointer;padding:14px 18px;font-family:"Signika",sans-serif;font-weight:600;
+  font-size:16.5px;list-style:none;display:flex;justify-content:space-between;gap:14px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:"JetBrains Mono",monospace;font-size:19px;
+  color:var(--accent-texte);flex:none;line-height:1}
+details[open] summary::after{content:"−"}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.rep{padding:0 18px 16px;color:var(--cream-mut);font-size:15.3px}
+.rep p{margin:.55rem 0}
+.rep b{color:var(--cream)}
+.rep ul{margin:.5rem 0;padding-left:1.15rem}
+.rep li{margin:.3rem 0}
+.rep li::marker{color:var(--accent-texte)}
+
+.marque{display:inline-block;font-family:"Signika",sans-serif;font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:4px;
+  margin:0 0 9px}
+.marque.avocat{background:var(--alerte-soft);color:var(--alerte);border:1px solid rgba(240,160,138,.35)}
+.marque.attente{background:var(--accent-soft);color:var(--accent-texte);border:1px solid rgba(232,185,62,.35)}
+
+.avis{border:1px solid rgba(240,160,138,.35);background:var(--alerte-soft);
+  border-radius:12px;padding:15px 19px;margin:22px 0;font-size:14.6px;color:var(--cream-mut)}
+.avis b{color:var(--alerte);font-family:"Signika",sans-serif}
+.note{border:1px solid var(--line);background:var(--bg-2);border-left:3px solid var(--accent);
+  border-radius:12px;padding:15px 19px;margin:22px 0;font-size:14.6px;color:var(--cream-mut)}
+.note b{color:var(--accent-texte);font-family:"Signika",sans-serif}
+
+.vide{display:none;color:var(--cream-dim);font-size:15px;padding:20px 4px;text-align:center}
+.pied{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--cream-dim);line-height:1.6}
+
+@media print{
+  body{background:#fff;color:#111C2E}
+  .cherche{display:none}
+  details{border-color:rgba(17,28,46,.15);background:#fff;break-inside:avoid}
+  .rep,.lead,.pied{color:rgba(17,28,46,.72)}
+  summary::after{content:""}
+  @page{size:A4 portrait;margin:14mm 13mm}
+}
+</style>
+
+<div class="wrap">
+
+  <h1>Des questions&nbsp;? <span class="em">Les réponses.</span></h1>
+  <p class="lead"><span id="lead-n">Les questions</span> qui reviennent. Si la tienne n'y est
+  pas, écris-nous depuis la messagerie : on répond, et on l'ajoute ici.</p>
+
+  <div class="note">
+    <b>Ce document sert trois fois.</b> C'est la page d'aide publique, c'est le socle de
+    l'agent qui répond tout seul dans la messagerie, et c'est du référencement naturel : les
+    artisans tapent leurs questions dans Google, pas dans un moteur interne. Les réponses sont
+    écrites <b>une seule fois</b>, ici. Écrire deux fois la même réponse, c'est en avoir deux
+    différentes six mois plus tard.
+  </div>
+
+  <div class="avis">
+    <b id="avis-n">Certaines réponses ne sont pas publiables en l'état.</b> Elles touchent au
+    droit : responsabilité sur un chantier, nature de la relation entre artisans, assurance,
+    données personnelles. Elles portent la mention « à valider par l'avocat » et attendent sa
+    relecture. Une autre attend le prix de l'abonnement, qui n'est pas arrêté : on préfère ne
+    rien écrire plutôt qu'un chiffre qui bougerait. Le reste est factuel et part tel quel.
+  </div>
+
+  <div class="cherche">
+    <input id="q" type="search" placeholder="Cherche un mot : SIRET, agenda, payé, résilier…"
+           aria-label="Chercher dans l'aide" oninput="filtrer()">
+    <div class="compte" id="compte"></div>
+  </div>
+
+  <div id="liste"></div>
+  <p class="vide" id="vide">Aucune réponse ne contient ce mot. Écris-nous, on ajoutera la question.</p>
+
+  <div class="pied">
+    Rédigé le 13/09/2026 par Joan Aglave &amp; Alec Ferrante. Les réponses marquées
+    « à valider par l'avocat » ne sont pas publiables avant sa relecture : c'est lui qui porte
+    sa responsabilité, pas nous. Document de travail, confidentiel tant que la marque n'est
+    pas déposée.
+  </div>
+</div>
+
+<script>
+/* LES QUESTIONS, ECRITES UNE FOIS. La page d'aide et l'agent de reponse lisent
+   cette meme table. `m` marque ce qui n'est pas publiable : "avocat" quand la
+   reponse engage juridiquement, "attente" quand il manque une donnee. */
+var AIDE=[
+{c:"S'inscrire", q:[
+ {t:"Comment je m'inscris, et ça prend combien de temps ?",
+  r:"<p>Tu donnes ton numéro SIRET, ton métier et ta zone. On récupère le reste tout seul dans l'annuaire des entreprises. <b>Deux minutes</b>, pas de papier à envoyer.</p><p>Ensuite tu complètes ta fiche quand tu veux : photos de chantiers, matériel, diplômes. Plus elle est remplie, plus on te trouve.</p>"},
+
+ {t:"Pourquoi vous demandez mon SIRET ?",
+  r:"<p>Parce qu'<b>à dispo est réservé aux entreprises</b>. On vérifie que la tienne existe et qu'elle est active, auprès de l'annuaire officiel.</p><p>C'est ce qui te protège : en face, tu as toujours une entreprise immatriculée, pas quelqu'un qui bricole le week-end. Et c'est ce qui fait que tu travailles entre pros, comme avec n'importe quel sous-traitant.</p>"},
+
+ {t:"Je suis auto-entrepreneur, ça marche pour moi ?",
+  r:"<p>Oui. Auto-entrepreneur, EURL, SARL, SAS : à partir du moment où tu as un SIRET actif, tu peux t'inscrire.</p><p>Si tu as demandé à ne pas apparaître dans les fichiers publics, on ne pourra pas récupérer ton nom automatiquement. <b>Tu le saisis à la main</b>, et ça s'arrête là : ton inscription passe quand même.</p>"},
+
+ {t:"Mon numéro est refusé, qu'est-ce que je fais ?",
+  r:"<p>Trois raisons possibles, et le message te dit laquelle :</p><ul><li><b>Une faute de frappe.</b> Le numéro fait 14 chiffres. Reprends-le sur ton avis de situation.</li><li><b>L'établissement est fermé.</b> Ça arrive quand tu as déménagé ou changé de structure : on t'affiche ton numéro actuel, utilise celui-là.</li><li><b>L'entreprise a cessé.</b> Si tu en as créé une nouvelle, inscris-toi avec son numéro.</li></ul>"},
+
+ {t:"Je viens de créer mon entreprise, mon numéro ne passe pas.",
+  r:"<p>C'est normal. Une immatriculation met quelques jours à apparaître dans l'annuaire public.</p><p><b>Ton inscription est enregistrée quand même.</b> On revérifie tout seuls, et ton compte s'ouvre dès que ton numéro apparaît. Tu n'as rien à refaire.</p>"},
+
+ {t:"Mon métier n'est pas dans la liste.",
+  r:"<p>Dis-le-nous avec le formulaire prévu : tu tapes ton métier, on te prévient dès qu'il est ajouté.</p><p>On a démarré avec les métiers les plus demandés. La liste s'allonge en fonction de ce que vous nous remontez, pas de ce qu'on imagine.</p>"}
+]},
+
+{c:"Mes disponibilités", q:[
+ {t:"Comment je dis que je suis dispo ?",
+  r:"<p>Tu ouvres ton calendrier et tu coches. C'est tout.</p><p>Tu peux poser une journée, <b>une demi-journée</b>, ou une plage d'heures. Un chantier qui se libère un mardi après-midi, ça se vend : c'est fait pour ça.</p>"},
+
+ {t:"Est-ce que mon agenda personnel devient visible ?",
+  r:"<p>Non, et c'est important. Si tu branches ton agenda Google, Outlook ou Apple, on ne récupère <b>que le libre et l'occupé</b>.</p><p>Les titres de tes rendez-vous, les noms, les lieux : on ne les lit pas, on ne les stocke pas. Les autres voient uniquement que tu es pris, jamais par quoi.</p>"},
+
+ {t:"Comment je branche mon agenda ?",
+  r:"<p>Depuis ton compte, tu choisis Google, Outlook ou Apple, et tu autorises. Tes jours occupés remontent tout seuls.</p><p>On demande la <b>lecture seule</b> : on n'écrit jamais dans ton agenda. Et tu peux débrancher quand tu veux, ce qui efface ce qu'on avait récupéré.</p>"},
+
+ {t:"Si j'oublie de mettre à jour mes dispos ?",
+  r:"<p>Personne ne te pénalise. Mais tu risques d'être appelé pour un créneau où tu n'es plus libre, et ça agace en face.</p><p>Le plus simple est de brancher ton agenda une fois : après, tu n'y penses plus.</p>"}
+]},
+
+{c:"Travailler avec quelqu'un", q:[
+ {t:"Qui paie qui, et comment ?",
+  r:"<p><b>Ça se règle entre vous, directement, comme avec n'importe quel sous-traitant.</b> Devis, facture, paiement : à dispo ne touche jamais à l'argent de vos chantiers.</p><p>Nous, on te fait payer un abonnement pour utiliser la plateforme. Rien d'autre, et aucune commission sur ce que tu factures.</p>"},
+
+ {t:"C'est légal ? On n'est pas en train de prêter de la main d'œuvre ?", m:"avocat",
+  r:"<p>À dispo met en relation <b>deux entreprises immatriculées</b>. Ce qui se passe ensuite est une relation entre professionnels, avec devis et facture, comme une sous-traitance ordinaire.</p><p>C'est la raison pour laquelle on vérifie le SIRET à l'inscription, et pour laquelle la plateforme ne gère aucun paiement de chantier.</p>"},
+
+ {t:"Qui est responsable si ça se passe mal sur le chantier ?", m:"avocat",
+  r:"<p>Chaque entreprise reste responsable de son travail et de ses assurances, comme sur n'importe quel chantier.</p><p>À dispo vous met en relation, la plateforme n'intervient pas dans l'exécution. Vérifie les assurances de celui que tu fais venir, exactement comme tu le ferais avec un sous-traitant trouvé par le bouche-à-oreille.</p>"},
+
+ {t:"Je peux refuser une demande ?",
+  r:"<p>Oui, toujours, et sans te justifier. Être visible ne t'engage à rien.</p><p>Réponds simplement, même pour dire non : en face, c'est quelqu'un qui cherche une solution pour la semaine.</p>"},
+
+ {t:"Comment on fixe le prix de la journée ?",
+  r:"<p>Entre vous. On n'impose aucun tarif et on n'en suggère aucun.</p><p>Tu connais ton prix de journée mieux que nous. La plateforme sert à trouver la personne, pas à la négocier à ta place.</p>"},
+
+ {t:"Qui peut me noter, et sur quoi ?",
+  r:"<p>Après un chantier, chacun note l'autre. <b>Ça marche dans les deux sens</b>, et c'est voulu.</p><ul><li>Celui qui est venu travailler est noté sur la qualité et le sérieux.</li><li>Celui qui a fait venir est noté sur <b>les délais de paiement</b> et la clarté du chantier.</li></ul><p>Un donneur d'ordre qui paie à 90 jours, ça se saura. C'est la moitié qui manque partout ailleurs.</p>"}
+]},
+
+{c:"L'abonnement", q:[
+ {t:"Combien ça coûte ?", m:"attente",
+  r:"<p>Un abonnement unique, au mois ou à l'année, l'année étant plus intéressante. Des options s'ajoutent par-dessus si tu en as besoin, comme la vente de matériel.</p><p><b>Le tarif est en cours d'arbitrage et sera affiché ici dès qu'il est arrêté.</b> On préfère ne rien écrire plutôt qu'un chiffre qui bougerait ensuite.</p>"},
+
+ {t:"Je peux arrêter quand je veux ?",
+  r:"<p>Oui. Tu résilies depuis ton compte, <b>sans nous écrire et sans justification</b>. L'abonnement court jusqu'à la fin de la période déjà payée, puis s'arrête.</p><p>Ta fiche et ton historique sont conservés : si tu reviens dans six mois, tu retrouves tout.</p>"},
+
+ {t:"Le premier mois est gratuit ?",
+  r:"<p>Oui, au lancement. L'idée est simple : tu essaies pour de vrai, avec de vrais artisans autour de toi, avant de payer quoi que ce soit.</p><p>On te prévient avant la fin de la période d'essai. Pas de prélèvement surprise.</p>"},
+
+ {t:"Comment je change ma carte ou la date du prélèvement ?",
+  r:"<p>Les deux se font depuis ton compte, en quelques clics.</p><p>La date de prélèvement est modifiable une fois par mois. Pratique quand tu es payé le 15 et pas le 5.</p>"},
+
+ {t:"Le parrainage, ça marche comment ?",
+  r:"<p>Tu as un code. Un artisan s'inscrit avec, <b>tu gagnes un mois offert</b>.</p><p>Pas de limite de bon sens : plus tu en amènes, plus tu en gagnes. C'est le moyen le plus rapide pour que ta région se remplisse, et une plateforme vide ne sert à personne.</p>"}
+]},
+
+{c:"Le matériel", q:[
+ {t:"Je peux mettre ma nacelle ou mon camion à dispo ?",
+  r:"<p>Oui, dans l'onglet matériel, séparé de la recherche de personnes. Tu publies une annonce avec photos, tarif et disponibilités.</p><p>Là encore, <b>la location se règle entre vous</b>. La plateforme ne prend rien et ne touche à rien.</p>"},
+
+ {t:"Il me faut quels documents pour louer mon matériel ?", m:"avocat",
+  r:"<p>Certains documents sont obligatoires, notamment côté assurance, et l'annonce doit porter des mentions précises.</p><p>La liste exacte est en cours de validation par un avocat, et elle sera affichée ici. Tant qu'un document manque, l'annonce ne peut pas être publiée : c'est ce qui protège les deux côtés.</p>"}
+]},
+
+{c:"Mes données", q:[
+ {t:"Qu'est-ce que vous faites de mes données ?", m:"avocat",
+  r:"<p>On stocke ce que tu saisis : ta fiche, tes disponibilités, tes échanges. On récupère le libre et l'occupé de ton agenda si tu le branches, <b>jamais le contenu</b>.</p><p>Le détail complet, les durées de conservation et la façon de tout supprimer figurent dans la politique de confidentialité, rédigée par un avocat.</p>"},
+
+ {t:"Comment je supprime mon compte ?", m:"avocat",
+  r:"<p>Depuis ton compte, en une demande. On te confirme, et tes données sont supprimées.</p><p>Certaines pièces doivent être conservées un temps pour des raisons comptables et légales : la durée exacte est précisée dans la politique de confidentialité.</p>"}
+]}
+];
+
+/* Rendu. Les compteurs sont calcules, jamais ecrits a la main. */
+var MARQUES={
+ avocat:["à valider par l'avocat","avocat"],
+ attente:["en attente d'une donnée","attente"]
+};
+var html="", total=0, aValider=0, enAttente=0;
+AIDE.forEach(function(bloc){
+  html+='<h2><span class="n">'+bloc.q.length+' QUESTION'+(bloc.q.length>1?'S':'')+'</span>'+bloc.c+'</h2>';
+  bloc.q.forEach(function(x){
+    total++;
+    if(x.m==="avocat")aValider++;
+    if(x.m==="attente")enAttente++;
+    var m=x.m?'<span class="marque '+MARQUES[x.m][1]+'">'+MARQUES[x.m][0]+'</span>':'';
+    html+='<details><summary>'+x.t+'</summary><div class="rep">'+m+x.r+'</div></details>';
+  });
+});
+document.getElementById('liste').innerHTML=html;
+document.getElementById('compte').textContent=
+  total+" questions · "+aValider+" à valider par l'avocat · "+enAttente+" en attente d'une donnée";
+
+/* Les nombres cites dans le texte sont CALCULES. Ecrits a la main, ils etaient
+   deja faux a la premiere mesure : « vingt-et-une questions » pour vingt-cinq,
+   et « six reponses touchent au droit » pour cinq. Un nombre recopie dans une
+   phrase ne se met jamais a jour. */
+document.getElementById('lead-n').textContent =
+  "Les "+total+" questions";
+document.getElementById('avis-n').textContent =
+  aValider+" réponses ne sont pas publiables en l'état.";
+
+/* La recherche. Un artisan tape « paye » sans accent et sans e final : on
+   compare donc sans accents, et sur le texte de la reponse aussi, parce que
+   son mot est souvent dans la reponse et pas dans le titre. */
+function sansAccent(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+function filtrer(){
+  var m=sansAccent(document.getElementById('q').value.trim());
+  var n=0;
+  document.querySelectorAll('#liste details').forEach(function(d){
+    var vu=!m||sansAccent(d.textContent).indexOf(m)>=0;
+    d.style.display=vu?'':'none';
+    if(vu)n++;
+    if(m&&vu)d.open=true; else if(!m)d.open=false;
+  });
+  document.querySelectorAll('#liste h2').forEach(function(h){
+    var e=h.nextElementSibling, vu=false;
+    while(e&&e.tagName==='DETAILS'){if(e.style.display!=='none')vu=true;e=e.nextElementSibling}
+    h.style.display=vu?'':'none';
+  });
+  document.getElementById('vide').style.display=(m&&!n)?'block':'none';
+  document.getElementById('compte').textContent= m
+    ? n+" réponse"+(n>1?"s":"")+" contiennent « "+document.getElementById('q').value.trim()+" »"
+    : total+" questions · "+aValider+" à valider par l'avocat · "+enAttente+" en attente d'une donnée";
+}
+</script>

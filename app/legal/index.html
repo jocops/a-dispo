@@ -1,0 +1,1225 @@
+<title>Mentions légales et conditions - À dispo</title>
+<!--
+  LA TRAME JURIDIQUE, ET CE QU'ELLE N'EST PAS.
+
+  CE DOCUMENT N'ENGAGE PERSONNE EN L'ETAT. C'est une trame de travail : elle
+  range les obligations, elle nomme les trous, et elle se donne a lire a un
+  avocat pour qu'il n'ait pas a partir d'une page blanche. Elle ne remplace pas
+  sa redaction, elle la prepare. Publier ce texte tel quel reviendrait a
+  s'engager sur des clauses que personne n'a validees.
+
+  POURQUOI ELLE EXISTE QUAND MEME. Le devis chiffre la redaction juridique
+  entre 800 et 1 500 € et la met HORS PERIMETRE (devis/index.html lignes 263 et
+  276, deck-investisseur/index.html ligne 650). Sans avocat designe, le site ne
+  peut pas ouvrir ses inscriptions (cadrage/index.html ligne 365). Entre
+  « rien » et « un texte invente », il y a cette trame : ce qu'on sait, ce
+  qu'on ignore, et le geste humain qui debloque chaque manque.
+
+  AUCUNE DONNEE JURIDIQUE N'EST INVENTEE. Pas de raison sociale, pas
+  d'adresse, pas de SIRET, pas de nom d'hebergeur, pas de nom d'assureur. Tout
+  ce qui manque porte un marqueur VISIBLE A L'ECRAN, et la liste de ces
+  marqueurs est CALCULEE a partir de la page, jamais recopiee : recopiee, elle
+  serait fausse des la premiere correction.
+
+  LES CINQ POINTS DE aide/index.html SONT REPRIS SOUS LA MEME MARQUE.
+  Responsabilite de chantier, nature de la relation entre artisans, assurance
+  du loueur, donnees personnelles, suppression du compte : meme marque, meme
+  couleur, meme promesse, ce qui est rouge ne se publie pas. Un sixieme point
+  s'y ajoute ici, que la page d'aide n'aborde pas : le droit de retractation
+  entre professionnels. Le compteur affiche a l'ecran est CALCULE, pour qu'il
+  reste juste le jour ou un septieme apparait.
+
+  LE POINT LE PLUS SENSIBLE, ECRIT SANS LE TRAVESTIR. « A dispo » met en
+  relation des entreprises independantes en sous-traitance. Elle n'est ni
+  employeuse, ni entreprise de travail temporaire, ni partie au contrat conclu
+  entre deux artisans, et elle ne touche jamais a l'argent qu'ils s'echangent.
+  C'est la these juridique du projet. Elle tient ou elle ne tient pas, et c'est
+  l'avocat qui le dit, pas nous.
+
+  LE PRIX DE L'ABONNEMENT N'EST PAS ARRETE. Aucun montant n'est ecrit nulle
+  part dans cette page. Un chiffre plausible pose ici serait cite par un
+  artisan six mois plus tard.
+
+  LA DATE DE MISE A JOUR EST LUE, PAS RECOPIEE. Elle vient de l'en-tete
+  `Last-Modified` du document publie, et a defaut de la date du fichier connue
+  du navigateur. Si aucune des deux n'est disponible, la page le DIT au lieu
+  d'afficher une date fausse.
+
+  CE QUI N'EST PAS BRANCHE, ET QUI EST DIT COMME TEL.
+    · RELEVE PERIME, CORRIGE LE 14/09/2026 : la page EST desormais enregistree
+      dans `outils/build.py` (entree "legal/index.html" vers
+      "dist/legal/index.html"), elle part donc bien dans `dist/` et /legal
+      repond. build.py ne se modifie toujours pas depuis ici.
+    · Aucun lien du site ne mene ici, pour la meme raison. Un lien vers une
+      page non publiee est un lien mort.
+    · Le bandeau de traceurs n'existe pas encore. Il n'est pas necessaire
+      aujourd'hui : la page mesure ce qui est reellement charge, et rien de ce
+      qui est charge ne depose de traceur soumis a consentement. Le jour ou la
+      mesure d'audience arrive, le bandeau devient obligatoire.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
+     Bloc identique sur les sept écrans applicatifs. Source : CHARTE-CLAIRE.md,
+     relevé et mesuré le 14/09/2026. Tout ratio cité est calculé par la formule
+     WCAG 2.1, alpha composité sur son fond réel. */
+
+  /* Verrouille les contrôles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Le gabarit de outils/build.py déclare
+     encore `meta color-scheme = dark` : la propriété CSS l'emporte sur la
+     balise, et c'est ici qu'elle se pose. */
+  color-scheme:light;
+
+  /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
+     (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
+     teinte nulle). */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de dégradé */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
+     #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
+
+  /* Les deux variables propres a cet ecran. Le filet secondaire suit le filet
+     principal : `rgba(242,234,216,.06)` pose sur du blanc donnait 1,01:1. */
+  --line-2:rgba(12,20,33,.08);
+  --r:16px;
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+/* Le systeme demande moins d'animation : on obeit, y compris sur le
+   defilement des ancres, qui est la seule animation de cette page. */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 420px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  overflow-wrap:break-word}
+img,svg{max-width:100%}
+.wrap{max-width:780px;margin:0 auto;padding:clamp(28px,6vw,64px) var(--gut) 80px}
+
+/* ---------------------------------------------------------- LA MESURE
+   C'EST UN DOCUMENT LONG : LA LONGUEUR DE LIGNE COMMANDE TOUT LE RESTE.
+   La borne est MESUREE dans le navigateur, caractere par caractere sur le
+   texte reel, et non deduite de l'unite `ch` : `ch` est la largeur du zero de
+   Karla, et 66ch y laissaient passer 78 a 89 caracteres, bien au dela de la
+   fenetre demandee. A 51ch, la ligne la plus longue de la page fait 74
+   caracteres a 768, 1024 et 1440 px, 61 a 430 px et 55 a 390 px, ou c'est
+   l'ecran qui borne et non la regle : descendre la taille du texte pour
+   atteindre 60 caracteres sur un telephone couterait plus qu'il ne rapporte.
+   L'interlignage passe de 1,6 a 1,75 : sur trente ecrans de clauses, c'est ce
+   qui separe un texte qu'on lit d'un texte qu'on survole. */
+.bloc p,.bloc li{max-width:51ch;font-size:16.2px;line-height:1.75}
+.lead{max-width:46ch}
+.clair,.note,.avis,.etat,.manque-liste li{max-width:54ch}
+
+/* Le lien d'evitement. Invisible tant qu'on ne navigue pas au clavier, et la
+   toute premiere chose atteinte des qu'on tabule. L'encre sur l'ambre : 10,06:1. */
+.saut{position:absolute;left:-9999px;top:0;background:var(--accent);color:var(--encre);
+  font-family:"Signika",sans-serif;font-weight:700;padding:11px 18px;border-radius:0 0 10px 0;z-index:50}
+.saut:focus{left:0}
+
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:20px;line-height:1;margin-bottom:22px;color:var(--cream)}
+/* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE : le `à` ambre donne 9,31:1 sur le
+   nuit et 1,66:1 sur le papier. Il passe donc a l'ambre-lettre, 5,85:1. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(27px,5.2vw,40px);line-height:1.12}
+/* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
+   Le mot reste en encre (18,46:1), l'ambre passe dessous en surlignage, et la
+   ou la barre couvre la lettre l'encre sur l'ambre vaut 10,06:1. */
+h1 .em{color:var(--cream);
+  background:linear-gradient(var(--accent),var(--accent)) 0 88%/100% .2em no-repeat}
+.lead{color:var(--cream-mut);font-size:clamp(15.5px,2.2vw,18px);margin:14px 0 0}
+
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:clamp(19px,2.8vw,24px);
+  margin:52px 0 6px;padding-top:20px;border-top:1px solid var(--line);scroll-margin-top:74px}
+h2 .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:400;
+  color:var(--cream-dim);display:block;margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase}
+h3{font-family:"Signika",sans-serif;font-weight:600;font-size:16.5px;margin:30px 0 2px}
+
+p{margin:.6rem 0}
+.bloc{margin:0 0 4px}
+.bloc p,.bloc li{color:var(--cream-mut)}
+.bloc b,.bloc strong{color:var(--cream)}
+ul,ol{margin:.5rem 0;padding-left:1.15rem}
+li{margin:.32rem 0}
+/* Une puce ambre sur du papier vaut 1,84:1 : elle disparait. Ambre-lettre. */
+li::marker{color:var(--accent-texte)}
+
+/* « En clair » : la meme chose, en langue d'artisan. La cible lit parfois mal
+   le francais et consulte sur un telephone. Une clause qu'il faut relire deux
+   fois est une clause ratee.
+   SUR FOND CLAIR, LE FILET AMBRE SEUL NE TIENT PLUS : 3 px d'ambre sur du
+   blanc valent 1,84:1, le bloc perdait sa marque. Il prend donc le voile
+   d'ambre comme fond, et son titre passe a l'ambre-lettre : 5,69:1. */
+.clair{border-left:4px solid var(--accent-texte);background:var(--accent-soft);
+  border-radius:0 10px 10px 0;padding:13px 17px;margin:14px 0 18px;
+  font-size:15px;line-height:1.7;color:var(--cream-mut)}
+.clair b{color:var(--accent-texte);font-family:"Signika",sans-serif}
+
+/* ---- LE MARQUEUR. Ce qui n'est pas connu se voit, et de loin. ----
+   C'EST LE POSTE QUE LA BASCULE CHANGE LE PLUS. Sur le nuit, le marqueur etait
+   une lettre ambre sur un voile ambre : 7,75:1, et il sautait aux yeux. Sur du
+   papier, la meme lettre tombe a 1,84:1 et le marqueur DISPARAIT, c'est-a-dire
+   que la page cesse de dire ce qu'elle ne sait pas.
+   On applique donc la regle de la charte a la lettre : l'ambre passe du texte
+   au REMPLISSAGE. Le marqueur devient un aplat ambre plein portant l'encre,
+   mesure a 10,06:1 : c'est la paire la plus contrastee de toute la page, donc
+   l'element le plus voyant, ce qui est exactement son role.
+   `display:inline` plutot que `inline-block`, avec `box-decoration-break`
+   pour que le cadre se redessine sur chaque ligne. En inline-block, un
+   marqueur long prenait toute la largeur et rejetait le point de la phrase
+   seul sur la ligne suivante : mesure faite a 375 px, trois fois dans la
+   section 1.
+   `scroll-margin-top` : sans lui, un marqueur atteint depuis la liste se range
+   SOUS le sommaire colle en haut, et on croit que le lien ne marche pas. Le
+   sommaire mesure 71 px de haut sur telephone, on prend 86. */
+.tc{display:inline;background:var(--accent);color:var(--encre);
+  border:1px solid var(--accent-2);border-radius:6px;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  font-family:"JetBrains Mono",monospace;font-size:12.6px;font-weight:600;
+  padding:1px 7px;margin:0 1px;line-height:1.9;white-space:normal;
+  scroll-margin-top:86px}
+.tc::before{content:"▸ "}
+/* Le seul marqueur qui n'en est pas un : celui qui sert a montrer a quoi
+   ressemble un marqueur. Il est exclu du comptage, sans quoi la page
+   annoncerait un manque de plus qu'elle n'en a. Il se distingue par sa FORME
+   (creux, trait discontinu) et non par une opacite : une demi-opacite sur du
+   clair fait echouer jusqu'au noir. Ambre-lettre sur voile : 5,69:1. */
+.tc.exemple{background:var(--accent-soft);color:var(--accent-texte);
+  border:1px dashed var(--accent-texte)}
+/* Le marqueur qu'on vient d'atteindre depuis la liste s'allume : sans ca, on
+   arrive au bon endroit sans savoir lequel des trois marqueurs de l'ecran on
+   cherchait. Les roles s'inversent, encre pleine et lettre ambre : 10,06:1,
+   la seule paire de la charte ou l'ambre a le droit d'etre une lettre, parce
+   que son fond est le bleu nuit et non le papier. */
+.tc:target{background:var(--cream);color:var(--accent);border-color:var(--cream)}
+/* La cible du lien d'evitement ne doit pas dessiner un cadre autour de toute
+   la page : le focus y sert a poser le curseur, pas a designer un bouton. */
+#contenu:focus{outline:none}
+
+/* Etiquette de champ lue par les lecteurs d'ecran, invisible a l'oeil. La
+   technique `clip` plutot que `display:none`, qui la retirerait aussi de la
+   restitution vocale. */
+.vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Les deux marques heritees de aide/index.html, a l'identique : ce qui est
+   marque la-bas doit se reconnaitre ici du premier coup d'oeil. Les bordures
+   sont reconstruites sur la couleur sombre correspondante : celles de la
+   charte sombre valaient 1,23:1 a 1,28:1 sur du papier, c'est-a-dire rien. */
+.marqueur{display:inline-block;font-family:"Signika",sans-serif;font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:4px;margin:0 0 6px}
+.marqueur.avocat{background:var(--alerte-soft);color:var(--alerte);border:1px solid rgba(169,60,36,.35)}
+.marqueur.attente{background:var(--accent-soft);color:var(--accent-texte);border:1px solid rgba(118,90,14,.35)}
+
+.avis{border:1px solid rgba(169,60,36,.35);background:var(--alerte-soft);
+  border-radius:var(--r);padding:17px 20px;margin:26px 0;font-size:15px;line-height:1.7;
+  color:var(--cream-mut)}
+.avis b{color:var(--alerte);font-family:"Signika",sans-serif}
+.avis p{margin:.5rem 0}
+/* La note porte la these juridique du projet : c'est le bloc le plus
+   important de la page apres l'avertissement. Sur du papier elle se marque a
+   l'encre pleine, la valeur la plus forte de la charte. */
+.note{border:1px solid var(--line);background:var(--bg-2);border-left:4px solid var(--cream);
+  border-radius:0 var(--r) var(--r) 0;padding:17px 20px;margin:22px 0;font-size:15px;
+  line-height:1.7;color:var(--cream-mut);box-shadow:var(--ombre-1)}
+.note b{color:var(--cream);font-family:"Signika",sans-serif}
+
+/* ---- Le sommaire. Sur telephone il se colle en haut et defile lateralement
+   DANS SA BOITE : la page, elle, ne deborde jamais. Sur grand ecran il quitte
+   le haut de page et devient une colonne fixe a gauche du texte : voir le
+   plan de bureau, plus bas. ----
+   LE FONDU PARTAIT D'UN NUIT TRANSPARENT : sur du clair, le navigateur
+   interpole vers du noir transparent et pose un voile gris bleute. Un degrade
+   vers la transparence doit partir de la couleur d'arrivee. */
+.sommaire{position:sticky;top:0;z-index:9;margin:26px calc(var(--gut) * -1) 0;
+  padding:10px var(--gut) 11px;background:linear-gradient(180deg,var(--bg) 74%,rgba(246,243,236,0));
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sommaire::-webkit-scrollbar{display:none}
+.sommaire ul{display:flex;gap:7px;margin:0;padding:0;list-style:none;width:max-content}
+/* 44 px de haut, pas 40 : c'est la regle de cible tactile du projet, et le
+   sommaire se touche debout, d'une main, sur un telephone. */
+.sommaire a{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;
+  border:1px solid var(--line);border-radius:999px;background:var(--bg-2);
+  color:var(--cream-mut);text-decoration:none;font-family:"Signika",sans-serif;
+  font-weight:600;font-size:13.5px;white-space:nowrap;box-shadow:var(--ombre-1)}
+.sommaire a:hover{border-color:var(--accent-texte);color:var(--accent-texte)}
+.sommaire a:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+/* Le lien vers ce qui manque est le seul qui compte avant publication : il
+   prend l'aplat ambre et l'encre, 10,06:1, la paire la plus forte de la page. */
+.sommaire a.manque{background:var(--accent);border-color:var(--accent-2);color:var(--encre)}
+.sommaire a.manque:hover{background:var(--accent-2);color:var(--encre)}
+
+.cherche{margin:12px 0 0}
+/* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND : `--surface` posee
+   sur le sol ne donne que 1,02:1. Filet `--cream-dim`, 5,57:1. */
+.cherche input{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--cream-dim);border-radius:999px;padding:13px 20px;
+  min-height:48px;outline:none;-webkit-appearance:none;appearance:none}
+.cherche input:focus{border-color:var(--accent-texte);box-shadow:0 0 0 3px var(--accent-soft)}
+.cherche input::placeholder{color:var(--cream-dim);opacity:1}
+.compte{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-dim);
+  margin-top:9px;padding-left:6px;line-height:1.55}
+
+/* ---- Les etats. Chargement, vide, erreur, succes : aucun ecran blanc. ---- */
+.etat{border-radius:12px;padding:13px 17px;margin:16px 0 0;font-size:14.6px;
+  color:var(--cream-mut);border:1px solid var(--line);background:var(--bg-2);
+  box-shadow:var(--ombre-1)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
+.etat.ok b{color:var(--vert)}
+.etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35)}
+.etat.ko b{color:var(--alerte)}
+.etat.chargement b{color:var(--cream-dim)}
+.etat code{font-family:"JetBrains Mono",monospace;font-size:12.4px;color:var(--cream-mut)}
+
+.vide{display:none;color:var(--cream-dim);font-size:15px;padding:26px 4px;text-align:center}
+
+/* ---- Ce qui manque, calcule a partir de la page elle-meme ---- */
+.manque-liste{margin:14px 0 0;padding:0;list-style:none;counter-reset:m}
+.manque-liste li{display:flex;gap:12px;align-items:flex-start;padding:11px 0;
+  border-top:1px solid var(--line-2);font-size:15px;line-height:1.65;color:var(--cream-mut)}
+.manque-liste li:first-child{border-top:none}
+.manque-liste .rang{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--accent-texte);
+  flex:none;min-width:2.1em;padding-top:5px}
+.manque-liste .lib{display:block;color:var(--cream);font-family:"Signika",sans-serif;
+  font-weight:600;font-size:15px;line-height:1.35}
+.manque-liste .ou{display:block;font-family:"JetBrains Mono",monospace;font-size:11px;
+  color:var(--cream-dim);margin-top:4px;letter-spacing:.03em}
+/* Les liens de la liste conduisent a l'endroit exact du manque. Cible tactile
+   de 44 px de haut, mesuree : a 32 px ils passaient sous le seuil du projet,
+   et ce sont eux qu'on touche le plus sur cette page. */
+.manque-liste .ou a{display:inline-block;min-height:44px;line-height:44px;
+  color:var(--accent-texte);text-decoration:none;border-bottom:1px solid rgba(118,90,14,.45)}
+.manque-liste .ou a:hover{border-bottom-color:var(--accent-texte)}
+.manque-liste .ou a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px;border-radius:3px}
+
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15px;
+  min-height:48px;border-radius:999px;padding:0 24px;cursor:pointer;
+  border:1px solid var(--line);background:var(--bg-2);color:var(--cream);
+  box-shadow:var(--ombre-1)}
+.bouton.plein{background:var(--accent);color:var(--encre);border-color:var(--accent-2)}
+.bouton.plein:hover:enabled{background:var(--accent-2)}
+/* UN BOUTON ETEINT RESTE LISIBLE, ET L'OPACITE NE SERT PAS A L'OBTENIR : sur
+   fond clair une demi-opacite fait echouer jusqu'au noir. #546279 sur
+   #EFEADF = 5,15:1. */
+.bouton:disabled{background:var(--surface-2);color:var(--cream-dim);
+  border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+
+/* Les tableaux. Sur ecran large, un vrai tableau. Sous 560 px, chaque ligne
+   devient une carte : un tableau de trois colonnes sur un telephone tenu d'une
+   main se lit a la loupe, ou pas du tout. L'en-tete disparait alors de l'oeil
+   mais reste devant chaque valeur, repris par `data-t`. */
+.tableau{margin:18px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14.6px}
+th,td{text-align:left;padding:11px 14px 11px 0;border-bottom:1px solid var(--line-2);
+  vertical-align:top;color:var(--cream-mut);line-height:1.6}
+th{font-family:"Signika",sans-serif;font-weight:600;color:var(--cream);font-size:13px;
+  text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line)}
+@media(max-width:560px){
+  .tableau thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .tableau table,.tableau tbody,.tableau tr,.tableau td{display:block;width:100%}
+  .tableau tr{border:1px solid var(--line);border-radius:12px;background:var(--bg-2);
+    padding:11px 14px;margin:10px 0;box-shadow:var(--ombre-1)}
+  .tableau td{border:none;padding:7px 0}
+  .tableau td::before{content:attr(data-t);display:block;font-family:"JetBrains Mono",monospace;
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-texte);
+    margin-bottom:2px}
+}
+
+.pied{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--cream-dim);line-height:1.7;max-width:70ch}
+.pied b{color:var(--cream-mut);font-family:"Signika",sans-serif}
+.pied ul{padding-left:1.1rem}
+.pied code{font-family:"JetBrains Mono",monospace;font-size:11.5px}
+
+/* ------------------------------------------------------- LE PLAN DE BUREAU
+   LA MISE EN PAGE CHANGE AVEC LA LARGEUR, ELLE NE S'ETIRE PAS. Sous 1100 px,
+   le sommaire se colle en haut et defile lateralement : c'est ce qu'il faut
+   sur un telephone. Au dessus, la place existe pour le poser a demeure a
+   gauche, et un document de trente ecrans devient navigable sans remonter :
+   le sommaire reste sous l'oeil pendant toute la lecture.
+   `display:contents` sur le rail en dessous du seuil : sans lui, le sommaire
+   colle se retrouverait enferme dans une boite haute de 120 px et ne pourrait
+   plus coller a rien. */
+.rail{display:contents}
+@media(min-width:1100px){
+  .wrap{max-width:1040px;display:grid;align-items:start;
+    grid-template-columns:minmax(0,15rem) minmax(0,1fr);
+    column-gap:clamp(2.5rem,4vw,4.5rem)}
+  /* TOUT LE DOCUMENT TIENT DANS LA COLONNE DE DROITE, titre compris. Un
+     chapeau qui s'etale sur les deux colonnes puis des sections qui se rangent
+     a droite font sauter la colonne de lecture d'un bord a l'autre au premier
+     defilement : on lit alors deux documents au lieu d'un.
+     Le rail occupe la colonne de gauche sur toute la hauteur de la grille
+     (`grid-row: 1 / span 24`, plus de lignes qu'il n'en existe, les lignes en
+     trop ayant une hauteur nulle) : c'est cette hauteur qui donne au sommaire
+     collant de quoi coller pendant toute la lecture. */
+  .marque,h1,.lead,.avis,.note,#s-date,#contenu,#vide,.pied{grid-column:2}
+  .rail{display:block;grid-column:1;grid-row:1 / span 24;position:sticky;top:24px;
+    max-height:calc(100vh - 48px);overflow-y:auto}
+  .sommaire{position:static;margin:0;padding:0;background:none;overflow:visible}
+  .sommaire ul{flex-direction:column;width:auto;gap:5px}
+  .sommaire a{width:100%}
+  /* Le sommaire ne couvre plus le haut de l'ecran : la reserve de defilement
+     n'a plus lieu d'etre, et un titre atteint se pose enfin en haut. */
+  h2{scroll-margin-top:24px;margin-top:44px}
+  .tc{scroll-margin-top:24px}
+}
+
+/* L'impression. Cette trame part chez un avocat : elle sera imprimee ou mise
+   en PDF. La charte claire etant desormais celle de l'ecran, l'impression n'a
+   plus a tout retourner : elle ne corrige que ce que le papier impose.
+   LES MARQUEURS RESTENT LES ELEMENTS LES PLUS VOYANTS DE LA FEUILLE, mais en
+   creux et non en aplat : trente-neuf aplats ambre pleins sur un document de
+   quinze pages coutent une cartouche. Mesure du marqueur imprime :
+   #765A0E sur #FFF6DD = 6,02:1, contre 4,70 pour l'ancien #8A6A00. */
+@media print{
+  body{background:#fff;color:#0C1421}
+  .sommaire,.cherche,.actions,.saut,#s-copie,.rail{display:none}
+  .wrap{max-width:none;padding:0;display:block}
+  h1,h2,h3,.bloc b,.bloc strong,.manque-liste .lib,th{color:#0C1421}
+  h1 .em{background:none;color:#765A0E}
+  .bloc p,.bloc li,.lead,.pied,.clair,.avis,.note,.etat,td{color:#3C4A62}
+  .clair,.avis,.note,.etat,.tableau tr{background:#fff;border-color:rgba(12,20,33,.2);
+    box-shadow:none}
+  .clair{border-left-color:#765A0E}
+  .clair b,.avis b,.note b,.etat b,.manque-liste .rang,.manque-liste .ou a{color:#765A0E}
+  .note{border-left-color:#0C1421}
+  .note b{color:#0C1421}
+  .marque{color:#0C1421}
+  .marque .a,.marque svg{color:#765A0E}
+  .marqueur{background:#fff;border-color:rgba(12,20,33,.35);color:#765A0E}
+  .tc,.tc:target{border-color:#765A0E;color:#765A0E;background:#FFF6DD}
+  li::marker{color:#765A0E}
+  h2{break-after:avoid}
+  h3{break-after:avoid}
+  .clair,.avis,.note,.tableau tr{break-inside:avoid}
+  @page{size:A4 portrait;margin:14mm 13mm}
+}
+</style>
+
+<a class="saut" href="#contenu">Aller au contenu</a>
+
+<div class="wrap">
+
+  <span class="marque">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+      <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span><span class="a">à</span> dispo</span>
+  </span>
+
+  <h1>Mentions légales <span class="em">et conditions</span>.</h1>
+  <p class="lead">Mentions légales, données personnelles, conditions d'utilisation, conditions
+  de vente et traceurs. <span id="lead-n">Les sections</span> sur une seule page, pour n'avoir
+  qu'une adresse à donner.</p>
+
+  <div class="avis">
+    <p><b>Ce texte n'engage personne en l'état.</b> C'est une trame de travail. Elle doit être
+    relue, corrigée et engagée par un avocat avant toute ouverture au public. Publier ces
+    clauses telles quelles reviendrait à s'engager sur des phrases que personne n'a validées.</p>
+    <p>La rédaction juridique est <b>hors périmètre du devis</b> : conditions générales,
+    contrats-types de sous-traitance et de location, volet données personnelles. Elle est
+    chiffrée entre 800 et 1 500 € par un avocat rémunéré, qui engage sa responsabilité civile.
+    Nous intégrons ses textes, nous ne les écrivons pas.</p>
+    <p id="avis-compte" class="compte" style="padding-left:0">Comptage en cours…</p>
+  </div>
+
+  <div class="note">
+    <p><b>La thèse juridique du projet, écrite sans la travestir.</b> « À dispo » met en
+    relation des <b>entreprises indépendantes</b> qui travaillent entre elles en
+    sous-traitance. Elle n'est pas employeuse. Elle n'est pas une entreprise de travail
+    temporaire. Elle n'est pas partie au contrat conclu entre deux artisans. Et elle ne touche
+    jamais à l'argent échangé entre eux.</p>
+    <p>Tout le reste en découle : la vérification du SIRET à l'inscription, l'absence de tout
+    encaissement de chantier, le fait que chaque entreprise garde la direction de ses propres
+    salariés. Cette thèse tient ou elle ne tient pas : <b>c'est l'avocat qui le dit, pas
+    nous.</b></p>
+  </div>
+
+  <div class="etat chargement" id="s-date" role="status" aria-live="polite">
+    <b>Lecture de la date de publication…</b>
+  </div>
+
+  <!-- LE RAIL. Il n'existe que pour la mise en page : sous 1100 px il est
+       transparent (`display:contents`) et le sommaire se colle en haut comme
+       avant ; au dessus, il devient la colonne fixe de gauche. Aucun
+       identifiant ne bouge, donc aucune ligne de script ne change. -->
+  <div class="rail">
+  <nav class="sommaire" aria-label="Sommaire">
+    <ul>
+      <li><a class="manque" href="#manque" id="lien-manque">Ce qui manque</a></li>
+      <li><a href="#mentions">1. Mentions légales</a></li>
+      <li><a href="#donnees">2. Données personnelles</a></li>
+      <li><a href="#cgu">3. Conditions d'utilisation</a></li>
+      <li><a href="#cgv">4. Conditions de vente</a></li>
+      <li><a href="#traceurs">5. Traceurs</a></li>
+    </ul>
+  </nav>
+
+  <div class="cherche">
+    <label for="q" class="vh">Chercher un mot dans les conditions</label>
+    <!-- Les quatre mots proposes ont ete VERIFIES : chacun ramene au moins une
+         section. Un exemple qui ne ramene rien apprend a l'artisan que la
+         recherche ne marche pas. -->
+    <input id="q" type="search" placeholder="Cherche un mot : SIRET, agenda, résilier, assurance…"
+           aria-describedby="compte">
+    <div class="compte" id="compte" role="status" aria-live="polite">Préparation de la page…</div>
+  </div>
+  </div><!-- /.rail -->
+
+  <div id="contenu" tabindex="-1">
+
+  <!-- ================================================== CE QUI MANQUE == -->
+  <h2 id="manque"><span class="n">Avant toute publication</span>Ce qui manque, nommé</h2>
+  <div class="bloc">
+    <p>Aucune donnée juridique n'est inventée dans cette page : ni raison sociale, ni adresse,
+    ni SIRET, ni nom d'hébergeur, ni nom d'assureur. Chaque information inconnue porte un
+    marqueur <span class="tc exemple">comme celui-ci</span> à l'endroit exact où elle
+    manque. Celui-là est l'exemple, il n'est pas compté.</p>
+    <p>La liste ci-dessous est <b>calculée à partir de la page</b>, à chaque ouverture. Elle
+    n'est pas recopiée : recopiée, elle serait fausse dès la première correction.</p>
+
+    <div id="manque-etat" class="etat chargement" role="status" aria-live="polite">
+      <b>Relevé des marqueurs en cours…</b>
+    </div>
+    <ol class="manque-liste" id="manque-liste"></ol>
+
+    <div class="actions">
+      <button type="button" class="bouton plein" id="copier">Copier la liste pour l'avocat</button>
+    </div>
+    <div class="etat" id="s-copie" role="status" aria-live="polite" hidden></div>
+  </div>
+
+  <!-- ================================================== 1. MENTIONS == -->
+  <h2 id="mentions"><span class="n">Section 1</span>Mentions légales</h2>
+
+  <div class="bloc">
+    <div class="clair"><b>En clair.</b> Qui édite ce site, où il est hébergé, et à qui écrire
+    quand quelque chose ne va pas.</div>
+
+    <h3>1.1 L'éditeur du site</h3>
+    <p>Le site est édité par <span class="tc">À COMPLÉTER : raison sociale</span>,
+    <span class="tc">À COMPLÉTER : forme juridique et capital social</span>, dont le siège est
+    situé <span class="tc">À COMPLÉTER : adresse du siège</span>.</p>
+    <ul>
+      <li>Numéro d'identification : <span class="tc">À COMPLÉTER : SIRET</span>.</li>
+      <li>Immatriculation : <span class="tc">À COMPLÉTER : numéro RCS et ville du greffe</span>.</li>
+      <li>Taxe sur la valeur ajoutée : <span class="tc">À COMPLÉTER : numéro de TVA intracommunautaire, ou mention d'exonération</span>.</li>
+      <li>Contact : <span class="tc">À COMPLÉTER : adresse électronique de contact</span>
+        et <span class="tc">À COMPLÉTER : numéro de téléphone</span>.</li>
+    </ul>
+    <p>Ces éléments sont exigés par l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la
+    confiance dans l'économie numérique, et par l'article L111-7 du Code de la consommation
+    pour les opérateurs de plateforme en ligne. <b>La portée exacte de l'article L111-7 sur une
+    plateforme réservée aux professionnels est à trancher avec l'avocat</b> : ce texte vise en
+    premier lieu l'information du consommateur.</p>
+
+    <h3>1.2 Le directeur de la publication</h3>
+    <p>Directeur de la publication : <span class="tc">À COMPLÉTER : directeur de publication</span>.</p>
+
+    <h3>1.3 L'hébergement</h3>
+    <p>Le site est hébergé par <span class="tc">À COMPLÉTER : hébergeur du site, raison sociale et adresse</span>.
+    La base de données est hébergée par
+    <span class="tc">À COMPLÉTER : hébergeur de la base, raison sociale, adresse et pays d'hébergement</span>.</p>
+    <div class="clair"><b>Ce qu'on mesure aujourd'hui, à confirmer avant publication.</b> Le
+    dépôt indique un hébergement du site sur Cloudflare Pages depuis le 04/09/2026, un nom de
+    domaine <code>a-dispo.fr</code> enregistré chez OVH le même jour, et une base de données
+    Supabase (projet <code>ucnyvsocoxenxbuakluo</code>). Source :
+    <code>DEPLOIEMENT.md</code>, lignes 3 et 11. Ce sont des constats techniques :
+    <b>les identités et adresses légales de ces sociétés ne sont pas dans le dépôt, donc elles
+    ne sont pas écrites ici.</b> Le pays d'hébergement de la base doit être relevé dans la
+    console du fournisseur, pas deviné.</div>
+
+    <h3>1.4 La marque et la propriété intellectuelle</h3>
+    <p>Le nom « à dispo », le logo, la charte graphique, les textes, les visuels et le code du
+    site sont protégés. Le dépôt de la marque est
+    <span class="tc">À COMPLÉTER : date et numéro de dépôt INPI de la marque</span>. Toute
+    reprise sans accord écrit est interdite.</p>
+    <div class="clair"><b>Pourquoi cette page ne décrit pas le service dans son code.</b> Tant
+    que la marque n'est pas déposée, le site ne se décrit pas : <code>outils/build.py</code>
+    retire volontairement la balise de description, et <code>robots.txt</code> refuse la visite
+    des robots. Ce n'est pas un oubli, c'est une protection.</div>
+
+    <h3>1.5 L'assurance</h3>
+    <p>Assurance de responsabilité civile professionnelle :
+    <span class="tc">À COMPLÉTER : assureur, adresse et numéro de contrat</span>, couvrant
+    <span class="tc">À COMPLÉTER : étendue géographique de la garantie</span>.</p>
+  </div>
+
+  <!-- ================================================== 2. DONNEES == -->
+  <h2 id="donnees"><span class="n">Section 2</span>Politique de confidentialité</h2>
+
+  <div class="bloc">
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <div class="clair"><b>En clair.</b> Ce qu'on garde de toi, pourquoi, combien de temps, et
+    comment tu récupères ou supprimes tout. Cette section reprend deux des réponses de la page
+    d'aide qui attendent l'avocat : « qu'est-ce que vous faites de mes données » et « comment
+    je supprime mon compte ».</div>
+
+    <h3>2.1 Qui est responsable de ces données</h3>
+    <p>Le responsable du traitement est <span class="tc">À COMPLÉTER : raison sociale</span>,
+    <span class="tc">À COMPLÉTER : adresse du siège</span>. Pour toute question sur tes données,
+    écrire à <span class="tc">À COMPLÉTER : adresse électronique dédiée aux données personnelles</span>.
+    Désignation d'un délégué à la protection des données :
+    <span class="tc">À COMPLÉTER : délégué à la protection des données, ou constat qu'il n'est pas obligatoire</span>.</p>
+
+    <h3>2.2 Ce qui est réellement collecté</h3>
+    <p>La liste ci-dessous n'est pas une liste de principe : elle est relevée dans le schéma de
+    la base (<code>crm/supabase/migration-espace-artisan.sql</code> et
+    <code>crm/supabase/migration-inscriptions.sql</code>). Elle doit être reprise à chaque
+    évolution de la base, sans quoi elle devient fausse.</p>
+    <div class="tableau">
+    <table>
+      <thead>
+        <tr><th scope="col">Ce qui est enregistré</th><th scope="col">Pourquoi</th><th scope="col">Base légale</th></tr>
+      </thead>
+      <tbody>
+      <tr><td data-t="Ce qui est enregistré">Liste d'attente : adresse électronique, métier, département, téléphone facultatif, origine de la visite</td>
+          <td data-t="Pourquoi">Prévenir de l'ouverture, et décider dans quels métiers et quels départements ouvrir en premier</td>
+          <td data-t="Base légale">Consentement, retirable en un clic</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Identité : prénom, nom, téléphone, photo</td>
+          <td data-t="Pourquoi">Tenir la fiche et permettre à deux entreprises de se reconnaître</td>
+          <td data-t="Base légale">Exécution du contrat</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Entreprise : SIRET, dénomination, activité, commune, code postal, date de vérification</td>
+          <td data-t="Pourquoi">Vérifier qu'on est entre entreprises immatriculées, condition de tout le reste</td>
+          <td data-t="Base légale">Exécution du contrat et obligation légale de vigilance</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Métier, présentation, rayon d'intervention, compétences, outillage, permis, matériel</td>
+          <td data-t="Pourquoi">Être trouvé par les entreprises qui cherchent</td>
+          <td data-t="Base légale">Exécution du contrat</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Disponibilités : créneaux occupés, saisis à la main ou remontés d'un agenda</td>
+          <td data-t="Pourquoi">Le cœur du service</td>
+          <td data-t="Base légale">Exécution du contrat</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Agendas raccordés : fournisseur, date de raccordement, jetons d'accès</td>
+          <td data-t="Pourquoi">Faire remonter les créneaux occupés, en lecture seule</td>
+          <td data-t="Base légale">Consentement, retirable en débranchant l'agenda</td></tr>
+      <tr><td data-t="Ce qui est enregistré">Abonnement : formule, dates d'essai et d'échéance</td>
+          <td data-t="Pourquoi">Savoir qui a accès au service</td>
+          <td data-t="Base légale">Exécution du contrat</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>Ce qui n'est jamais lu ni conservé :</b> le contenu des agendas raccordés. Ni les
+    titres des rendez-vous, ni les lieux, ni les participants. Seuls le libre et l'occupé
+    remontent. Cette promesse est tenue dans le code autant que dans le texte : la lecture des
+    fichiers de calendrier ignore explicitement le titre, le lieu et les participants
+    (<code>espace/index.html</code>, fonction <code>lireIcs</code>).</p>
+    <p><b>Ce qui n'est jamais demandé :</b> aucune donnée bancaire n'est saisie sur le site à
+    ce jour. Le prestataire de paiement n'est pas raccordé
+    (<span class="tc">À COMPLÉTER : prestataire de paiement retenu</span>).</p>
+
+    <h3>2.3 Ce qui est visible par les autres</h3>
+    <p>La fiche publique d'un artisan montre : le prénom, la dénomination de l'entreprise, le
+    métier, la présentation, la photo, la commune, <b>les deux premiers chiffres du code
+    postal</b> et le rayon d'intervention. <b>Le nom de famille n'est jamais public</b>, ni le
+    téléphone, ni l'adresse électronique. Une fiche n'apparaît que si son propriétaire l'a
+    publiée et a terminé son inscription.</p>
+
+    <h3>2.4 Combien de temps</h3>
+    <p>Durées de conservation : <span class="tc">À COMPLÉTER : durées de conservation, poste par poste</span>.
+    Les pièces comptables et les factures obéissent à une durée légale distincte, à confirmer :
+    <span class="tc">À COMPLÉTER : durée de conservation des pièces comptables</span>.</p>
+    <div class="clair"><b>Pourquoi c'est vide.</b> Une durée de conservation inventée est pire
+    qu'une durée absente : elle s'oppose à l'utilisateur le jour où il demande la suppression.
+    C'est une décision d'avocat, poste par poste.</div>
+
+    <h3>2.5 Qui d'autre y a accès</h3>
+    <p>Sous-traitants et destinataires : <span class="tc">À COMPLÉTER : liste des sous-traitants, leur rôle et leur pays d'hébergement</span>.
+    Transferts hors de l'Union européenne et garanties associées :
+    <span class="tc">À COMPLÉTER : transferts hors Union européenne, et leur encadrement</span>.</p>
+    <p>Les données ne sont ni vendues, ni louées, ni cédées à des tiers à des fins publicitaires.</p>
+
+    <h3>2.6 Tes droits</h3>
+    <p>Droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de
+    portabilité, prévus par les articles 15 à 22 du règlement (UE) 2016/679 et par la loi
+    n° 78-17 du 6 janvier 1978. Ils s'exercent à l'adresse indiquée au 2.1, et une réclamation
+    peut être portée devant la Commission nationale de l'informatique et des libertés.</p>
+
+    <h3>2.7 Supprimer son compte</h3>
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <p>La suppression se demande depuis le compte, sans avoir à écrire à quiconque et sans
+    justification. Elle entraîne la suppression de la fiche, des disponibilités, des
+    compétences et des agendas raccordés. Certaines pièces sont conservées plus longtemps pour
+    des raisons comptables et légales : la durée exacte est celle du 2.4, et elle n'est pas
+    encore fixée.</p>
+    <div class="clair"><b>Ce qui existe déjà techniquement.</b> Dans la base, la fiche d'un
+    artisan et tout ce qui s'y rattache (compétences, agendas, jetons, disponibilités)
+    disparaissent ensemble à la suppression du compte : la suppression en cascade est écrite
+    dans le schéma. <b>L'écran qui déclenche cette demande, lui, n'existe pas encore</b> : il
+    est au plan d'action, et il attend les textes de l'avocat.</div>
+  </div>
+
+  <!-- ================================================== 3. CGU == -->
+  <h2 id="cgu"><span class="n">Section 3</span>Conditions générales d'utilisation</h2>
+
+  <div class="bloc">
+    <div class="clair"><b>En clair.</b> Ce que le service fait, ce qu'il ne fait pas, et ce que
+    chacun s'engage à respecter.</div>
+
+    <h3>3.1 Ce qu'est « à dispo », et ce qu'elle n'est pas</h3>
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <p>« À dispo » est un service de mise en relation entre <b>entreprises indépendantes du
+    bâtiment</b>, en vue de travaux réalisés en sous-traitance, au sens de la loi n° 75-1334 du
+    31 décembre 1975.</p>
+    <p>« À dispo » :</p>
+    <ul>
+      <li>n'est <b>pas employeuse</b> des artisans inscrits ni de leurs équipes ;</li>
+      <li>n'est <b>pas une entreprise de travail temporaire</b> ;</li>
+      <li>n'est <b>pas partie</b> au contrat conclu entre deux entreprises inscrites ;</li>
+      <li>ne <b>touche jamais</b> à l'argent échangé entre elles : devis, facture et paiement
+        se règlent directement entre les deux entreprises ;</li>
+      <li>n'exerce <b>aucune direction</b> sur les chantiers, ni sur les personnes qui y
+        travaillent.</li>
+    </ul>
+    <p>Chaque entreprise inscrite garde la direction de ses propres salariés, ses propres
+    obligations et ses propres assurances. Cette architecture existe pour tenir le service à
+    l'écart du prêt de main d'œuvre à but lucratif, interdit par l'article L8241-1 du Code du
+    travail hors des cas prévus pour le travail temporaire, ainsi que du marchandage visé à
+    l'article L8231-1 du même code.</p>
+    <div class="clair"><b>Pourquoi le SIRET est vérifié à l'inscription.</b> Parce que c'est ce
+    qui rend la phrase ci-dessus vraie. Sans vérification, le service accueillerait des
+    personnes physiques et changerait de nature. La vérification sert aussi l'obligation de
+    vigilance de l'article L8222-1 du Code du travail.</div>
+
+    <h3>3.2 Qui peut s'inscrire</h3>
+    <p>Le service est réservé aux entreprises immatriculées, disposant d'un numéro SIRET actif,
+    quelle que soit leur forme : entrepreneur individuel, micro-entrepreneur, EURL, SARL, SAS.
+    L'inscription suppose d'accepter les présentes conditions, par une case <b>jamais
+    pré-cochée</b>. La date de l'acceptation et la version acceptée du texte sont conservées :
+    <span class="tc">À COMPLÉTER : numéro de version des présentes conditions, à horodater à l'acceptation</span>.</p>
+
+    <h3>3.3 Le compte</h3>
+    <p>Le compte est personnel à l'entreprise. Ses identifiants ne se partagent pas. Les
+    informations déclarées doivent être exactes et tenues à jour : une disponibilité fausse
+    fait perdre du temps à une autre entreprise, et c'est la seule chose que le service ne
+    pardonne pas longtemps.</p>
+
+    <h3>3.4 Les disponibilités et les agendas raccordés</h3>
+    <p>L'artisan pose ses créneaux à la main, ou raccorde un agenda existant. Le raccordement
+    est demandé en <b>lecture seule</b> : rien n'est jamais écrit dans l'agenda personnel.
+    Seuls le libre et l'occupé sont lus. Le débranchement efface ce qui avait été remonté.</p>
+    <div class="clair"><b>Ce qui marche aujourd'hui, et ce qui attend.</b> L'import d'un
+    fichier de calendrier fonctionne dès maintenant, sans personne. Les raccordements Google,
+    Microsoft et Apple sont <b>éteints</b> tant que les identifiants et déclarations
+    correspondants n'ont pas été créés chez ces fournisseurs. L'écran le dit à l'artisan plutôt
+    que de lui présenter un bouton qui ne fait rien.</div>
+
+    <h3>3.5 Ce qui se passe entre deux entreprises</h3>
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <p>Chaque entreprise reste responsable de son travail, de ses assurances, de la sécurité de
+    ses équipes et du respect des règles de son métier, exactement comme sur un chantier trouvé
+    par le bouche-à-oreille. « À dispo » n'intervient pas dans l'exécution des travaux et ne
+    garantit ni leur qualité, ni leur achèvement, ni le paiement du prix convenu.</p>
+    <p>Il appartient à chaque entreprise de vérifier, avant de faire intervenir une autre
+    entreprise, ses attestations d'assurance, sa vigilance sociale et ses qualifications.</p>
+    <p>Contrat-type de sous-traitance mis à disposition des inscrits :
+    <span class="tc">À COMPLÉTER : contrat-type de sous-traitance, rédigé par l'avocat</span>.</p>
+
+    <h3>3.6 Le matériel mis à disposition</h3>
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <p>La mise à disposition de matériel relève du louage de chose, article 1709 du Code civil.
+    La location se règle directement entre les deux entreprises : aucun paiement ne transite
+    par la plateforme. Le loueur doit fournir les documents exigés, notamment d'assurance, et
+    l'annonce doit porter les mentions obligatoires correspondantes :
+    <span class="tc">À COMPLÉTER : liste des documents exigés du loueur, et mentions obligatoires de l'annonce</span>.</p>
+    <p>Tant qu'un document manque, l'annonce ne peut pas être publiée. C'est ce qui protège les
+    deux côtés.</p>
+
+    <h3>3.7 Les avis et les notes</h3>
+    <p>Après un chantier, chaque entreprise peut noter l'autre, dans les deux sens : la qualité
+    et le sérieux d'un côté, les délais de paiement et la clarté du chantier de l'autre. Les
+    avis engagent leur auteur. Un avis manifestement abusif, injurieux ou sans rapport avec une
+    mission réelle peut être retiré. Les règles de collecte et d'affichage des avis sont à
+    caler avec l'avocat : <span class="tc">À COMPLÉTER : règles de modération et d'affichage des avis</span>.</p>
+
+    <h3>3.8 Ce qui est interdit</h3>
+    <ul>
+      <li>Se faire passer pour une autre entreprise, ou utiliser un numéro SIRET qui n'est pas
+        le sien.</li>
+      <li>Utiliser la messagerie pour du démarchage en masse.</li>
+      <li>Aspirer, copier ou réutiliser les fiches des autres inscrits.</li>
+      <li>Contourner le service pour proposer des prestations qui sortent de la sous-traitance
+        entre entreprises.</li>
+    </ul>
+
+    <h3>3.9 Suspension et fermeture</h3>
+    <p>Un compte peut être suspendu en cas de manquement grave, notamment un SIRET devenu
+    inactif ou une fraude. La procédure, les délais de préavis et les voies de recours sont à
+    fixer avec l'avocat : <span class="tc">À COMPLÉTER : procédure de suspension, préavis et recours</span>.</p>
+
+    <h3>3.10 Disponibilité du service</h3>
+    <p>Le service est fourni en l'état, sans garantie de fonctionnement ininterrompu. Des
+    interruptions peuvent survenir pour maintenance ou du fait des fournisseurs techniques.</p>
+    <p><b>Le service n'est pas encore ouvert au public :</b>
+    <span class="tc">À COMPLÉTER : date d'ouverture au public</span>. Aujourd'hui, seule
+    l'inscription à la liste d'attente est ouverte.</p>
+  </div>
+
+  <!-- ================================================== 4. CGV == -->
+  <h2 id="cgv"><span class="n">Section 4</span>Conditions générales de vente</h2>
+
+  <div class="bloc">
+    <div class="clair"><b>En clair.</b> Ce qui est payé, quand, et comment on arrête.</div>
+
+    <h3>4.1 Ce qui est vendu</h3>
+    <p>Un abonnement donnant accès au service, souscrit par une entreprise pour les besoins de
+    son activité professionnelle. Des options peuvent s'y ajouter. <b>Aucune commission n'est
+    prélevée sur les chantiers</b> : « à dispo » ne perçoit jamais le prix des travaux ni celui
+    d'une location.</p>
+
+    <h3>4.2 Le prix</h3>
+    <span class="marqueur attente">en attente d'une donnée</span>
+    <p><b>Le prix de l'abonnement n'est pas arrêté à ce jour</b>, et aucun montant ne figure
+    dans cette page : <span class="tc">À COMPLÉTER : prix de l'abonnement, des options, et de la remise annuelle</span>.
+    Les prix seront affichés en euros, et la mention « hors taxes » ou « toutes taxes
+    comprises » sera portée sans ambiguïté :
+    <span class="tc">À COMPLÉTER : régime de TVA applicable à l'abonnement</span>.</p>
+    <div class="clair"><b>Pourquoi c'est vide et pas approximatif.</b> Un montant plausible
+    écrit ici serait cité par un artisan six mois plus tard, et il faudrait alors expliquer
+    pourquoi il a changé. On préfère ne rien écrire.</div>
+
+    <h3>4.3 L'essai</h3>
+    <p>Une période d'essai est prévue au lancement. L'abonné est prévenu avant sa fin : pas de
+    prélèvement surprise. Durée exacte et conditions :
+    <span class="tc">À COMPLÉTER : durée de la période d'essai et conditions de sortie</span>.</p>
+
+    <h3>4.4 Paiement et facturation</h3>
+    <p>Le paiement s'effectue en ligne par le prestataire retenu
+    (<span class="tc">À COMPLÉTER : prestataire de paiement retenu</span>). Une facture est
+    mise à disposition dans le compte à chaque échéance. En cas d'échec de prélèvement, une
+    relance automatique est envoyée avant toute suspension.</p>
+    <p>Entre professionnels, le retard de paiement ouvre droit aux pénalités et à l'indemnité
+    forfaitaire de recouvrement prévues aux articles L441-10 et D441-5 du Code de commerce. Le
+    taux applicable et le montant de l'indemnité sont à confirmer par l'avocat :
+    <span class="tc">À COMPLÉTER : taux des pénalités de retard et montant de l'indemnité forfaitaire</span>.</p>
+    <div class="clair"><b>Aucune carte ne peut être saisie aujourd'hui.</b> Le prestataire de
+    paiement n'est pas raccordé, et l'écran d'abonnement le dit en toutes lettres plutôt que de
+    présenter un formulaire qui n'aboutirait pas.</div>
+
+    <h3>4.5 Durée, reconduction et résiliation</h3>
+    <p>L'abonnement est souscrit pour la durée choisie, puis reconduit. <b>Résilier se fait
+    depuis le compte</b>, sans avoir à écrire à quiconque et sans justification. L'abonnement
+    court jusqu'à la fin de la période déjà payée, puis s'arrête. La fiche et l'historique sont
+    conservés, dans la limite des durées de la section 2.4.</p>
+    <p>Durée d'engagement, préavis et modalités de remboursement :
+    <span class="tc">À COMPLÉTER : durée d'engagement, préavis et politique de remboursement</span>.</p>
+
+    <h3>4.6 Rétractation</h3>
+    <span class="marqueur avocat">à valider par l'avocat</span>
+    <p>Le droit de rétractation de quatorze jours prévu à l'article L221-18 du Code de la
+    consommation bénéficie au consommateur. L'article L221-3 l'étend à certains professionnels
+    sous conditions, notamment lorsque l'objet du contrat n'entre pas dans le champ de leur
+    activité principale. <b>Ici, le service entre par construction dans l'activité de
+    l'abonné : l'applicabilité de ce droit doit être tranchée par l'avocat</b>, et non
+    présumée dans un sens ou dans l'autre.</p>
+
+    <h3>4.7 Réclamations et médiation</h3>
+    <p>Toute réclamation s'adresse d'abord à <span class="tc">À COMPLÉTER : adresse électronique de contact</span>.</p>
+    <p>Médiateur de la consommation : <span class="tc">À COMPLÉTER : médiateur de la consommation, nom et adresse, si des consommateurs sont clients</span>.</p>
+    <div class="clair"><b>Pourquoi ce point n'est pas automatique.</b> Le recours à un
+    médiateur de la consommation, articles L611-1 et suivants du Code de la consommation,
+    s'impose aux professionnels qui contractent avec des <b>consommateurs</b>. Le service étant
+    réservé aux entreprises, l'obligation n'est pas évidente. C'est exactement le genre de
+    point qu'on ne tranche pas soi-même.</div>
+
+    <h3>4.8 Droit applicable et litiges</h3>
+    <p>Droit applicable et juridiction compétente :
+    <span class="tc">À COMPLÉTER : droit applicable et tribunal compétent</span>.</p>
+  </div>
+
+  <!-- ================================================== 5. TRACEURS == -->
+  <h2 id="traceurs"><span class="n">Section 5</span>Traceurs et cookies</h2>
+
+  <div class="bloc">
+    <div class="clair"><b>En clair.</b> Ce que le site dépose sur ton téléphone, et ce qu'il ne
+    dépose pas.</div>
+
+    <h3>5.1 Ce qui est déposé aujourd'hui</h3>
+    <p>Cette section décrit ce que le site charge <b>réellement</b>, relevé dans le code, et
+    non ce qu'un modèle de politique de cookies décrirait d'habitude.</p>
+    <div class="tableau">
+    <table>
+      <thead>
+        <tr><th scope="col">Ce qui est chargé</th><th scope="col">À quoi ça sert</th><th scope="col">Consentement</th></tr>
+      </thead>
+      <tbody>
+      <tr><td data-t="Ce qui est chargé">Session de connexion, conservée par le navigateur</td>
+          <td data-t="À quoi ça sert">Rester connecté d'une page à l'autre. Sans elle, il faudrait se reconnecter à
+          chaque écran</td>
+          <td data-t="Consentement">Strictement nécessaire, pas de consentement à demander</td></tr>
+      <tr><td data-t="Ce qui est chargé">Polices de caractères servies par Google Fonts</td>
+          <td data-t="À quoi ça sert">Afficher la typographie de la marque</td>
+          <td data-t="Consentement">Pas de traceur déposé, mais l'adresse IP du visiteur est transmise au
+          fournisseur : point à confirmer avec l'avocat</td></tr>
+      <tr><td data-t="Ce qui est chargé">Bibliothèque technique servie par un réseau de diffusion</td>
+          <td data-t="À quoi ça sert">Faire fonctionner la connexion et l'espace artisan</td>
+          <td data-t="Consentement">Pas de traceur déposé, même remarque sur l'adresse IP</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>Il n'y a aujourd'hui aucune mesure d'audience, aucune publicité, aucun traceur de
+    réseau social.</b> C'est pour cette raison qu'aucun bandeau de consentement n'est affiché :
+    poser un bandeau qui ne gouverne rien habitue les gens à cliquer sans lire.</p>
+
+    <h3>5.2 Ce qui arrivera, et ce que ça déclenche</h3>
+    <p>La mesure d'audience est prévue au plan d'action. Le jour où elle est posée :</p>
+    <ul>
+      <li>un bandeau de consentement devient obligatoire, avec un choix par défaut qui est le
+        plus protecteur, et un refus aussi simple qu'une acceptation ;</li>
+      <li>refuser doit réellement couper la mesure, et cela se vérifie, sans quoi le bandeau
+        est un décor ;</li>
+      <li>l'outil retenu doit être déclaré dans la politique de confidentialité, faute de quoi
+        la mesure est illicite ;</li>
+      <li>l'outil retenu est à nommer ici : <span class="tc">À COMPLÉTER : outil de mesure d'audience retenu, et sa configuration</span>.</li>
+    </ul>
+    <p>Cadre applicable : article 82 de la loi n° 78-17 du 6 janvier 1978 et recommandations de
+    la Commission nationale de l'informatique et des libertés.</p>
+
+    <h3>5.3 Reprendre la main</h3>
+    <p>Le navigateur permet de supprimer les données déposées par un site et de les bloquer.
+    Supprimer la session de connexion déconnecte simplement du service.</p>
+  </div>
+
+  </div><!-- /#contenu -->
+
+  <p class="vide" id="vide">Aucune section ne contient ce mot. Essaie un autre terme, ou lis le
+  sommaire en haut de page.</p>
+
+  <div class="pied">
+    <p><b>Statut de ce document.</b> Trame de travail, non engageante, rédigée le 13/09/2026 par
+    Joan Aglave &amp; Alec Ferrante. Elle prépare le travail de l'avocat, elle ne le remplace
+    pas. Confidentiel tant que la marque n'est pas déposée.</p>
+    <p><b>Ce sur quoi cette trame s'appuie, et où le vérifier.</b></p>
+    <ul>
+      <li>Rédaction juridique chiffrée entre 800 et 1 500 € et placée hors périmètre :
+        <code>devis/index.html</code> lignes 263 et 276, <code>deck-investisseur/index.html</code>
+        ligne 650, <code>cadrage/index.html</code> lignes 269 à 274.</li>
+      <li>Sans avocat désigné, les inscriptions ne peuvent pas ouvrir :
+        <code>cadrage/index.html</code> ligne 365.</li>
+      <li>Les cinq réponses marquées « à valider par l'avocat » :
+        <code>aide/index.html</code>, questions sur la légalité de la relation, la
+        responsabilité de chantier, les documents du loueur, les données personnelles et la
+        suppression du compte.</li>
+      <li>Les micro-tâches juridiques et le bandeau de traceurs :
+        <code>plan/index.html</code> lignes 404 à 415 et 437.</li>
+      <li>Les données réellement enregistrées :
+        <code>crm/supabase/migration-espace-artisan.sql</code> et
+        <code>crm/supabase/migration-inscriptions.sql</code>.</li>
+      <li>Hébergement et nom de domaine : <code>DEPLOIEMENT.md</code> lignes 3 et 11.</li>
+      <li>Absence de description du site tant que la marque n'est pas déposée :
+        <code>outils/build.py</code>.</li>
+    </ul>
+    <p><b>Les textes cités</b> : loi n° 2004-575 du 21 juin 2004 article 6 ; article L111-7 du
+    Code de la consommation ; articles L8241-1, L8231-1 et L8222-1 du Code du travail ; loi
+    n° 75-1334 du 31 décembre 1975 ; article 1709 du Code civil ; règlement (UE) 2016/679 ; loi
+    n° 78-17 du 6 janvier 1978, dont l'article 82 ; articles L221-3, L221-18 et L611-1 et
+    suivants du Code de la consommation ; articles L441-10 et D441-5 du Code de commerce.
+    <b>Chacun de ces renvois doit être revérifié par l'avocat</b> : ils balisent le terrain,
+    ils ne le tranchent pas.</p>
+    <p id="pied-date">Date de mise à jour : en cours de lecture…</p>
+  </div>
+</div>
+
+<noscript>
+  <div class="wrap" style="padding-top:0">
+    <div class="etat ko"><b>Le comptage et la recherche sont éteints.</b> Le texte des
+    sections est intégralement lisible ci-dessus : rien n'est masqué. Seuls la liste calculée
+    des éléments à compléter, la recherche et la date de mise à jour demandent JavaScript. Les
+    éléments à compléter restent visibles un par un dans le texte, en jaune.</div>
+  </div>
+</noscript>
+
+<script>
+/* ==========================================================================
+   TOUT CE QUI EST COMPTE ICI EST CALCULE A PARTIR DE LA PAGE.
+   Un nombre recopie dans une phrase est faux des la premiere correction :
+   c'est deja arrive sur aide/index.html, ou « vingt-et-une questions » en
+   designait vingt-cinq. Meme methode ici.
+   ========================================================================== */
+
+var $ = function (i) { return document.getElementById(i); };
+
+/* ------------------------------------------------- 1. Ce qui manque */
+
+/* `:not(.exemple)` ecarte le marqueur de demonstration du chapeau. Sans lui,
+   la page annoncerait un manque de plus qu'elle n'en a, et le premier nombre
+   lu serait deja faux. */
+var marqueurs = [].slice.call(document.querySelectorAll('#contenu .tc:not(.exemple)'));
+var avocats   = document.querySelectorAll('#contenu .marqueur.avocat').length;
+var attentes  = document.querySelectorAll('#contenu .marqueur.attente').length;
+/* Les sections juridiques : tous les titres de niveau 2 sauf « ce qui
+   manque », qui est un outil de travail et pas une section du contrat. */
+var NB_SECTIONS = document.querySelectorAll('#contenu h2:not(#manque)').length;
+
+/* Le libelle affiche est « À COMPLÉTER : quelque chose ». On ne garde que la
+   partie utile pour la liste, mais on laisse le texte intact dans la page :
+   c'est lui qui doit sauter aux yeux a l'endroit du manque. */
+function libelle(el) {
+  var t = (el.textContent || '').replace(/^[▸\s]+/, '').trim();
+  var i = t.indexOf(':');
+  return i > 0 ? t.slice(i + 1).trim() : t;
+}
+function sectionDe(el) {
+  var h = el.closest('.bloc');
+  while (h && h.previousElementSibling && h.previousElementSibling.tagName !== 'H2') {
+    h = h.previousElementSibling;
+  }
+  var titre = h && h.previousElementSibling ? h.previousElementSibling : null;
+  if (!titre) return { id: 'contenu', nom: 'La page' };
+  var clone = titre.cloneNode(true);
+  var n = clone.querySelector('.n');
+  if (n) n.remove();
+  return { id: titre.id || 'contenu', nom: clone.textContent.trim() };
+}
+
+var etatManque = $('manque-etat');
+var listeManque = $('manque-liste');
+
+/* UNE INFORMATION MANQUANTE PEUT APPARAITRE A PLUSIEURS ENDROITS : la raison
+   sociale est demandee aux mentions legales ET a la politique de
+   confidentialite. On regroupe donc par information, et on compte les deux
+   nombres separement. Lister « raison sociale » deux fois donnerait a l'avocat
+   l'impression qu'on lui demande deux choses. */
+var groupes = [], parLibelle = {};
+marqueurs.forEach(function (el, k) {
+  /* Chaque marqueur devient atteignable : on lui pose une ancre, et la liste y
+     renvoie. Sans ancre, la liste serait un inventaire sans usage. */
+  el.id = 'tc-' + (k + 1);
+  var lib = libelle(el);
+  if (!Object.prototype.hasOwnProperty.call(parLibelle, lib)) {
+    parLibelle[lib] = groupes.length;
+    groupes.push({ libelle: lib, cibles: [] });
+  }
+  groupes[parLibelle[lib]].cibles.push({ id: el.id, nom: sectionDe(el).nom });
+});
+
+if (!groupes.length) {
+  /* L'etat VIDE. Il ne peut arriver qu'une fois tous les marqueurs comblés,
+     et ce jour-la il faut le dire franchement : il reste quand meme la
+     relecture de l'avocat. */
+  etatManque.className = 'etat ok';
+  etatManque.innerHTML = '<b>Plus aucun élément à compléter.</b> Les données manquantes ont '
+    + 'toutes été renseignées. La relecture par l\'avocat reste due avant publication.';
+} else {
+  var lignes = '';
+  groupes.forEach(function (g, k) {
+    var ou = g.cibles.map(function (c) {
+      return '<a href="#' + c.id + '">' + c.nom + '</a>';
+    }).join(' · ');
+    lignes += '<li><span class="rang">' + (k + 1) + '.</span><span>'
+           +  '<b class="lib">' + g.libelle + '</b>'
+           +  '<span class="ou">À compléter dans : ' + ou + '</span></span></li>';
+  });
+  listeManque.innerHTML = lignes;
+  etatManque.className = 'etat ko';
+  etatManque.innerHTML = '<b>' + groupes.length + ' information'
+    + (groupes.length > 1 ? 's' : '') + ' à fournir avant publication</b>, '
+    + 'réparties sur ' + marqueurs.length + ' emplacement'
+    + (marqueurs.length > 1 ? 's' : '') + ' dans la page. Chacun est visible à sa place '
+    + 'dans le texte, en jaune : cliquer sur un nom de section y conduit.';
+}
+
+/* Le compteur de l'avertissement, et celui du sommaire. */
+$('avis-compte').textContent =
+  groupes.length + ' information' + (groupes.length > 1 ? 's' : '') + ' à fournir · '
+  + avocats + ' point' + (avocats > 1 ? 's' : '') + ' à valider par l\'avocat · '
+  + attentes + ' en attente d\'une donnée';
+$('lien-manque').textContent = 'Ce qui manque (' + groupes.length + ')';
+$('lead-n').textContent = 'Les ' + NB_SECTIONS + ' sections';
+
+/* ------------------------------------------------- 2. Copier pour l'avocat */
+
+var bCopier = $('copier'), sCopie = $('s-copie');
+function direCopie(classe, texte) {
+  sCopie.hidden = false;
+  sCopie.className = 'etat ' + classe;
+  sCopie.innerHTML = texte;
+}
+function texteDeLaListe() {
+  var l = ['À compléter avant publication de la page des mentions légales et conditions.',
+           'Relevé automatiquement le ' + new Date().toLocaleDateString('fr-FR') + ' : '
+             + groupes.length + ' informations, ' + marqueurs.length + ' emplacements.', ''];
+  groupes.forEach(function (g, k) {
+    var ou = g.cibles.map(function (c) { return c.nom; }).join(', ');
+    l.push((k + 1) + '. ' + g.libelle + '  [' + ou + ']');
+  });
+  return l.join('\n');
+}
+if (!groupes.length) {
+  bCopier.disabled = true;
+  bCopier.textContent = 'Rien à copier';
+} else {
+  bCopier.addEventListener('click', function () {
+    var t = texteDeLaListe();
+    /* Le presse-papier peut etre refuse : page non securisee, cadre restreint,
+       reglage du navigateur. On ne fait pas semblant que ca a marche : on
+       montre le texte a selectionner a la main. */
+    var replier = function () {
+      direCopie('ko', '<b>Le presse-papier est refusé par le navigateur.</b> '
+        + 'Sélectionne le texte ci-dessous et copie-le à la main.'
+        + '<textarea readonly rows="8" aria-label="Liste à copier" '
+        + 'style="width:100%;margin-top:10px;font:inherit;font-size:13px;'
+        + 'font-family:monospace;background:var(--surface);color:var(--cream);'
+        + 'border:1px solid var(--cream-dim);border-radius:10px;padding:10px">'
+        + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</textarea>');
+    };
+    if (!navigator.clipboard || !navigator.clipboard.writeText) { replier(); return; }
+    navigator.clipboard.writeText(t).then(function () {
+      direCopie('ok', '<b>Copié.</b> ' + groupes.length + ' ligne'
+        + (groupes.length > 1 ? 's' : '') + ' dans le presse-papier, prêtes à être collées '
+        + 'dans un message à l\'avocat.');
+    }).catch(replier);
+  });
+}
+
+/* ------------------------------------------------- 3. La date de mise a jour
+   ELLE EST LUE, JAMAIS RECOPIEE. Premier essai : l'en-tete `Last-Modified` du
+   document publie, qui est la date de publication reelle. Second essai : la
+   date du fichier telle que le navigateur la connait. Si aucune des deux n'est
+   disponible, on le DIT : une date fausse sur un document juridique est pire
+   qu'une date absente. */
+
+var FR = { day: 'numeric', month: 'long', year: 'numeric' };
+
+function direDate(classe, corps) {
+  var d = $('s-date');
+  d.className = 'etat ' + classe;
+  d.innerHTML = corps;
+}
+
+(function dateDeMiseAJour() {
+  function poser(date, source) {
+    var joli = date.toLocaleDateString('fr-FR', FR);
+    direDate('ok', '<b>Dernière mise à jour : ' + joli + '.</b> '
+      + 'Cette date n\'est pas saisie à la main : elle est lue ' + source + '.');
+    $('pied-date').innerHTML = 'Date de mise à jour : <b>' + joli + '</b>, lue ' + source + '.';
+  }
+  function echouer() {
+    direDate('ko', '<b>La date de mise à jour n\'a pas pu être lue.</b> '
+      + 'Ni l\'en-tête <code>Last-Modified</code>, ni la date du fichier ne sont disponibles '
+      + 'ici. Aucune date n\'est affichée plutôt qu\'une date fausse. '
+      + '<br>Geste humain : servir la page avec un en-tête <code>Last-Modified</code>, '
+      + 'ou l\'ouvrir depuis le site publié plutôt qu\'en fichier local.');
+    $('pied-date').textContent = 'Date de mise à jour : non disponible sur cette copie.';
+  }
+  /* La date du fichier, connue du navigateur. PIEGE : quand elle est inconnue,
+     la norme impose de rendre l'HEURE COURANTE. Prise telle quelle, la page
+     afficherait « mis à jour aujourd'hui » tous les jours, ce qui est
+     exactement la fausse donnée qu'on refuse. Une date à moins de deux minutes
+     d'ici est donc, presque toujours, cette valeur de repli déguisée : on la
+     rejette. Le seul cas ou l'on se prive d'une vraie date est celui d'une
+     publication vieille de moins de deux minutes. */
+  function dateDuFichier() {
+    var d = new Date(document.lastModified);
+    if (isNaN(d.getTime())) return null;
+    if (Math.abs(Date.now() - d.getTime()) < 120000) return null;
+    return d;
+  }
+  var repli = dateDuFichier();
+
+  if (!window.fetch || location.protocol === 'file:') {
+    if (repli) poser(repli, 'dans la date du fichier, faute de serveur pour la fournir');
+    else echouer();
+    return;
+  }
+  fetch(location.href, { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+    var h = r.headers.get('Last-Modified');
+    var d = h ? new Date(h) : null;
+    if (d && !isNaN(d.getTime())) { poser(d, 'dans l\'en-tête <code>Last-Modified</code> du document publié'); return; }
+    if (repli) { poser(repli, 'dans la date du fichier connue du navigateur'); return; }
+    echouer();
+  }).catch(function () {
+    if (repli) poser(repli, 'dans la date du fichier, le serveur n\'ayant pas répondu');
+    else echouer();
+  });
+})();
+
+/* ------------------------------------------------- 4. La recherche
+   Un artisan tape « resilier » sans accent : on compare donc sans accents, et
+   sur le texte entier du bloc, parce que son mot est plus souvent dans le
+   corps que dans le titre. Meme methode que aide/index.html. */
+
+function sansAccent(s) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+var BLOCS = [].slice.call(document.querySelectorAll('#contenu .bloc'));
+var TITRES = [].slice.call(document.querySelectorAll('#contenu h2'));
+var reposCompte = groupes.length + ' information' + (groupes.length > 1 ? 's' : '')
+  + ' à fournir · ' + avocats + ' point' + (avocats > 1 ? 's' : '')
+  + ' à valider par l\'avocat · ' + NB_SECTIONS + ' sections';
+
+function filtrer() {
+  var brut = $('q').value.trim();
+  var m = sansAccent(brut);
+  var n = 0;
+  BLOCS.forEach(function (b) {
+    var vu = !m || sansAccent(b.textContent).indexOf(m) >= 0;
+    b.hidden = !vu;
+    if (vu) n++;
+  });
+  TITRES.forEach(function (h) {
+    var e = h.nextElementSibling, vu = false;
+    while (e && !/^H2$/.test(e.tagName)) {
+      if (e.classList && e.classList.contains('bloc') && !e.hidden) vu = true;
+      e = e.nextElementSibling;
+    }
+    h.hidden = !vu;
+  });
+  $('vide').style.display = (m && !n) ? 'block' : 'none';
+  /* Le verbe s'accorde avec le nombre. « 1 section contiennent » se lit comme
+     une page mal finie, et c'est exactement ce que c'est. */
+  $('compte').textContent = m
+    ? (n ? n + ' section' + (n > 1 ? 's contiennent' : ' contient') + ' « ' + brut + ' »'
+         : 'Aucune section ne contient « ' + brut + ' »')
+    : reposCompte;
+}
+$('q').addEventListener('input', filtrer);
+$('compte').textContent = reposCompte;
+</script>

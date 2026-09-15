@@ -1,0 +1,14 @@
+# La marque « a dispo » n'est pas deposee a l'INPI, et l'etude de marche a releve
+# qu'un service de surveillance de marques veille sur le nom voisin « adispo ».
+# On refuse donc la VISITE, et pas seulement l'indexation : un X-Robots-Tag
+# noindex laisse un robot bien eleve lire chaque page, et n'arrete aucun robot
+# d'entrainement.
+#
+# Une seule regle, tout le site, aucun chemin nomme : lister /crm reviendrait a
+# l'annoncer. Ce fichier ne protege pas, il demande. La seule protection reelle
+# du CRM reste la connexion par compte.
+#
+# A LEVER le jour du depot INPI et de l'ouverture au public.
+
+User-agent: *
+Disallow: /

@@ -1,0 +1,17 @@
+# La sortie : regeneree par `npm run build`, jamais commitee.
+dist/
+node_modules/
+
+# Etat local de wrangler : contient l'identifiant du projet et des jetons.
+.wrangler/
+.dev.vars
+.env*
+
+# Donnees personnelles. Le fichier des contacts porte les coordonnees de
+# 1 374 personnes reelles : il vit sur le disque et dans Supabase, jamais dans
+# git, dont l'historique ne s'efface pas.
+crm/contacts.json
+supabase/seed.sql
+
+# Systeme
+.DS_Store

@@ -1,0 +1,12 @@
+{
+  "name": "a-dispo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node outils/construire.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

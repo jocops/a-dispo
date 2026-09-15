@@ -1,0 +1,1195 @@
+<title>Chercher un confrère - À dispo</title>
+<!--
+  LA RECHERCHE : QUI EST LIBRE, DANS QUEL METIER, A QUELLES DATES, A COMBIEN DE KM.
+  Devis N°2027-02, ligne 5, NON SIGNE. Seul le devis-facture N°20260910-1 engage
+  la cliente : rien de cet ecran n'y figure. C'est ecrit ici pour que personne
+  ne le decouvre a la recette.
+
+  CE QUI GOUVERNE CET ECRAN : ON NE MONTRE QUE CE QUE LA BASE ACCEPTE DE RENDRE.
+  Deux sources, et pas une troisieme :
+    · la fonction `rechercher_confreres(...)` de
+      crm/supabase/migration-recherche-relations.sql, qui croise les fiches
+      publiees avec les occupations. Ce croisement est IMPOSSIBLE depuis un
+      navigateur : `occupations` n'est lisible que par son proprietaire, et
+      c'est tres bien ainsi. Elle exige une session ;
+    · la vue `fiches_publiques`, ouverte a `anon`, qui ne rend que des colonnes
+      choisies une par une.
+  Le telephone, le SIRET et le nom de famille ne sortent NI de l'une NI de
+  l'autre. La page ne fait donc aucun effort pour les cacher : ils n'arrivent
+  jamais jusqu'ici. Le contact passe par une demande de mise en relation, et
+  `coordonnees_confrere(demande)` est la seule porte, APRES acceptation.
+
+  DEUX MODES, ET C'EST LA BASE QUI TRANCHE, JAMAIS LE VISITEUR.
+    · mode COMPLET : une session est ouverte ET la fonction existe. Metier,
+      periode, commune et rayon s'appliquent, le tri se fait par distance.
+    · mode PUBLIC : pas de session, ou fonction absente. La recherche par
+      metier reste possible sur la vue publique, mais SANS les dates et SANS le
+      rayon. Les champs concernes sont alors ETEINTS et la page dit pourquoi,
+      avec la marche a suivre. Un visiteur sans compte n'est pas mis dehors :
+      il voit les fiches, il ne peut pas demander de mise en relation.
+
+  ETAT MESURE LE 13/09/2026, par appel reel a l'API REST avec la cle publique :
+    · GET /rest/v1/metiers            -> 200, 15 metiers actifs ;
+    · GET /rest/v1/fiches_publiques   -> 200, ZERO ligne (aucune fiche publiee) ;
+    · GET /rest/v1/communes           -> 404, PGRST205 (table absente) ;
+    · POST /rest/v1/rpc/chercher_commune     -> 404, PGRST202 ;
+    · POST /rest/v1/rpc/rechercher_confreres -> 404, PGRST202.
+  Autrement dit : la migration des relations est ECRITE mais PAS JOUEE. Le mode
+  complet ne s'ouvrira pas tant qu'elle ne l'est pas, et la page le dit en
+  clair au lieu de tourner dans le vide.
+
+  CE QUI RESTE A FAIRE HORS DE CETTE PAGE, et qui ne s'invente pas d'ici :
+    1. jouer crm/supabase/migration-recherche-relations.sql sur la base ;
+    2. charger la table `communes` depuis geo.api.gouv.fr : sans elle, aucun
+       rayon ne se calcule, et la page eteint le champ « commune du chantier » ;
+    (Le point 3, « declarer la page dans outils/build.py », est REGLE : releve
+     du 14/09/2026, l'entree existe, source recherche/index.html vers
+     dist/recherche/index.html. La page part donc bien dans dist/.)
+
+  AUCUN MONTANT D'ABONNEMENT N'EST ECRIT ICI, ni a l'ecran ni dans ce
+  commentaire : le tarif est en cours d'arbitrage.
+
+  MOBILE D'ABORD. L'artisan lit ca debout, dehors, avec une main. Une seule
+  colonne, rien qui deborde sur le cote, cibles tactiles a 44 px au moins, et
+  aucune animation d'attente : l'attente se dit par du texte.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Les controles natifs, l'ascenseur et le remplissage automatique du
+     navigateur suivent ce mot : sans lui, ils restent peints en sombre. */
+  color-scheme:light;
+
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES --- */
+
+  /* Fonds. Blanc casse chaud, teinte 42 deg : la teinte du creme de marque
+     (41,5 deg). Le blanc pur a ete mesure et ecarte : 18,46 contre 16,66,
+     mais teinte nulle, donc aucune parente avec la marque. */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posee dessus, et le haut du degrade de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et elements enfonces */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, legendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de degrade */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'etiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalcules pour le clair : les valeurs sombres y sont
+     illisibles. #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* reussite et disponibilite.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet creme sombre pose sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : equilibre sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchange */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSEE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre. Meme teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintees au bleu nuit. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+/* RIEN NE DEBORDE SUR LE COTE, et pas par un `overflow-x:hidden` sur body qui
+   masquerait le defaut au lieu de le corriger. On coupe les mots trop longs a
+   la source : une denomination sociale sans espace, un message de la base. */
+img,svg{max-width:100%}
+code{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cream-dim);
+  overflow-wrap:anywhere}
+.wrap{max-width:620px;margin:0 auto;padding:clamp(24px,5vw,48px) var(--gut) 80px}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  flex-wrap:wrap;margin-bottom:26px}
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:21px;line-height:1}
+/* Le mot-marque suppose un fond fonce : le « a » ambre vaut 9,31:1 sur le nuit
+   et 1,66:1 sur le papier clair. Il prend l'ambre de texte, 5,85:1 sur le sol. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+/* 44 px de haut : c'est un lien d'action, il se vise avec un pouce. */
+.lien-haut{display:inline-flex;align-items:center;min-height:44px;
+  background:none;border:1px solid var(--line);color:var(--cream-dim);
+  font:inherit;font-size:12.5px;border-radius:999px;padding:0 16px;text-decoration:none}
+.lien-haut:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* HIERARCHIE. Le titre saute de 16 px de corps a 44 px : l'ecart se lit avant
+   le premier mot. Sur telephone il tient encore 30 px, soit 1,9 fois le corps. */
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(30px,6vw,44px);line-height:1.02;letter-spacing:-.022em}
+/* L'ambre SOUS le mot, jamais DANS le mot : en lettre il vaut 1,84:1 sur le
+   papier, en aplat sous la ligne de base l'encre reste a 16,66:1. */
+h1 .em{color:var(--cream);padding:0 .06em;
+  background:linear-gradient(180deg,transparent 62%,var(--accent) 62%)}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:16px;margin:34px 0 0}
+.lead{color:var(--cream-mut);font-size:16px;margin:14px 0 0;max-width:46ch}
+
+.champ{margin:16px 0 0}
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;margin:0 0 5px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px}
+input,select{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none;
+  -webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+/* LE FOCUS SE SIGNALE EN AMBRE DE TEXTE, PAS EN AMBRE. Une bordure ambre sur
+   du blanc vaut 1,84:1 contre les 3,0 exiges d'un indicateur, et aucun voile
+   ne rattrape : --accent-soft a .22 donne 1,14:1, a .35 encore 1,23.
+   --accent-texte donne 6,48:1. Le halo reste, comme confort, pas comme signe. */
+input:focus,select:focus{border-color:var(--accent-texte);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder{color:var(--cream-dim)}
+input[aria-invalid="true"]{border-color:var(--alerte)}
+/* Un champ eteint reste LISIBLE. Sur du clair, opacity:.5 fait tomber l'encre
+   la plus forte a 3,49:1 : la demi-opacite fait echouer jusqu'au noir. On pose
+   donc des couleurs mesurees : terne sur le puits, 5,15:1. */
+input:disabled,select:disabled{background:var(--surface-2);color:var(--cream-dim);
+  -webkit-text-fill-color:var(--cream-dim);cursor:not-allowed}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:430px){.deux{grid-template-columns:1fr}}
+.err{color:var(--alerte);font-size:13px;margin-top:5px;display:none}
+.err.vu{display:block}
+.aide{font-size:12.5px;color:var(--cream-dim);margin:6px 0 0;line-height:1.5}
+
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:44px;font:inherit;font-family:"Signika",sans-serif;font-weight:700;
+  font-size:15.5px;border-radius:999px;padding:12px 26px;cursor:pointer;
+  border:1px solid transparent;text-decoration:none}
+/* L'aplat ambre porte l'encre : 10,06:1. Jamais de blanc dessus (1,84:1). */
+.bouton.plein{background:var(--accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.bouton.plein:hover{background:var(--accent-2)}
+.bouton.creux{background:transparent;color:var(--cream);border-color:var(--line)}
+.bouton:disabled,.bouton[aria-disabled="true"]{background:var(--surface-2);
+  color:var(--cream-dim);border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.pied-actions{display:flex;gap:10px;align-items:center;margin:22px 0 0;flex-wrap:wrap}
+.lien{background:none;border:none;color:var(--accent-texte);font:inherit;font-size:13px;
+  padding:0;cursor:pointer;text-decoration:underline}
+.lien:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* Une carte blanche sur le sol ne donne que 1,108:1 : le palier seul ne suffit
+   pas. Filet a 1,35 plus ombre douce, jamais un aplat plus fonce derriere. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:16px 18px;margin:12px 0 0;box-shadow:var(--ombre-1)}
+/* PAS D'OPACITE SUR UNE CARTE QUI PORTE UNE EXPLICATION : c'est justement ce
+   qu'il faut lire. On la distingue par un trait discontinu. */
+.carte.eteinte{border-style:dashed;box-shadow:none}
+.carte h3{font-family:"Signika",sans-serif;font-size:15px;margin:0 0 3px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.carte p{margin:.3rem 0;font-size:13.5px;color:var(--cream-mut)}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap}
+
+/* ---- Les communes proposees. Des BOUTONS, jamais des lignes cliquables :
+   atteignables au clavier, et assez hauts pour un doigt. ---- */
+.sug{display:flex;flex-direction:column;gap:6px;margin:9px 0 0}
+.sug button{display:flex;align-items:center;min-height:44px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--line);color:var(--cream);
+  font:inherit;font-size:14px;border-radius:10px;padding:8px 14px;cursor:pointer}
+.sug button:hover{border-color:var(--accent-texte);background:var(--bg-2)}
+.sug button:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.sug .dep{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-dim);
+  margin-left:auto;padding-left:12px}
+.choisi{font-size:14px;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ---- Un resultat ---- */
+.res{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:15px 17px;margin:12px 0 0;display:flex;gap:13px;align-items:flex-start;
+  box-shadow:var(--ombre-1)}
+/* L'AMBRE EN APLAT, L'ENCRE DESSUS : 10,06:1. En lettre ambre sur le puits,
+   l'initiale tombait a 1,53:1, c'est-a-dire nulle part. */
+.mono{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent);
+  color:var(--encre);font-family:"Signika",sans-serif;font-weight:700;font-size:19px;
+  display:grid;place-items:center}
+/* `min-width:0` : sans lui, un mot long pousse la colonne au-dela du telephone. */
+.res-corps{flex:1;min-width:0}
+.res-tete{display:flex;gap:10px;align-items:baseline;justify-content:space-between}
+.res h3{font-family:"Signika",sans-serif;font-weight:700;font-size:16px;margin:0;
+  overflow-wrap:anywhere}
+.res .meta{font-size:13.5px;color:var(--cream-mut);margin:2px 0 0;overflow-wrap:anywhere}
+.res .pres{font-size:13.5px;color:var(--cream-mut);margin:8px 0 0;overflow-wrap:anywhere}
+.km{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--accent-texte);
+  background:var(--accent-soft);padding:3px 8px;border-radius:4px;white-space:nowrap}
+.note{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-dim);margin:7px 0 0}
+.hors{font-size:12.5px;color:var(--cream-mut);margin:7px 0 0}
+.res .pied-actions{margin:12px 0 0}
+.res .bouton{font-size:14px;padding:10px 20px}
+.vide{font-size:12.5px;color:var(--cream-dim);margin:8px 0 0;line-height:1.5}
+.compte{font-family:"Signika",sans-serif;font-weight:700;font-size:16px;margin:26px 0 0}
+/* `:focus-visible` et non `:focus` : ce titre recoit le focus par programme
+   apres chaque recherche. Avec `:focus`, un cadre ambre restait autour du
+   compte pour tout le monde, y compris a la souris, et se lisait comme un
+   element de dessin. Avec `:focus-visible`, il n'apparait qu'a celui qui
+   navigue au clavier, c'est-a-dire a celui qui en a besoin. */
+.compte:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px}
+.legende{font-size:12px;color:var(--cream-dim);margin:16px 0 0;line-height:1.55}
+
+.etat{border-radius:12px;padding:13px 16px;margin:18px 0 0;font-size:14.2px;display:none}
+.etat.vu{display:block}
+/* Les bordures d'etat sont RECONSTRUITES sur les couleurs sombres : le vert vif
+   a 35 % donnait 1,27:1 sur une carte blanche, le saumon 1,28:1. Elles
+   s'effacaient. */
+.etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+
+.chargement{color:var(--cream-dim);font-size:14px;padding:40px 0;text-align:center}
+
+.pied{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--cream-dim);line-height:1.6}
+.pied a{color:var(--cream-dim)}
+
+/* La barre de l'espace. Defilement horizontal plutot qu'un menu replie : sur un
+   chantier l'artisan a une main, et un menu demande deux gestes au lieu d'un. */
+.nav-app{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.nav-app::-webkit-scrollbar{display:none}
+/* Des pastilles, pas des liens de texte : le soulignement par defaut
+   traversait l'aplat ambre de l'ecran courant. Le survol et le focus gardent
+   chacun leur signe. */
+.nav-app a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 14px;
+  border-radius:999px;font-weight:600;font-size:.9375rem;color:var(--cream-mut);
+  text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.nav-app a:hover{background:var(--surface-2);color:var(--cream)}
+/* L'ecran ou l'on est : aplat ambre plein, encre dessus. 10,06:1. */
+.nav-app a[aria-current="page"]{background:var(--accent);color:var(--encre)}
+/* Jamais d'opacite sur du texte clair : a .45 l'encre tombe a 2,1:1.
+   Le gris terne, lui, est mesure a 5,15:1 sur la surface la plus foncee. */
+.nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none}
+.nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.nav-note{margin:-10px 0 16px;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
+
+/* ------------------------------------------------- LA MISE EN PAGE CHANGE
+   En dessous de 900 px : une colonne, dans l'ordre de lecture, ce qu'on
+   demande puis ce qu'on obtient. Au-dessus : les filtres tiennent a gauche et
+   restent sous les yeux pendant qu'on parcourt les resultats, au lieu de
+   remonter la page a chaque essai. Ce n'est pas la meme page compressee. */
+.atelier{display:grid;gap:clamp(20px,3.5vw,40px)}
+@media(min-width:900px){
+  .wrap{max-width:1000px}
+  .atelier{grid-template-columns:minmax(0,340px) minmax(0,1fr);align-items:start;
+    gap:clamp(28px,4vw,56px)}
+  .volet-filtres{position:sticky;top:24px}
+  .volet-filtres .pied-actions .bouton{width:100%}
+  .lead{max-width:60ch}
+}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE. */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <span class="marque">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </span>
+    <a class="lien-haut" id="lien-haut" href="/connexion" hidden>Se connecter</a>
+  </div>
+
+  <!-- LA BARRE DE L'ESPACE. Elle n'existe que pour qui a une session : un
+       visiteur de passage sur une fiche publique n'a rien a faire de cinq liens
+       qui le renverraient tous vers la connexion. Et tant que le parcours n'est
+       pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
+       au lieu de mener sur du vide. -->
+  <nav class="nav-app" id="nav-app" data-ici="recherche" aria-label="Mon espace" hidden>
+    <a href="/espace" data-ecran="espace">Mon espace</a>
+    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
+    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
+    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
+    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
+  </nav>
+  <p class="nav-note" id="nav-note" hidden></p>
+
+  <h1>Qui est <span class="em">libre</span>&nbsp;?</h1>
+  <p class="lead" id="lead">On regarde ce qui est raccordé…</p>
+
+  <!-- DEUX VOLETS AU-DELA DE 900 px, une colonne en dessous. Les
+       identifiants ne bougent pas : le script retrouve #mode, #f et
+       #resultats exactement la ou il les cherchait. -->
+  <div class="atelier">
+    <div class="volet-filtres">
+    <!-- La carte qui dit dans quel mode on est, et ce qui manque le cas echeant.
+         Elle est remplie par le script : ecrire un etat en dur ici serait ecrire
+         une donnee qu'on n'a pas encore mesuree. -->
+    <div id="mode"></div>
+
+    <form id="f" novalidate>
+      <div class="champ">
+        <label for="metier">Métier</label>
+        <select id="metier">
+          <option value="">Tous les métiers</option>
+        </select>
+        <p class="aide" id="aide-metier">Un confrère qui a écrit son métier lui-même
+        n'apparaît que dans «&nbsp;tous les métiers&nbsp;».</p>
+      </div>
+
+      <div class="deux" id="bloc-periode">
+        <div class="champ">
+          <label for="debut">Du</label>
+          <input id="debut" type="date" aria-describedby="e-periode" disabled>
+        </div>
+        <div class="champ">
+          <label for="fin">Au</label>
+          <input id="fin" type="date" aria-describedby="e-periode" disabled>
+        </div>
+      </div>
+      <p class="err" id="e-periode"></p>
+
+      <div class="champ" id="bloc-commune">
+        <label for="commune">Commune du chantier <span class="opt">facultatif</span></label>
+        <input id="commune" type="text" autocomplete="off" placeholder="Aix-les-Bains"
+               aria-describedby="aide-commune e-commune" disabled>
+        <p class="aide" id="aide-commune">Deux lettres suffisent. On te propose la liste,
+        tu choisis.</p>
+        <!-- `aria-live` : les communes proposees arrivent APRES la frappe. Sans
+             cela, celui qui n'a pas l'ecran sous les yeux ne sait pas qu'une
+             liste est apparue sous son champ. -->
+        <div class="sug" id="sug-commune" aria-live="polite"></div>
+        <p class="choisi" id="choisi" hidden></p>
+        <p class="err" id="e-commune"></p>
+      </div>
+
+      <div class="champ" id="bloc-rayon">
+        <label for="rayon">Jusqu'où tu acceptes de chercher</label>
+        <select id="rayon" aria-describedby="aide-rayon" disabled></select>
+        <p class="aide" id="aide-rayon">Le rayon s'applique à partir de la commune du
+        chantier : sans commune, il ne filtre rien.</p>
+      </div>
+
+      <div class="pied-actions">
+        <button class="bouton plein" id="chercher" type="submit" disabled>Chercher</button>
+      </div>
+    </form>
+    </div>
+
+    <div class="volet-resultats">
+      <div id="resultats" aria-live="polite" aria-busy="true">
+        <p class="chargement">Un instant…</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="etat ok" id="s-ok"></div>
+  <div class="etat ko" id="s-ko"></div>
+
+  <div class="pied">
+    Entre entreprises indépendantes, en sous-traitance.
+    <a href="/aide">Des questions&nbsp;?</a>
+  </div>
+</div>
+
+<script type="module">
+/* La base du projet. La cle publique est publique par nature : elle est lisible
+   dans le source de cette page. La protection ne vient pas de son secret, elle
+   vient des politiques posees sur les tables. Mesure du 13/09/2026 : sans
+   session, `fiches_publiques` rend ses colonnes choisies, `occupations` ne rend
+   rien, et `artisans` ne rend rien non plus. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+/* Les pages voisines. On ne suppose pas qu'elles sont en ligne : elles sont
+   ecrites par d'autres chantiers, et une page declaree dans PAGES n'est en
+   ligne qu'apres un emballage et un deploiement. Releve du 14/09/2026 :
+   /artisan, /legal, /connexion, /espace et /aide sont toutes declarees dans
+   outils/build.py. On verifie quand meme avant d'en faire un lien : c'est le
+   deploiement qui tranche, pas la liste. */
+const PAGE_FICHE     = "/artisan";
+const PAGE_LEGAL     = "/legal";
+const PAGE_CONNEXION = "/connexion";
+const PAGE_ESPACE    = "/espace";
+
+/* Les colonnes de `fiches_publiques`, nommees une par une et jamais `*` : le
+   jour ou quelqu'un ajoute une colonne a la vue, cette page ne se met pas a
+   l'afficher toute seule. `photo_url` n'est volontairement PAS demandee : une
+   liste de resultats chargerait autant d'images venues d'ailleurs, souvent en
+   4G depuis un chantier. La fiche, elle, les affiche. */
+const COLONNES = "id,prenom,denomination,metier,presentation,commune,departement,rayon_km";
+
+/* Les memes paliers que l'ecran metier de l'espace : un artisan qui a declare
+   « je me deplace a 50 km » retrouve ses reperes. */
+const RAYONS = [10, 20, 30, 50, 80, 120, 200];
+
+const $ = (i) => document.getElementById(i);
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  /* Le defilement doux est coupe si le systeme demande moins d'animation :
+     `behavior:"smooth"` passe outre la feuille de style. */
+  const doux = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  d.scrollIntoView({ behavior: doux ? "smooth" : "auto", block: "nearest" });
+}
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+
+/* ------------------------------------------------------------ l'etat de la page
+   `mode` vaut "complet" quand la base accepte de croiser les agendas, "public"
+   sinon. Il n'est JAMAIS choisi par le visiteur : il est deduit d'une session
+   et d'une reponse de la base. */
+let mode = "public";
+let sb = null;
+let session = null;
+let metiers = [];
+let etatBase = null;           /* ce que rend etat_recherche() : des nombres, jamais des noms */
+let commune = null;            /* { code_insee, nom, departement, latitude, longitude } */
+let ficheEnLigne = "inconnu";  /* "oui", "non", "inconnu" */
+let legalEnLigne = "inconnu";
+
+/* Le client Supabase, en singleton paresseux. Il n'est JAMAIS charge au
+   chargement de la page : le module pese quelques dizaines de kilo-octets, et
+   le visiteur de passage n'en a pas besoin. Il descend seulement si une trace
+   de session existe, ou au premier clic qui en a besoin. */
+async function client() {
+  if (sb) return sb;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return sb;
+}
+
+/* Une lecture publique, en REST direct : la liste des metiers et les fiches
+   publiques n'ont besoin d'aucune bibliotheque. Rend toujours un objet, jamais
+   une exception : c'est l'appelant qui decide quoi dire. */
+async function lire(chemin) {
+  try {
+    const r = await fetch(BASE + "/rest/v1/" + chemin, {
+      headers: { apikey: CLE, Authorization: "Bearer " + CLE, Accept: "application/json" }
+    });
+    let corps = null;
+    try { corps = await r.json(); } catch (e) { corps = null; }
+    if (r.ok) return { ok: true, lignes: Array.isArray(corps) ? corps : [] };
+    return { ok: false, statut: r.status,
+             code: corps && corps.code ? corps.code : null,
+             message: corps && corps.message ? corps.message : "" };
+  } catch (e) {
+    return { ok: false, statut: 0, code: "reseau", message: e && e.message ? e.message : "" };
+  }
+}
+
+/* Une page du site est-elle deja en ligne ? « oui », « non », ou « inconnu »
+   quand la question n'a pas pu etre posee. On ne repond jamais « non » a partir
+   d'un doute : dire a un artisan qu'une page n'existe pas alors qu'elle existe
+   est une fausse donnee au meme titre qu'un bouton mort. */
+const DEJA_VU = new Map();
+function existe(chemin) {
+  if (!DEJA_VU.has(chemin)) {
+    DEJA_VU.set(chemin, fetch(chemin, { method: "HEAD" })
+      .then((r) => (r.ok ? "oui" : "non"))
+      .catch(() => "inconnu"));
+  }
+  return DEJA_VU.get(chemin);
+}
+
+/* ------------------------------------------------------------------ les dates */
+const jourISO = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+                     + "-" + String(d.getDate()).padStart(2, "0");
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août",
+              "septembre","octobre","novembre","décembre"];
+function enClair(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  if (!m) return iso || "";
+  return +m[3] + " " + MOIS[+m[2] - 1];
+}
+/* Un seul jour demande ne s'ecrit pas « du 13 septembre au 13 septembre » :
+   c'est le cas le plus courant, celui de l'artisan qui cherche quelqu'un pour
+   demain. */
+function laPeriode() {
+  const d = $("debut").value, f = $("fin").value;
+  return d === f ? "le " + enClair(d) : "du " + enClair(d) + " au " + enClair(f);
+}
+
+/* ------------------------------------------------------- ce que la page dit d'elle
+   UN SEUL ENDROIT POUR ETEINDRE LES CHAMPS. Les deux raisons se ressemblent
+   trop pour etre ecrites a deux endroits : elles divergeraient a la premiere
+   retouche, et l'une des deux finirait sans explication. */
+function eteindreFiltres(titre, pourquoi, marche) {
+  for (const id of ["debut", "fin", "commune", "rayon"]) {
+    $(id).disabled = true;
+    /* Le champ eteint pointe vers la phrase qui dit POURQUOI il l'est : sans
+       cela, un lecteur d'ecran annonce « indisponible » et rien d'autre. */
+    decrirePar($(id), "pourquoi-eteint");
+  }
+  $("sug-commune").innerHTML = "";
+  $("choisi").hidden = true;
+  $("commune").hidden = false;
+  $("aide-commune").hidden = false;
+  commune = null;
+  $("mode").innerHTML =
+    '<div class="carte eteinte"><h3>' + titre + '<span class="quand">pas raccordé</span></h3>'
+    + '<p id="pourquoi-eteint">' + pourquoi + "</p>"
+    + '<p style="font-size:12.5px">' + marche + "</p></div>";
+}
+
+/* Ajoute un identifiant a `aria-describedby` sans effacer ceux qui y sont
+   deja, et sans le poser deux fois. */
+function decrirePar(el, id) {
+  const liste = (el.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+  if (!liste.includes(id)) liste.push(id);
+  el.setAttribute("aria-describedby", liste.join(" "));
+}
+function nePlusDecrirePar(el, id) {
+  const liste = (el.getAttribute("aria-describedby") || "").split(/\s+/)
+    .filter((x) => x && x !== id);
+  if (liste.length) el.setAttribute("aria-describedby", liste.join(" "));
+  else el.removeAttribute("aria-describedby");
+}
+
+function allumerFiltres() {
+  /* La table des communes est-elle chargee ? Sans elle, aucun point de depart,
+     donc aucun rayon : le champ de commune ET le rayon restent eteints, plutot
+     que d'offrir deux controles qui ne filtrent rien. */
+  const geo = etatBase && +etatBase.communes_chargees > 0;
+  for (const id of ["debut", "fin"]) {
+    $(id).disabled = false;
+    nePlusDecrirePar($(id), "pourquoi-eteint");
+  }
+  for (const id of ["commune", "rayon"]) {
+    $(id).disabled = !geo;
+    if (geo) nePlusDecrirePar($(id), "pourquoi-eteint");
+    else decrirePar($(id), "pourquoi-sans-rayon");
+  }
+
+  let h = '<div class="carte"><h3>Recherche complète<span class="quand">branchée</span></h3>'
+        + "<p>Tu vois qui est <b>libre sur toute la période</b> que tu demandes. "
+        + "On ne lit jamais ce qu'il y a dans son agenda : seulement le libre et l'occupé.</p>";
+  if (!geo) {
+    /* La table des communes n'est pas chargee : aucun point, donc aucun rayon.
+       On le dit, et on n'affiche AUCUNE distance plutot qu'une distance fausse. */
+    h += '<p id="pourquoi-sans-rayon"><b>Le rayon ne se calcule pas encore.</b> '
+       + "La table des communes est vide : sans elle, on n'a pas de point de départ. "
+       + "La recherche marche quand même, mais elle ne classe pas par distance.</p>"
+       + '<p style="font-size:12.5px">Ce qui débloque : charger la table des communes '
+       + "depuis l'annuaire officiel des communes.</p>";
+  }
+  if (etatBase) {
+    h += '<p style="font-size:12.5px">Aujourd\'hui&nbsp;: '
+       + nombre(etatBase.publies, "confrère publié", "confrères publiés")
+       + ", dont " + etatBase.positionnes + " situé" + (+etatBase.positionnes > 1 ? "s" : "")
+       + " sur une carte.</p>";
+  }
+  /* Ce que la base garde d'une recherche. C'est ecrit dans la fonction
+     elle-meme : le metier, les dates, le point, le rayon et le NOMBRE de
+     reponses. Jamais qui a ete trouve. */
+  h += '<p style="font-size:12.5px">Ce qu\'on garde d\'une recherche&nbsp;: le métier, '
+     + "les dates, le point et le rayon, et le nombre de réponses. Jamais qui a été trouvé."
+     + (legalEnLigne === "oui"
+         ? ' <a href="' + PAGE_LEGAL + '" style="color:var(--accent-texte)">En savoir plus</a>.' : "")
+     + "</p></div>";
+  $("mode").innerHTML = h;
+}
+
+function nombre(n, singulier, pluriel) {
+  const v = +n || 0;
+  return v + " " + (v > 1 ? pluriel : singulier);
+}
+
+/* --------------------------------------------------------------- le demarrage */
+(async () => {
+  /* Trois questions posees EN MEME TEMPS : la liste des metiers, et l'existence
+     des deux pages voisines. Les enchainer ferait attendre l'artisan pour rien. */
+  const [rep, f, l] = await Promise.all([
+    lire("metiers?select=code,libelle&actif=eq.true&order=ordre"),
+    existe(PAGE_FICHE),
+    existe(PAGE_LEGAL)
+  ]);
+  ficheEnLigne = f; legalEnLigne = l;
+
+  if (!rep.ok) {
+    /* La liste des metiers ne descend pas. On ne fabrique pas une liste en dur
+       pour sauver les apparences : elle vivrait sa vie et finirait fausse. */
+    $("lead").textContent = "La base ne répond pas pour le moment.";
+    $("resultats").setAttribute("aria-busy", "false");
+    $("resultats").innerHTML = "";
+    $("chercher").disabled = true;
+    dire("ko", "On n'a pas pu charger la liste des métiers.",
+      "Réessaie dans un instant. Tant qu'elle n'est pas là, la recherche ne peut rien filtrer."
+      + (rep.message ? " <br><small>" + echapper(rep.message) + "</small>" : ""));
+    return;
+  }
+  metiers = rep.lignes;
+
+  /* La liste des metiers. La valeur est le CODE (c'est lui que la fonction
+     attend), et le libelle est garde a cote parce que la vue publique, elle,
+     ne connait que le libelle : `coalesce(m.libelle, a.metier_libre)`. */
+  const sel = $("metier");
+  metiers.forEach((m) => {
+    const o = document.createElement("option");
+    o.value = m.code;
+    o.textContent = m.libelle;
+    o.dataset.libelle = m.libelle;
+    sel.appendChild(o);
+  });
+
+  const r = $("rayon");
+  RAYONS.forEach((k) => {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = k + " km";
+    if (k === 50) o.selected = true;
+    r.appendChild(o);
+  });
+
+  const auj = new Date();
+  $("debut").value = jourISO(auj);
+  $("fin").value = jourISO(auj);
+  $("debut").min = jourISO(auj);
+  $("fin").min = jourISO(auj);
+
+  /* Y a-t-il une session ? On ne telecharge pas la bibliotheque pour le
+     decouvrir : Supabase range sa session dans le stockage local sous une cle
+     connue. Pas de trace, pas de session, et la page reste legere pour le
+     visiteur de passage, qui est le cas le plus frequent. */
+  let trace = false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { trace = true; break; }
+    }
+  } catch (e) { /* stockage refuse : on continue en mode public */ }
+
+  if (trace) {
+    try {
+      const c = await client();
+      const { data } = await c.auth.getSession();
+      session = data && data.session ? data.session : null;
+    } catch (e) { session = null; }
+  }
+
+  $("lien-haut").hidden = false;
+  if (session) {
+    $("lien-haut").href = PAGE_ESPACE;
+    $("lien-haut").textContent = "Mon espace";
+  }
+
+  if (!session) {
+    mode = "public";
+    $("lead").innerHTML = "Choisis un métier et regarde qui a publié sa fiche. "
+      + "Pour savoir <b>qui est libre à telles dates</b>, il faut un compte&nbsp;: "
+      + "les agendas ne sortent jamais de la base.";
+    eteindreFiltres("Dates et rayon",
+      "Tu n'es pas connecté. Les disponibilités d'un confrère ne sont lisibles que par "
+      + "lui et par la base : aucun navigateur ne les voit, même le nôtre. Croiser les "
+      + "agendas demande donc une session ouverte.",
+      'Tu peux chercher par métier dès maintenant. <a href="' + PAGE_CONNEXION
+      + '" style="color:var(--accent-texte)">Se connecter</a> ouvre les dates, le rayon '
+      + "et la mise en relation.");
+  } else {
+    /* UNE SESSION NE SUFFIT PAS : la fonction doit exister. On le demande a
+       `etat_recherche()`, qui ne fait que compter et n'ecrit rien. Sonder avec
+       `rechercher_confreres()` aurait ecrit une ligne dans le journal des
+       recherches a chaque ouverture de la page. */
+    let manqueBase = false;
+    try {
+      const c = await client();
+      const { data, error } = await c.rpc("etat_recherche");
+      if (error) {
+        if (error.code === "PGRST202" || error.code === "42883" || error.code === "42P01") manqueBase = true;
+        else throw error;
+      } else etatBase = Array.isArray(data) ? data[0] : data;
+    } catch (e) { manqueBase = true; }
+
+    if (manqueBase) {
+      mode = "public";
+      $("lead").innerHTML = "Choisis un métier et regarde qui a publié sa fiche. "
+        + "Le croisement avec les agendas n'est <b>pas encore raccordé</b>.";
+      eteindreFiltres("Dates et rayon",
+        "La recherche par dates et par rayon vit dans une migration qui n'est pas encore "
+        + "jouée sur la base. Elle est écrite, elle n'est pas branchée : rien ne se "
+        + "passerait si ces champs étaient actifs.",
+        "Côté technique : jouer crm/supabase/migration-recherche-relations.sql, "
+        + "puis charger la table des communes.");
+    } else {
+      mode = "complet";
+      $("lead").innerHTML = "Le métier, les dates, le rayon. "
+        + "On te rend ceux qui sont <b>libres sur toute la période</b>, "
+        + "les plus proches d'abord.";
+      allumerFiltres();
+    }
+  }
+
+  $("chercher").disabled = false;
+  $("resultats").setAttribute("aria-busy", "false");
+  $("resultats").innerHTML = '<p class="vide">Lance une recherche : '
+    + (mode === "complet"
+        ? "le métier, les dates, et la commune du chantier si tu la connais."
+        : "le métier suffit.") + "</p>";
+})();
+
+/* --------------------------------------------------------- la commune du chantier */
+let minuteur = null;
+$("commune").addEventListener("input", () => {
+  clearTimeout(minuteur);
+  const texte = $("commune").value.trim();
+  $("e-commune").classList.remove("vu");
+  if (texte.length < 2) { $("sug-commune").innerHTML = ""; return; }
+  /* On attend que la frappe s'arrete : une requete par lettre ferait vingt
+     appels pour « Saint-Jean-de-Maurienne ». */
+  minuteur = setTimeout(() => proposerCommunes(texte), 350);
+});
+
+async function proposerCommunes(texte) {
+  const zone = $("sug-commune");
+  zone.innerHTML = '<p class="vide">On cherche…</p>';
+  try {
+    const c = await client();
+    const { data, error } = await c.rpc("chercher_commune", { p_texte: texte, p_limite: 8 });
+    if (error) throw error;
+    const liste = data || [];
+    if (!liste.length) {
+      zone.innerHTML = '<p class="vide">Aucune commune ne commence par «&nbsp;'
+        + echapper(texte) + '&nbsp;». Essaie le début du nom, sans l\'article.</p>';
+      return;
+    }
+    zone.innerHTML = liste.map((v) =>
+      '<button type="button" data-insee="' + echapper(v.code_insee) + '">'
+      + echapper(v.nom)
+      + '<span class="dep">' + echapper(v.departement || "") + "</span></button>").join("");
+    zone.querySelectorAll("button").forEach((b) =>
+      b.addEventListener("click", () => {
+        const v = liste.find((x) => x.code_insee === b.dataset.insee);
+        if (v) choisirCommune(v);
+      }));
+  } catch (e) {
+    zone.innerHTML = "";
+    $("e-commune").textContent = "La liste des communes n'a pas répondu. "
+      + "Tu peux chercher sans commune : les résultats ne seront pas classés par distance.";
+    $("e-commune").classList.add("vu");
+  }
+}
+
+function choisirCommune(v) {
+  commune = v;
+  $("commune").hidden = true;
+  $("aide-commune").hidden = true;
+  $("sug-commune").innerHTML = "";
+  const c = $("choisi");
+  c.hidden = false;
+  c.innerHTML = "Chantier à <b>" + echapper(v.nom) + "</b> ("
+    + echapper(v.departement || "") + ") "
+    + '<button type="button" class="lien" id="changer">Changer de commune</button>';
+  $("changer").addEventListener("click", () => {
+    commune = null;
+    c.hidden = true;
+    $("commune").hidden = false;
+    $("aide-commune").hidden = false;
+    $("commune").value = "";
+    $("commune").focus();
+  });
+}
+
+/* ------------------------------------------------------------------ la recherche */
+$("f").addEventListener("submit", (ev) => { ev.preventDefault(); chercher(); });
+
+async function chercher() {
+  taire();
+  const b = $("chercher");
+  const zone = $("resultats");
+  const opt = $("metier").selectedOptions[0];
+  const code = $("metier").value || null;
+  const libelle = opt && opt.dataset ? opt.dataset.libelle || null : null;
+
+  if (mode === "complet" && !valider()) return;
+
+  b.disabled = true;
+  const etiquette = b.textContent;
+  b.textContent = "On regarde…";
+  zone.setAttribute("aria-busy", "true");
+  zone.innerHTML = '<p class="chargement">On regarde qui est libre…</p>';
+  try {
+    if (mode === "complet") await chercherComplet(code);
+    else await chercherPublic(code, libelle);
+  } catch (e) {
+    zone.innerHTML = "";
+    dire("ko", "La recherche n'a pas abouti.",
+      "Réessaie dans un instant."
+      + (e && e.message ? " <br><small>" + echapper(e.message) + "</small>" : ""));
+  } finally {
+    b.disabled = false;
+    b.textContent = etiquette;
+    zone.setAttribute("aria-busy", "false");
+  }
+}
+
+/* La periode se verifie ICI aussi, et pas seulement dans la base. La base
+   refuse une periode a l'envers par une exception, qui arriverait a l'ecran
+   sous forme de message technique. Autant le dire proprement, sous le champ
+   fautif. */
+function valider() {
+  const e = $("e-periode");
+  const d = $("debut").value, f = $("fin").value;
+  e.classList.remove("vu");
+  $("debut").setAttribute("aria-invalid", "false");
+  $("fin").setAttribute("aria-invalid", "false");
+  if (!d || !f) {
+    e.textContent = "Donne une date de début et une date de fin.";
+    e.classList.add("vu");
+    (!d ? $("debut") : $("fin")).setAttribute("aria-invalid", "true");
+    (!d ? $("debut") : $("fin")).focus();
+    return false;
+  }
+  if (f < d) {
+    e.textContent = "La fin est avant le début : inverse les deux dates.";
+    e.classList.add("vu");
+    $("fin").setAttribute("aria-invalid", "true");
+    $("fin").focus();
+    return false;
+  }
+  return true;
+}
+
+async function chercherComplet(code) {
+  const c = await client();
+  const { data, error } = await c.rpc("rechercher_confreres", {
+    p_metier: code,
+    p_debut: $("debut").value,
+    p_fin: $("fin").value,
+    p_latitude: commune ? commune.latitude : null,
+    p_longitude: commune ? commune.longitude : null,
+    p_rayon_km: +$("rayon").value,
+    p_limite: 50
+  });
+
+  if (error) {
+    const m = (error.message || "").toLowerCase();
+    /* La fonction a disparu entre l'ouverture de la page et le clic : on ne
+       laisse pas l'artisan devant une erreur technique, on bascule en mode
+       public et on refait la recherche qui, elle, marche encore. */
+    if (error.code === "PGRST202" || error.code === "42883") {
+      mode = "public";
+      eteindreFiltres("Dates et rayon",
+        "La fonction de recherche n'est plus là : la migration n'est pas jouée sur la base.",
+        "Côté technique : jouer crm/supabase/migration-recherche-relations.sql.");
+      dire("ko", "La recherche par dates vient de tomber.",
+        "On te montre quand même les fiches publiées, sans filtre de dates.");
+      const opt = $("metier").selectedOptions[0];
+      await chercherPublic(code, opt && opt.dataset ? opt.dataset.libelle : null);
+      return;
+    }
+    if (m.indexOf("aucune session") >= 0) {
+      $("resultats").innerHTML = "";
+      dire("ko", "Ta session s'est fermée.",
+        'Reconnecte-toi pour croiser les agendas : <a href="' + PAGE_CONNEXION
+        + '" style="color:var(--accent-texte)">se connecter</a>.');
+      return;
+    }
+    if (m.indexOf("periode invalide") >= 0 || m.indexOf("période invalide") >= 0) {
+      $("resultats").innerHTML = "";
+      $("e-periode").textContent = "Cette période n'est pas valable : vérifie les deux dates.";
+      $("e-periode").classList.add("vu");
+      $("debut").focus();
+      return;
+    }
+    throw error;
+  }
+
+  rendre((data || []).map((v) => ({
+    id: v.artisan_id,
+    prenom: v.prenom,
+    denomination: v.denomination,
+    metier: v.metier,
+    presentation: v.presentation,
+    commune: v.commune,
+    departement: v.departement,
+    rayon_km: v.rayon_km,
+    distance_km: v.distance_km,
+    dans_son_rayon: v.dans_son_rayon,
+    position_source: v.position_source,
+    note_moyenne: v.note_moyenne,
+    nb_notes: v.nb_notes
+  })), true);
+}
+
+/* Le mode public lit la VUE, et rien d'autre. Le filtre porte sur le LIBELLE du
+   metier et non sur son code : la vue rend `coalesce(m.libelle, a.metier_libre)`.
+   Filtrer sur le code ne rendrait jamais rien, sans la moindre erreur.
+   AUCUN FILTRE GEOGRAPHIQUE ICI, et c'est mesure : `departement` de la vue vaut
+   `left(code_postal, 2)`, et `code_postal` est mis a null pour tout artisan non
+   diffusible a l'annuaire, ce qui est le cas courant chez les artisans en nom
+   propre. Un filtre par departement les ferait disparaitre en silence. */
+async function chercherPublic(code, libelle) {
+  let chemin = "fiches_publiques?select=" + COLONNES + "&order=prenom&limit=50";
+  if (code && libelle) chemin += "&metier=eq." + encodeURIComponent(libelle);
+  const rep = await lire(chemin);
+  if (!rep.ok) {
+    $("resultats").innerHTML = "";
+    if (rep.code === "PGRST205") {
+      dire("ko", "Les fiches publiques ne sont pas encore en base.",
+        "La vue `fiches_publiques` n'existe pas sur ce projet. "
+        + "Côté technique : jouer crm/supabase/migration-espace-artisan.sql.");
+      return;
+    }
+    dire("ko", "La liste n'a pas pu être lue.",
+      "Réessaie dans un instant."
+      + (rep.message ? " <br><small>" + echapper(rep.message) + "</small>" : ""));
+    return;
+  }
+  rendre(rep.lignes.map((v) => ({
+    id: v.id, prenom: v.prenom, denomination: v.denomination, metier: v.metier,
+    presentation: v.presentation, commune: v.commune, departement: v.departement,
+    rayon_km: v.rayon_km,
+    distance_km: null, dans_son_rayon: null, position_source: null,
+    note_moyenne: null, nb_notes: null
+  })), false);
+}
+
+/* ------------------------------------------------------------------- l'affichage */
+function rendre(liste, complet) {
+  const zone = $("resultats");
+  if (!liste.length) { zone.innerHTML = vide(complet); ancrer(); return; }
+
+  const classe = complet && commune
+    ? "les plus proches d'abord"
+    : complet ? "par prénom : sans commune, on ne mesure aucune distance"
+              : "par prénom, pas par distance";
+
+  let h = '<h2 class="compte" id="compte" tabindex="-1">'
+        + nombre(liste.length, "confrère", "confrères")
+        + (complet
+            ? " libre" + (liste.length > 1 ? "s" : "") + " " + laPeriode()
+            : " avec une fiche publiée")
+        + "</h2>"
+        + '<p class="vide">Classés ' + classe + "."
+        + (liste.length === 50 ? " On s'arrête à 50 : affine le métier ou la période." : "")
+        + "</p>";
+
+  h += liste.map((v) => carte(v, complet)).join("");
+
+  h += '<p class="legende">Le téléphone, le nom de famille et le SIRET ne sortent pas '
+     + "d'ici : ils ne sont pas dans ce qu'on lit. Le contact passe par une demande de "
+     + "mise en relation, depuis la fiche, et les coordonnées ne circulent qu'une fois "
+     + "la demande acceptée.";
+  if (!session) {
+    /* Il regarde sans compte, et c'est permis. On lui dit ou s'arrete ce qu'il
+       peut faire, sans lui fermer la porte au nez. */
+    h += "<br>Regarder ne demande pas de compte. Demander une mise en relation, si : "
+       + 'c\'est le SIRET vérifié qui garantit à chacun qu\'en face il y a une entreprise. '
+       + '<a href="' + PAGE_CONNEXION + '" style="color:var(--accent-texte)">Se connecter</a>.';
+  }
+  if (complet && commune) {
+    h += "<br>Une distance marquée «&nbsp;centre de commune&nbsp;» est mesurée depuis le "
+       + "milieu de la commune, pas depuis une adresse : c'est la seule position "
+       + "disponible pour une entreprise non diffusible à l'annuaire.";
+  }
+  h += "</p>";
+
+  zone.innerHTML = h;
+  ancrer();
+}
+
+/* Le focus part sur le titre des resultats : sans cela, un lecteur d'ecran
+   reste sur le bouton « Chercher » et ne sait pas que la page a change. */
+function ancrer() {
+  const t = $("compte") || $("vide-titre");
+  if (t) t.focus();
+}
+
+function vide(complet) {
+  let h = '<h2 class="compte" id="vide-titre" tabindex="-1">Personne pour l\'instant.</h2>';
+  if (!complet) {
+    h += '<p class="vide">Aucune fiche publiée ne correspond. Une fiche n\'apparaît ici '
+       + "qu'une fois son parcours terminé et publiée par son propriétaire.</p>";
+    return h;
+  }
+  /* On ne dit pas seulement « personne » : on dit ce qu'il y a dans la base.
+     Un ecran vide sans chiffre laisse croire a une panne, ou pire, a un service
+     sans inscrits alors qu'il en a. Les nombres viennent de etat_recherche(). */
+  if (etatBase && +etatBase.publies === 0) {
+    h += '<p class="vide">Aucun confrère n\'a encore publié sa fiche. '
+       + "Ce n'est pas un filtre trop serré : la liste est vide pour tout le monde.</p>";
+    return h;
+  }
+  h += '<p class="vide">Personne n\'est libre sur toute la période demandée ('
+     + laPeriode() + ")"
+     + (commune ? ", à " + echapper(String($("rayon").value)) + " km de "
+                  + echapper(commune.nom) : "")
+     + ". Essaie une période plus courte, un rayon plus large, ou tous les métiers.";
+  if (etatBase) {
+    h += "<br>Dans la base aujourd'hui : "
+       + nombre(etatBase.publies, "confrère publié", "confrères publiés")
+       + ", dont " + etatBase.positionnes + " situé" + (+etatBase.positionnes > 1 ? "s" : "")
+       + " sur une carte.";
+    if (+etatBase.sans_position > 0 && commune) {
+      h += " " + etatBase.sans_position + " n'"
+         + (+etatBase.sans_position > 1 ? "ont" : "a")
+         + " pas de position : un filtre par rayon ne "
+         + (+etatBase.sans_position > 1 ? "les" : "le") + " voit pas.";
+    }
+  }
+  h += "</p>";
+  return h;
+}
+
+function carte(v, complet) {
+  const titre = v.prenom || v.denomination || "Une entreprise";
+  const sous = [];
+  if (v.denomination && v.prenom) sous.push(v.denomination);
+  if (v.metier) sous.push(v.metier);
+  const lieu = [v.commune, v.departement ? "(" + v.departement + ")" : ""]
+    .filter(Boolean).join(" ");
+  if (lieu) sous.push(lieu);
+
+  let h = '<div class="res"><span class="mono" aria-hidden="true">' + initiale(v) + "</span>"
+        + '<div class="res-corps"><div class="res-tete">'
+        + "<h3>" + echapper(titre) + "</h3>";
+  if (complet && v.distance_km != null) {
+    h += '<span class="km">' + km(v.distance_km) + "</span>";
+  }
+  h += "</div>";
+  if (sous.length) h += '<p class="meta">' + echapper(sous.join(" · ")) + "</p>";
+
+  if (complet && v.distance_km != null && v.position_source === "commune") {
+    h += '<p class="note">centre de commune</p>';
+  }
+  /* La note n'est affichee que si elle existe. « 0 sur 5 » pour quelqu'un qui
+     n'a jamais ete note serait une fausse donnee, et la plus injuste. */
+  if (v.nb_notes != null && +v.nb_notes > 0 && v.note_moyenne != null) {
+    h += '<p class="note">' + note(v.note_moyenne) + " sur 5 · "
+       + nombre(v.nb_notes, "avis", "avis") + "</p>";
+  } else if (complet) {
+    h += '<p class="note">pas encore noté</p>';
+  }
+  if (v.presentation) {
+    h += '<p class="pres">' + echapper(coupe(v.presentation, 180)) + "</p>";
+  }
+  /* Hors de sa zone : ce n'est pas une erreur, c'est une information. Il se
+     deplace peut-etre quand meme, et c'est a lui de le dire. */
+  if (complet && v.dans_son_rayon === false && v.rayon_km) {
+    h += '<p class="hors">Il annonce ' + (+v.rayon_km) + " km autour de chez lui, "
+       + "et ton chantier est plus loin. À lui de dire s'il s'y déplace.</p>";
+  }
+
+  h += '<div class="pied-actions">' + versFiche(v) + "</div></div></div>";
+  return h;
+}
+
+/* Le lien vers la fiche, en trois etats. /artisan est declaree dans PAGES
+   depuis le 14/09/2026, mais declaree n'est pas deployee : elle peut ne pas
+   etre en ligne. Un lien mort vaut un bouton mort, on demande donc au serveur
+   plutot que de faire confiance a la liste. */
+function versFiche(v) {
+  const adresse = PAGE_FICHE + "?id=" + encodeURIComponent(v.id);
+  const qui = echapper(v.prenom || v.denomination || "cette entreprise");
+  if (ficheEnLigne === "oui") {
+    return '<a class="bouton creux" href="' + adresse + '" aria-label="Voir la fiche de '
+         + qui + '">Voir sa fiche</a>';
+  }
+  if (ficheEnLigne === "non") {
+    return '<p class="vide">La fiche complète n\'est pas encore en ligne : il n\'y a donc '
+         + "pas de lien ici, plutôt qu'un lien qui mènerait à une page introuvable. "
+         + "Ce que tu vois ci-dessus est tout ce que la base rend pour l'instant.</p>";
+  }
+  return '<a class="bouton creux" href="' + adresse + '" aria-label="Voir la fiche de '
+       + qui + '">Voir sa fiche</a>'
+       + '<span class="vide">On n\'a pas pu vérifier que cette page est déjà en ligne.</span>';
+}
+
+/* L'initiale du PRENOM d'abord : « SARL TOITURE DES ALPES » donnerait un « S »
+   qui est l'initiale d'une forme juridique, pas de quelqu'un. */
+function initiale(v) {
+  const base = (v.prenom || v.denomination || "").trim();
+  const c = base.slice(0, 1).toUpperCase();
+  return /^[\p{L}\p{N}]$/u.test(c) ? echapper(c) : "?";
+}
+
+function km(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return "";
+  return (v < 10 ? v.toFixed(1).replace(".", ",") : String(Math.round(v))) + " km";
+}
+function note(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return "";
+  return v.toFixed(1).replace(".", ",");
+}
+function coupe(t, n) {
+  const s = String(t).trim();
+  return s.length <= n ? s : s.slice(0, n).replace(/\s+\S*$/, "") + "…";
+}
+
+/* --------- La barre de l'espace ---------
+   Elle ne depend d'aucune autre piece de la page : elle lit la session
+   directement dans le stockage local, comme le fait deja le chargement
+   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
+   qu'aucun n'ait a lui preter ses fonctions. */
+(function () {
+  var nav = document.getElementById("nav-app");
+  if (!nav || !window.localStorage) return;
+
+  var cle = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
+  }
+  if (!cle) return;                       // pas de session : la barre n'existe pas
+  var sess;
+  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!sess || !sess.access_token || !sess.user) return;
+
+  var ici = nav.getAttribute("data-ici") || "";
+  var liens = nav.querySelectorAll("a");
+  for (var j = 0; j < liens.length; j++) {
+    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
+  }
+  nav.hidden = false;
+
+  /* LA BARRE DEFILE, ET L'ECRAN OU L'ON EST DOIT S'Y VOIR. Mesure a 390 px :
+     les cinq liens demandent 592 px pour 358 px visibles, et « Messages »
+     commence au-dela du bord. On amene donc le lien courant sous les yeux,
+     sans defilement anime : c'est une position de depart, pas un mouvement. */
+  var courant = nav.querySelector('a[aria-current="page"]');
+  if (courant && nav.scrollWidth > nav.clientWidth) {
+    nav.scrollLeft = Math.max(0, courant.offsetLeft - 12);
+  }
+
+  /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
+     rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
+  fetch(BASE + "/rest/v1/artisans?id=eq." + sess.user.id + "&select=etape",
+        { headers: { apikey: CLE, Authorization: "Bearer " + sess.access_token } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d[0] || d[0].etape === "fini") return;
+      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < bloques.length; k++) {
+        bloques[k].setAttribute("aria-disabled", "true");
+        bloques[k].setAttribute("tabindex", "-1");
+      }
+      var note = document.getElementById("nav-note");
+      if (note) {
+        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
+        note.hidden = false;
+      }
+    })
+    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+})();
+</script>

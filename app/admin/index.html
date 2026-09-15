@@ -1,0 +1,1279 @@
+<title>Back office - À dispo</title>
+<!--
+  LE BACK OFFICE : VOIR, CORRIGER, SUSPENDRE, MODERER.
+  Devis 2027-02, ligne « Ton interface d'administration : voir, corriger,
+  suspendre, modérer » (2,5 j). CE DEVIS N'EST PAS SIGNE au 13/09/2026 : le
+  seul qui engage est le N°20260910-1, et il ne porte aucune ligne de back
+  office. Cet ecran existe, il n'est pas facture.
+
+  LA RESERVE EST PORTEE PAR LA BASE, PAS PAR CETTE PAGE. La cle publique
+  Supabase est lisible dans le code source, comme sur toutes les pages du
+  site : cacher un bouton ne protege rien, la console du navigateur le
+  retrouve en trois lignes. Ce qui protege, ce sont les politiques de
+  crm/supabase/migration-back-office.sql, qui exigent `est_admin()` pour lire
+  une fiche, une piece, une demande, un signalement ou le journal. Un compte
+  qui n'est pas administrateur ne recoit pas une page vide par politesse : il
+  recoit zero ligne parce que la base refuse.
+
+  CE QUE CET ECRAN NE FAIT PAS, ET POURQUOI.
+  · Il ne corrige AUCUNE donnee d'artisan (SIRET, telephone, nom, metier). Le
+    declencheur `artisans_moderation` les remet a leur valeur d'origine :
+    corriger a la place de quelqu'un, c'est signer une information qu'on n'a
+    pas verifiee.
+  · Il ne repond a aucune demande de mise en relation. Les transitions d'etat
+    sont tenues par la base et reservees aux deux parties. Un administrateur
+    qui accepterait a la place d'un confrere engagerait son entreprise.
+  · Il n'efface rien. Un effacement de donnees personnelles a son circuit et
+    son delai d'un mois, ce n'est pas un bouton de moderation.
+
+  CE QUI N'EST PAS BRANCHE, ET QUI EST DIT EN CLAIR A L'ECRAN. Chaque panneau
+  interroge sa propre table : quand la migration qui la pose n'a pas ete
+  jouee, le panneau nomme le fichier manquant au lieu d'afficher une liste
+  vide. Un tableau de bord qui affiche zero la ou il ne sait pas est un
+  tableau de bord qui ment, et c'est sur lui qu'on decidera.
+
+  AUCUN MONTANT D'ABONNEMENT N'APPARAIT ICI, y compris dans les compteurs :
+  le tarif est en cours d'arbitrage. On compte des abonnements, jamais des
+  euros.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
+     Bloc identique sur les sept écrans applicatifs. Source : CHARTE-CLAIRE.md,
+     relevé et mesuré le 14/09/2026. Tout ratio cité est calculé par la formule
+     WCAG 2.1, alpha composité sur son fond réel. */
+
+  /* Verrouille les contrôles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Le gabarit de outils/build.py déclare
+     encore `meta color-scheme = dark` : la propriété CSS l'emporte sur la
+     balise, et c'est ici qu'elle se pose. */
+  color-scheme:light;
+
+  /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
+     (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
+     teinte nulle). */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de dégradé */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
+     #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 460px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE. Le defilement doux declenche
+   depuis le script suit la meme preference : voir DOUX dans le module. */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+
+/* Le back office est le seul ecran a porter des tableaux : il lui faut plus
+   que les 620 px de l'espace artisan, sans jamais depasser une longueur de
+   ligne lisible pour le texte, qui reste borne par les cartes. */
+.wrap{max-width:1080px;margin:0 auto;padding:clamp(20px,4vw,40px) var(--gut) 80px}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  flex-wrap:wrap;margin-bottom:22px}
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:21px;line-height:1}
+/* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE : le `à` ambre donne 9,31:1 sur le
+   nuit et 1,66:1 sur le papier. Il passe donc a l'ambre-lettre, 5,85:1. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+.haut-droite{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sortir{background:var(--bg-2);border:1px solid var(--line);color:var(--cream-mut);
+  font:inherit;font-size:12.5px;border-radius:999px;padding:8px 16px;cursor:pointer;
+  min-height:48px;text-decoration:none;display:inline-flex;align-items:center;
+  box-shadow:var(--ombre-1)}
+.sortir:hover{border-color:var(--cream-dim);color:var(--cream)}
+.sortir:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(23px,4.6vw,30px);line-height:1.16}
+/* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
+   Le mot reste en encre (18,46:1), l'ambre passe dessous en surlignage, et la
+   ou la barre couvre la lettre l'encre sur l'ambre vaut 10,06:1. Ecrit en
+   ambre, le meme mot vaudrait 1,84:1. */
+h1 .em{color:var(--cream);
+  background:linear-gradient(var(--accent),var(--accent)) 0 86%/100% .24em no-repeat}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:17px;margin:28px 0 0}
+.lead{color:var(--cream-mut);font-size:15.5px;margin:11px 0 0;max-width:52ch}
+.aide{font-size:12.5px;color:var(--cream-dim);margin:6px 0 0;line-height:1.5;max-width:60ch}
+
+/* ---- Les onglets, repris de l'espace artisan au caractere pres ---- */
+.onglets{display:flex;gap:6px;margin:22px 0 22px;border-bottom:1px solid var(--line);
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.onglet{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-mut);
+  font:inherit;font-family:"Signika",sans-serif;font-weight:600;font-size:14px;
+  padding:11px 13px;cursor:pointer;white-space:nowrap;margin-bottom:-1px;min-height:48px}
+.onglet:hover{color:var(--cream)}
+/* L'ONGLET OUVERT NE PEUT PLUS ETRE SOULIGNE D'AMBRE : un filet `--accent` sur
+   du papier vaut 1,84:1, il disparait. L'ambre-lettre vaut 6,48:1, et le trait
+   est double par la graisse : l'information n'est jamais dans la seule couleur. */
+.onglet.ici{color:var(--accent-texte);font-weight:700;border-bottom-color:var(--accent-texte)}
+.onglet:focus-visible{outline:2px solid var(--cream);outline-offset:-2px}
+
+/* LA CARTE SE DISTINGUE PAR SON FILET ET UNE OMBRE DOUCE, JAMAIS PAR UN APLAT
+   PLUS FONCE : carte blanche sur le sol #F6F3EC = 1,108:1, le filet a 1,35:1
+   trace le bord, l'ombre la decolle. Un gris derriere salirait le papier. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:14px;
+  padding:15px 17px;margin:11px 0 0;box-shadow:var(--ombre-1)}
+/* UNE CARTE ETEINTE PORTE UNE EXPLICATION : elle se distingue par un trait
+   discontinu, pas par l'opacite. Sur fond clair `opacity:.55` sur l'encre
+   tombe a 3,5:1 et sur un libelle terne a 2,2:1 : on effacerait la raison. */
+.carte.eteinte{border-style:dashed;box-shadow:none;background:var(--surface)}
+.carte h3{font-family:"Signika",sans-serif;font-size:15px;margin:0 0 3px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.carte p{margin:.3rem 0;font-size:13.5px;color:var(--cream-mut);max-width:56ch}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap}
+
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  border-radius:999px;padding:14px 26px;cursor:pointer;border:1px solid transparent;
+  text-decoration:none;min-height:48px}
+.bouton.plein{background:var(--accent);color:var(--encre);border-color:var(--accent-2);
+  box-shadow:var(--ombre-1)}
+.bouton.plein:hover:enabled{background:var(--accent-2);box-shadow:var(--ombre-2)}
+.bouton.creux{background:var(--bg-2);color:var(--cream);border-color:var(--line);
+  box-shadow:var(--ombre-1)}
+.bouton.creux:hover:enabled{border-color:var(--cream-dim)}
+/* La cible tactile ne descend pas sous 48 px, y compris pour les boutons
+   d'action d'une ligne de tableau : c'est la regle d'accessibilite du projet,
+   et elle vaut d'abord pour une main sur un chantier. */
+.bouton.mini{font-size:13.5px;padding:11px 18px;min-height:48px}
+/* UN BOUTON ETEINT RESTE LISIBLE, ET L'OPACITE NE SERT PAS A L'OBTENIR : sur
+   fond clair une demi-opacite fait echouer jusqu'au noir (3,49:1). Couleurs
+   mesurees : #546279 sur #EFEADF = 5,15:1. */
+.bouton:disabled{background:var(--surface-2);color:var(--cream-dim);
+  border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.actions{display:flex;gap:9px;align-items:center;margin:14px 0 0;flex-wrap:wrap}
+
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;margin:0 0 5px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px}
+/* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND : `--surface` posee
+   sur une carte blanche ne donne que 1,03:1. Filet `--cream-dim` : 6,18:1. */
+input,select,textarea{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--cream-dim);border-radius:12px;padding:13px 15px;outline:none;
+  -webkit-appearance:none;appearance:none;min-height:48px}
+textarea{min-height:88px;resize:vertical}
+/* LE CHEVRON EST UNE IMAGE, PAS UNE VARIABLE : sa couleur est ecrite dans
+   l'adresse. Le bleu-gris de la charte sombre #A9B6C6 tombe a 1,94:1 sur le
+   champ clair et la fleche s'efface avec le seul signe qu'il s'agit d'une
+   liste deroulante. #546279 y vaut 5,83:1. */
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+/* LE FOCUS N'EST PLUS AMBRE : bordure `--accent` sur blanc = 1,84:1 contre les
+   3,0 exiges, et aucun voile d'ambre n'y arrive (1,14:1 a .22). 6,48:1 ici. */
+input:focus,select:focus,textarea:focus{border-color:var(--accent-texte);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--cream-dim);opacity:1}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--alerte);
+  box-shadow:0 0 0 3px var(--alerte-soft)}
+.champ{margin:14px 0 0}
+.err{color:var(--alerte);font-size:13px;margin-top:5px;display:none}
+.err.vu{display:block}
+
+.etat{border-radius:12px;padding:13px 16px;margin:18px 0 0;font-size:14.2px;display:none;
+  border:1px solid var(--line);background:var(--bg-2);box-shadow:var(--ombre-1)}
+.etat.vu{display:block}
+.etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+.etat a{color:var(--accent-texte)}
+
+/* L'attente se dit par du texte, jamais par une animation : sur un telephone
+   de chantier, une roue qui tourne ne dit pas si ca avance. */
+.chargement{color:var(--cream-dim);font-size:14px;padding:40px 0;text-align:center}
+/* L'ETAT VIDE. Un trait discontinu SEUL est trop faible sur du papier : le
+   filet a 1,35:1 y disparait. On lui donne le puits comme fond, 1,08:1 contre
+   le sol, ce qui suffit a dessiner le pave sans l'assombrir. */
+.vide{color:var(--cream-dim);font-size:14px;padding:30px 0;text-align:center;
+  border:1px dashed var(--line);background:var(--surface-2);border-radius:14px;margin:16px 0 0}
+
+/* ---- Les compteurs ---- */
+.chiffres{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));
+  gap:11px;margin:18px 0 0}
+.chiffre{border:1px solid var(--line);background:var(--bg-2);border-radius:14px;
+  padding:14px 15px;box-shadow:var(--ombre-1)}
+.chiffre.eteinte{border-style:dashed;box-shadow:none;background:var(--surface)}
+.chiffre .n{font-family:"JetBrains Mono",monospace;font-size:27px;font-weight:600;
+  line-height:1.1;color:var(--accent-texte);display:block}
+.chiffre .n.rien{font-size:14px;color:var(--cream-dim);font-weight:400;padding:6px 0 5px}
+.chiffre .l{font-family:"Signika",sans-serif;font-weight:600;font-size:13px;
+  margin:6px 0 0;display:block}
+.chiffre .p{font-size:12.5px;color:var(--cream-dim);margin:5px 0 0;line-height:1.45}
+
+/* ---- Les filtres ---- */
+.filtres{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:11px;margin:18px 0 0}
+.compte-lignes{font-family:"JetBrains Mono",monospace;font-size:11.5px;
+  color:var(--cream-dim);margin:14px 0 0}
+
+/* ---- Les tableaux ----
+   Sur grand ecran, un vrai tableau. Sous 760 px, chaque ligne devient une
+   carte et chaque cellule porte son intitule, lu depuis data-l : un tableau
+   qui defile lateralement sur un telephone ne se lit pas, il se devine.
+
+   SUR FOND CLAIR, LES FILETS DE LIGNE SONT REMPLACES PAR DES BANDES.
+   Un filet sous chaque cellule dessinait la grille sur du sombre, ou il
+   eclaircissait ; pose sur du papier il quadrille la page et fatigue l'oeil.
+   Une bande une ligne sur deux fait le meme travail sans tracer un seul trait :
+   le puits `--surface-2` contre le sol `--bg` mesure 1,08:1, assez pour suivre
+   une ligne des yeux sur 1 000 px, trop peu pour salir le papier. Seul l'en-tete
+   garde un filet, parce qu'il separe deux natures et non deux lignes. */
+.tableau{margin:16px 0 0;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+th{text-align:left;font-family:"Signika",sans-serif;font-weight:600;font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--cream-dim);
+  border-bottom:1px solid var(--line);padding:0 12px 8px 0;white-space:nowrap}
+td{padding:11px 12px;border-bottom:none;vertical-align:top}
+tbody tr:nth-child(even){background:var(--surface-2)}
+td:first-child{border-radius:8px 0 0 8px}
+td:last-child{border-radius:0 8px 8px 0}
+td .mono{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cream-dim)}
+td b{font-family:"Signika",sans-serif;font-weight:600}
+/* Le survol designe la ligne entiere, sans la peindre : le voile d'ambre
+   monte a 1,24:1 contre le sol, on la suit sans rien perdre de sa lisibilite
+   (l'encre y reste a 14,8:1). Reserve aux pointeurs : sur un ecran tactile,
+   un survol se declenche au doigt et ne se retire jamais. */
+@media(hover:hover){
+  tbody tr:hover{background:var(--accent-soft)}
+}
+
+.pastille{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  padding:3px 9px;border-radius:999px;white-space:nowrap;
+  background:var(--bg-2);color:var(--cream-mut);border:1px solid var(--line)}
+/* LES BORDURES D'ETAT ETAIENT CALIBREES CONTRE LE BLEU NUIT. Reprises telles
+   quelles sur du papier elles s'effacent : rgba(79,208,138,.35) vaut 1,27:1,
+   rgba(240,160,138,.35) 1,28:1, rgba(232,185,62,.35) 1,23:1. Reconstruites sur
+   la couleur sombre correspondante, elles cernent a nouveau la pastille. */
+.pastille.ok{background:var(--vert-soft);color:var(--vert);border-color:rgba(25,103,64,.35)}
+.pastille.att{background:var(--accent-soft);color:var(--accent-texte);border-color:rgba(118,90,14,.35)}
+.pastille.ko{background:var(--alerte-soft);color:var(--alerte);border-color:rgba(169,60,36,.35)}
+
+.replier{background:var(--bg-2);border:1px solid var(--line);color:var(--cream-mut);font:inherit;
+  font-size:12.5px;border-radius:999px;padding:7px 15px;cursor:pointer;min-height:48px;
+  box-shadow:var(--ombre-1)}
+.replier:hover{border-color:var(--cream-dim);color:var(--cream)}
+.replier:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.detail{border:1px solid var(--line);background:var(--surface-2);border-radius:12px;
+  padding:12px 14px;margin:10px 0 0;font-size:13px;color:var(--cream-mut);
+  white-space:pre-wrap;overflow-wrap:anywhere}
+.json{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-mut);
+  margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+
+@media(max-width:760px){
+  table{min-width:0}
+  .tableau{overflow-x:visible}
+  thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+    clip-path:inset(50%);white-space:nowrap}
+  table,tbody,tr,td{display:block;width:100%}
+  /* EN CARTES, LA BANDE N'A PLUS DE SENS : deux cartes voisines de couleurs
+     differentes se lisent comme deux etats differents. On revient au blanc, au
+     filet et a l'ombre, exactement comme les autres cartes de l'ecran. */
+  tbody tr:nth-child(even){background:var(--bg-2)}
+  tr{border:1px solid var(--line);background:var(--bg-2);border-radius:14px;
+    padding:13px 15px;margin:0 0 11px;box-shadow:var(--ombre-1)}
+  td{border-bottom:1px solid var(--line);padding:8px 0;display:grid;
+    grid-template-columns:8.2rem 1fr;gap:10px;align-items:start;border-radius:0}
+  td:last-child{border-bottom:none;padding-bottom:0}
+  td::before{content:attr(data-l);font-family:"Signika",sans-serif;font-weight:600;
+    font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--cream-dim);
+    padding-top:2px}
+  td .pastille{justify-self:start}
+  td.plein{grid-template-columns:1fr}
+  td.plein::before{content:none}
+}
+@media(max-width:400px){
+  td{grid-template-columns:1fr;gap:3px}
+  td::before{padding-top:0}
+}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <span class="marque">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </span>
+    <span class="haut-droite">
+      <a class="sortir" href="/espace" id="vers-espace" hidden>Mon espace</a>
+      <button class="sortir" id="sortir" hidden>Se déconnecter</button>
+    </span>
+  </div>
+
+  <div id="ecran"><p class="chargement">Un instant…</p></div>
+
+  <div class="etat ok" id="s-ok"></div>
+  <div class="etat ko" id="s-ko"></div>
+</div>
+
+<script type="module">
+/* La cle ci-dessous est PUBLIQUE par nature : elle voyage dans le code source
+   de chaque page du site. Elle ne protege rien, et elle n'a pas a proteger :
+   toute la reserve de cet ecran tient dans les politiques de securite par
+   ligne posees par crm/supabase/migration-back-office.sql, qui exigent
+   `est_admin()`. Un compte ordinaire qui appelle les memes requetes depuis sa
+   console recoit zero ligne. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+const $ = (i) => document.getElementById(i);
+const ecran = $("ecran");
+
+/* ANIMATION REDUITE SUR DEMANDE DU SYSTEME. `scrollIntoView({behavior:"smooth"})`
+   ne regarde PAS la regle CSS `scroll-behavior` : la preference doit etre lue
+   ici, sans quoi la page continue de faire glisser l'ecran de quelqu'un qui a
+   demande qu'on arrete. Lu une fois, au chargement. */
+const DOUX = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ? "auto" : "smooth";
+
+const ONGLETS = [
+  { cle: "chiffres",     nom: "Les chiffres" },
+  { cle: "artisans",     nom: "Artisans" },
+  { cle: "pieces",       nom: "Pièces" },
+  { cle: "demandes",     nom: "Mises en relation" },
+  { cle: "signalements", nom: "Signalements" },
+  { cle: "journal",      nom: "Journal" }
+];
+
+/* Les libelles des listes fermees de la base. On les traduit ici et nulle
+   part ailleurs : un etat affiche a deux endroits finit par s'ecrire de deux
+   facons. Le second element donne la couleur de la pastille. */
+const ETAPES = { identite: "Identité", entreprise: "Entreprise", metier: "Métier",
+                 abonnement: "Abonnement", agenda: "Agenda", fini: "Terminé" };
+const ETATS_PIECE = { deposee: ["Déposée", "att"], en_controle: ["En contrôle", "att"],
+                      acceptee: ["Acceptée", "ok"], refusee: ["Refusée", "ko"],
+                      expiree: ["Expirée", "ko"] };
+const GENRES_PIECE = { immatriculation: "Extrait d'immatriculation",
+                       assurance_decennale: "Assurance décennale",
+                       assurance_rc_pro: "Responsabilité civile professionnelle",
+                       vigilance_urssaf: "Attestation de vigilance",
+                       habilitation: "Habilitation ou CACES", autre: "Autre document" };
+const ETATS_DEMANDE = { envoyee: ["Envoyée", "att"], vue: ["Vue", "att"],
+                        acceptee: ["Acceptée", "ok"], refusee: ["Refusée", "ko"],
+                        annulee: ["Annulée", ""], expiree: ["Expirée", ""] };
+const MOTIFS_SIGNALEMENT = { demarchage: "Démarchage", insultes: "Insultes",
+                             hors_sujet: "Hors sujet", arnaque: "Arnaque",
+                             usurpation: "Usurpation d'identité", autre: "Autre" };
+
+/* Combien de lignes on lit. Le nombre est affiche a l'ecran sous chaque
+   tableau : ecrire « toutes les demandes » au-dessus d'une liste tronquee,
+   c'est mentir sur une page qui sert a decider. */
+const LIMITE = 200;
+const LIMITE_JOURNAL = 100;
+
+let sb = null, onglet = "chiffres", metiers = {}, ouvert = null;
+
+/* ------------------------------------------------------------- le socle */
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  d.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+async function client() {
+  if (sb) return sb;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return sb;
+}
+
+/* La phrase qui explique un refus de la base, plutot que son code. Les codes
+   sont traites a la main, comme inscription/index.html le fait deja pour 23505
+   et PGRST205 : une page qui affiche « PGRST205 » n'aide personne. */
+function pourquoi(e) {
+  if (!e) return "La base n'a pas répondu comme attendu.";
+  const code = e.code || "";
+  if (code === "PGRST205" || code === "42P01")
+    return "Cette table n'existe pas dans la base : la migration qui la pose n'a pas été jouée.";
+  if (code === "PGRST202" || code === "42883")
+    return "Cette fonction n'existe pas dans la base : la migration qui la pose n'a pas été jouée.";
+  if (code === "42501")
+    return "La base refuse : ce compte n'a pas le droit d'administration.";
+  return e.message || "La base n'a pas répondu comme attendu.";
+}
+
+/* Ce qui ne peut pas s'afficher le dit, et nomme ce qui manque : c'est la
+   meme carte eteinte que les quatre raccordements d'agenda de l'espace. */
+function bloquer(titre, phrase) {
+  return '<div class="carte eteinte"><h3>' + echapper(titre)
+    + '<span class="quand">indisponible</span></h3>'
+    + '<p style="font-size:12.5px">' + echapper(phrase) + "</p></div>";
+}
+function vide(phrase) { return '<p class="vide">' + echapper(phrase) + "</p>"; }
+function pastille(paire) {
+  const p = paire || ["Inconnu", ""];
+  return '<span class="pastille ' + p[1] + '">' + echapper(p[0]) + "</span>";
+}
+
+function jour(v) {
+  if (!v) return "";
+  return new Date(v).toLocaleDateString("fr-FR",
+    { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+function jourHeure(v) {
+  if (!v) return "";
+  return new Date(v).toLocaleString("fr-FR",
+    { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+function nombreLu(n, limite) {
+  if (n < limite) return n + (n > 1 ? " lignes lues." : " ligne lue.");
+  return "Les " + limite + " lignes les plus récentes. Il y en a peut-être davantage.";
+}
+
+/* ------------------------------------------------ les noms des artisans
+   Les tables de demandes, de pieces et de signalements ne portent que des
+   identifiants. On resout les noms en UNE requete par panneau, jamais une par
+   ligne : cent lignes feraient deux cents allers-retours. */
+async function nommer(ids) {
+  const utiles = [...new Set(ids.filter(Boolean))];
+  if (!utiles.length) return {};
+  const { data, error } = await sb.from("artisans")
+    .select("id,prenom,nom,denomination").in("id", utiles);
+  if (error) return {};
+  const table = {};
+  (data || []).forEach((a) => {
+    table[a.id] = a.denomination
+      || [a.prenom, a.nom].filter(Boolean).join(" ")
+      || "Compte sans nom";
+  });
+  return table;
+}
+function nomDe(table, id) {
+  if (!id) return "Compte supprimé";
+  return table[id] || "Compte inconnu";
+}
+
+async function chargerMetiers() {
+  const { data } = await sb.from("metiers").select("code,libelle");
+  (data || []).forEach((m) => { metiers[m.code] = m.libelle; });
+}
+function metierDe(a) {
+  if (a.metier && metiers[a.metier]) return metiers[a.metier];
+  if (a.metier) return a.metier;
+  if (a.metier_libre) return a.metier_libre + " (hors liste)";
+  return "Aucun métier déclaré";
+}
+
+/* ----------------------------------------------------------- l'ossature */
+
+function rendre() {
+  ecran.innerHTML =
+    '<h1>Le <span class="em">back office</span>.</h1>'
+    + '<p class="lead">Ce que la base sait, et rien d\'autre. Aucun chiffre n\'est '
+    + 'recopié à la main&nbsp;: tout est compté au moment où tu ouvres la page.</p>'
+    + '<div class="onglets" id="onglets"></div>'
+    + '<div id="panneau"><p class="chargement">Un instant…</p></div>';
+
+  const o = $("onglets");
+  o.innerHTML = ONGLETS.map((g) =>
+    '<button class="onglet' + (onglet === g.cle ? " ici" : "") + '" data-o="' + g.cle + '"'
+    + (onglet === g.cle ? ' aria-current="true"' : "") + ">" + g.nom + "</button>").join("");
+  o.querySelectorAll(".onglet").forEach((b) =>
+    b.addEventListener("click", () => { onglet = b.dataset.o; ouvert = null; taire(); rendre(); }));
+
+  if (onglet === "chiffres") return panneauChiffres();
+  if (onglet === "artisans") return panneauArtisans();
+  if (onglet === "pieces") return panneauPieces();
+  if (onglet === "demandes") return panneauDemandes();
+  if (onglet === "signalements") return panneauSignalements();
+  return panneauJournal();
+}
+
+/* ------------------------------------------------------------ les chiffres */
+
+async function panneauChiffres() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">On compte…</p>';
+  const { data, error } = await sb.rpc("chiffres_back_office");
+  if (error) {
+    z.innerHTML = bloquer("Les compteurs ne sont pas disponibles.", pourquoi(error));
+    return;
+  }
+  if (!data || !data.length) { z.innerHTML = vide("La base n'a renvoyé aucun compteur."); return; }
+
+  z.innerHTML = '<h2>Les chiffres, comptés en base</h2>'
+    + '<p class="aide">Chaque nombre est un comptage fait dans la base à l\'instant où tu '
+    + 'ouvres cette page. Quand une table n\'existe pas encore, le compteur dit '
+    + 'lequel manque plutôt que d\'afficher zéro.</p>'
+    + '<div class="chiffres">'
+    + data.map((c) =>
+        '<div class="chiffre' + (c.valeur === null ? " eteinte" : "") + '">'
+        + (c.valeur === null
+            ? '<span class="n rien">non disponible</span>'
+            : '<span class="n">' + echapper(c.valeur) + "</span>")
+        + '<span class="l">' + echapper(c.libelle) + "</span>"
+        + (c.pourquoi ? '<p class="p">' + echapper(c.pourquoi) + "</p>" : "")
+        + "</div>").join("")
+    + "</div>"
+    + '<div class="carte eteinte"><h3>Ce que ces chiffres ne disent pas'
+    + '<span class="quand">à savoir</span></h3>'
+    + "<p>Aucun montant n'apparaît ici, et ce n'est pas un oubli&nbsp;: le tarif de "
+    + "l'abonnement est en cours d'arbitrage. On compte des abonnements, jamais des euros.</p>"
+    + "<p>Les envois par courriel ne sont pas raccordés&nbsp;: aucun prestataire n'est "
+    + "choisi. Les notifications existent en base, elles ne partent pas.</p></div>";
+}
+
+/* ------------------------------------------------------------- les artisans */
+
+async function panneauArtisans() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">Un instant…</p>';
+  const { data, error } = await sb.from("artisans")
+    .select("id,cree_le,maj_le,prenom,nom,denomination,commune,code_postal,siret,"
+          + "siret_etat,telephone,metier,metier_libre,etape,publie,suspendu_le,"
+          + "motif_suspension,presentation,rayon_km")
+    .order("cree_le", { ascending: false }).limit(LIMITE);
+  if (error) { z.innerHTML = bloquer("Les fiches ne sont pas lisibles.", pourquoi(error)); return; }
+
+  const lignes = data || [];
+  if (!lignes.length) {
+    z.innerHTML = '<h2>Les artisans inscrits</h2>'
+      + vide("Aucun compte d'artisan n'existe encore dans cette base.");
+    return;
+  }
+
+  z.innerHTML = '<h2>Les artisans inscrits</h2>'
+    + '<p class="aide">Un administrateur voit la fiche, il ne la corrige pas&nbsp;: la base '
+    + 'remet toute autre modification à sa valeur d\'origine. Les deux seuls gestes '
+    + 'possibles ici sont suspendre une fiche publique, et lever une suspension.</p>'
+    + '<div class="filtres">'
+    +   '<div><label for="f-texte">Chercher</label>'
+    +     '<input id="f-texte" type="search" autocomplete="off" '
+    +     'placeholder="nom, entreprise, commune, SIRET"></div>'
+    +   '<div><label for="f-etape">Étape atteinte</label><select id="f-etape">'
+    +     '<option value="">Toutes</option>'
+    +     Object.keys(ETAPES).map((e) => '<option value="' + e + '">' + ETAPES[e] + "</option>").join("")
+    +     "</select></div>"
+    +   '<div><label for="f-fiche">État de la fiche</label><select id="f-fiche">'
+    +     '<option value="">Toutes</option>'
+    +     '<option value="ligne">En ligne</option>'
+    +     '<option value="non">Non publiée</option>'
+    +     '<option value="susp">Suspendue</option></select></div>'
+    + "</div>"
+    + '<div id="detail-artisan"></div>'
+    + '<div class="tableau"><table><thead><tr>'
+    +   "<th>Entreprise</th><th>Métier</th><th>Commune</th><th>Étape</th>"
+    +   "<th>Fiche</th><th>Inscrit le</th><th>Ouvrir</th>"
+    + '</tr></thead><tbody id="corps-artisans"></tbody></table></div>'
+    + '<p class="compte-lignes" id="compte-artisans"></p>';
+
+  const dessiner = () => {
+    const t = $("f-texte").value.trim().toLowerCase();
+    const e = $("f-etape").value, f = $("f-fiche").value;
+    const vus = lignes.filter((a) => {
+      if (e && a.etape !== e) return false;
+      if (f === "ligne" && !a.publie) return false;
+      if (f === "non" && (a.publie || a.suspendu_le)) return false;
+      if (f === "susp" && !a.suspendu_le) return false;
+      if (!t) return true;
+      return [a.prenom, a.nom, a.denomination, a.commune, a.code_postal, a.siret]
+        .filter(Boolean).join(" ").toLowerCase().includes(t);
+    });
+    $("corps-artisans").innerHTML = vus.length
+      ? vus.map((a) => {
+          const nom = a.denomination || [a.prenom, a.nom].filter(Boolean).join(" ") || "Compte sans nom";
+          const etat = a.suspendu_le ? ["Suspendue", "ko"]
+                     : a.publie ? ["En ligne", "ok"] : ["Non publiée", ""];
+          return "<tr>"
+            + '<td data-l="Entreprise"><b>' + echapper(nom) + "</b></td>"
+            + '<td data-l="Métier">' + echapper(metierDe(a)) + "</td>"
+            + '<td data-l="Commune">' + echapper([a.code_postal, a.commune].filter(Boolean).join(" ") || "Non renseignée") + "</td>"
+            + '<td data-l="Étape">' + echapper(ETAPES[a.etape] || a.etape || "Inconnue") + "</td>"
+            + '<td data-l="Fiche">' + pastille(etat) + "</td>"
+            + '<td data-l="Inscrit le"><span class="mono">' + echapper(jour(a.cree_le)) + "</span></td>"
+            + '<td data-l="Ouvrir"><button class="bouton creux mini" data-fiche="' + echapper(a.id)
+            + '" aria-label="Ouvrir la fiche de ' + echapper(nom) + '">Ouvrir</button></td>'
+            + "</tr>";
+        }).join("")
+      : '<tr><td class="plein" colspan="7">'
+        + echapper("Aucune fiche ne correspond à ces filtres.") + "</td></tr>";
+    $("compte-artisans").textContent = vus.length + " sur " + nombreLu(lignes.length, LIMITE);
+    $("corps-artisans").querySelectorAll("button[data-fiche]").forEach((b) =>
+      b.addEventListener("click", () => {
+        ouvert = lignes.find((x) => x.id === b.dataset.fiche) || null;
+        dessinerFiche(lignes, dessiner);
+      }));
+  };
+
+  ["f-texte", "f-etape", "f-fiche"].forEach((i) =>
+    $(i).addEventListener("input", dessiner));
+  dessiner();
+}
+
+/* La fiche ouverte, et les deux seuls gestes de moderation. Le motif est
+   exige ici ET par la base : celui de la page evite un aller-retour, celui de
+   la base est le seul qui compte. */
+function dessinerFiche(lignes, redessiner) {
+  const z = $("detail-artisan");
+  if (!ouvert) { z.innerHTML = ""; return; }
+  const a = ouvert;
+  const nom = a.denomination || [a.prenom, a.nom].filter(Boolean).join(" ") || "Compte sans nom";
+  const etat = a.suspendu_le ? ["Suspendue", "ko"]
+             : a.publie ? ["En ligne", "ok"] : ["Non publiée", ""];
+
+  z.innerHTML = '<div class="carte"><h3>' + echapper(nom)
+    + '<span class="quand">' + echapper(etat[0]) + "</span></h3>"
+    + "<p>" + echapper([a.prenom, a.nom].filter(Boolean).join(" ") || "Identité non renseignée")
+    +   (a.telephone ? " · " + echapper(a.telephone) : " · pas de téléphone") + "</p>"
+    + "<p>" + echapper(metierDe(a)) + " · rayon déclaré " + echapper(a.rayon_km) + " km</p>"
+    + "<p>" + echapper([a.code_postal, a.commune].filter(Boolean).join(" ") || "Commune non renseignée") + "</p>"
+    + '<p style="font-family:\'JetBrains Mono\',monospace;font-size:12px">'
+    +   (a.siret ? "SIRET " + echapper(a.siret)
+        + (a.siret_etat === "non_diffusible" ? " · non diffusible" : " · vérifié")
+        : "Aucun SIRET vérifié") + "</p>"
+    + (a.presentation ? '<div class="detail">' + echapper(a.presentation) + "</div>" : "")
+    + "<p>Étape " + echapper(ETAPES[a.etape] || a.etape || "inconnue")
+    +   " · inscrit le " + echapper(jour(a.cree_le))
+    +   " · dernière modification le " + echapper(jour(a.maj_le)) + "</p>"
+    + (a.suspendu_le
+        ? "<p>Suspendue le " + echapper(jour(a.suspendu_le)) + ".</p>"
+          + '<div class="detail">' + echapper(a.motif_suspension || "") + "</div>"
+          + '<div class="actions">'
+          + '<button class="bouton creux mini" id="lever">Lever la suspension</button>'
+          + '<button class="bouton creux mini" id="fermer-fiche">Fermer</button></div>'
+          + '<p class="aide">Lever la suspension ne remet pas la fiche en ligne&nbsp;: '
+          + "c'est à l'artisan de décider s'il veut revenir.</p>"
+        : '<div class="champ"><label for="motif-susp">Motif de la suspension</label>'
+          + '<textarea id="motif-susp" aria-describedby="e-motif-susp" '
+          + 'placeholder="Ce que l\'artisan lira si on lui explique la décision."></textarea>'
+          + '<p class="err" id="e-motif-susp"></p></div>'
+          + '<div class="actions">'
+          + '<button class="bouton creux mini" id="suspendre">Suspendre cette fiche</button>'
+          + '<button class="bouton creux mini" id="fermer-fiche">Fermer</button></div>'
+          + '<p class="aide">Une fiche suspendue sort de la recherche et de l\'annuaire public, '
+          + "et l'artisan ne peut pas la republier lui-même.</p>")
+    + "</div>";
+
+  $("fermer-fiche").addEventListener("click", () => { ouvert = null; dessinerFiche(lignes, redessiner); });
+
+  const appliquer = async (bouton, suspendre, motif) => {
+    bouton.disabled = true;
+    const avant = bouton.textContent;
+    bouton.textContent = "Un instant…";
+    try {
+      const { data, error } = await sb.rpc("moderer_fiche",
+        { p_artisan: a.id, p_suspendre: suspendre, p_motif: motif || null });
+      if (error) throw error;
+      const neuf = Array.isArray(data) ? data[0] : data;
+      Object.assign(a, neuf || {});
+      const k = lignes.findIndex((x) => x.id === a.id);
+      if (k >= 0) Object.assign(lignes[k], a);
+      dire("ok", suspendre ? "Fiche suspendue." : "Suspension levée.",
+        "La décision est inscrite au journal d'audit.");
+      redessiner();
+      dessinerFiche(lignes, redessiner);
+    } catch (e) {
+      bouton.disabled = false; bouton.textContent = avant;
+      dire("ko", "Modération impossible.", echapper(pourquoi(e)));
+    }
+  };
+
+  if (a.suspendu_le) {
+    $("lever").addEventListener("click", (ev) => appliquer(ev.currentTarget, false, null));
+  } else {
+    const champ = $("motif-susp");
+    champ.focus();
+    $("suspendre").addEventListener("click", (ev) => {
+      const m = champ.value.trim();
+      if (m.length < 3) {
+        $("e-motif-susp").textContent = "Écris le motif : une suspension sans motif ne se conteste pas.";
+        $("e-motif-susp").classList.add("vu");
+        champ.setAttribute("aria-invalid", "true");
+        champ.focus();
+        return;
+      }
+      $("e-motif-susp").classList.remove("vu");
+      champ.removeAttribute("aria-invalid");
+      appliquer(ev.currentTarget, true, m);
+    });
+  }
+  z.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+
+/* ---------------------------------------------------- les pieces justificatives */
+
+function poids(o) {
+  if (!o) return "taille inconnue";
+  if (o < 1024) return o + " octets";
+  if (o < 1024 * 1024) return Math.round(o / 1024) + " ko";
+  return (o / 1048576).toFixed(1).replace(".", ",") + " Mo";
+}
+
+async function panneauPieces() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">Un instant…</p>';
+  const { data, error } = await sb.from("pieces")
+    .select("id,artisan_id,genre,chemin,nom_origine,taille_octets,type_mime,depose_le,"
+          + "valide_du,valide_au,etat,controle_le,motif_refus")
+    .order("depose_le", { ascending: false }).limit(LIMITE);
+  if (error) { z.innerHTML = bloquer("Les pièces ne sont pas lisibles.", pourquoi(error)); return; }
+
+  const lignes = data || [];
+  const noms = await nommer(lignes.map((p) => p.artisan_id));
+
+  z.innerHTML = '<h2>Les pièces justificatives</h2>'
+    + '<p class="aide">Accepter ou refuser, avec un motif quand c\'est un refus. La base '
+    + "inscrit d'elle-même qui a contrôlé et quand&nbsp;: ce sont les deux champs qu'on "
+    + "relira le jour d'une contestation.</p>"
+    + '<div class="filtres"><div><label for="f-piece">État</label><select id="f-piece">'
+    +   '<option value="attente">À contrôler</option>'
+    +   '<option value="">Toutes</option>'
+    +   Object.keys(ETATS_PIECE).map((e) =>
+        '<option value="' + e + '">' + ETATS_PIECE[e][0] + "</option>").join("")
+    + "</select></div></div>"
+    + '<div id="detail-piece"></div>'
+    + '<div class="tableau"><table><thead><tr>'
+    +   "<th>Artisan</th><th>Document</th><th>Déposé le</th><th>Validité</th>"
+    +   "<th>État</th><th>Ouvrir</th>"
+    + '</tr></thead><tbody id="corps-pieces"></tbody></table></div>'
+    + '<p class="compte-lignes" id="compte-pieces"></p>';
+
+  const dessiner = () => {
+    const f = $("f-piece").value;
+    const vus = lignes.filter((p) => {
+      if (f === "attente") return p.etat === "deposee" || p.etat === "en_controle";
+      if (f) return p.etat === f;
+      return true;
+    });
+    $("corps-pieces").innerHTML = vus.length
+      ? vus.map((p) => "<tr>"
+          + '<td data-l="Artisan"><b>' + echapper(nomDe(noms, p.artisan_id)) + "</b></td>"
+          + '<td data-l="Document">' + echapper(GENRES_PIECE[p.genre] || p.genre) + "</td>"
+          + '<td data-l="Déposé le"><span class="mono">' + echapper(jour(p.depose_le)) + "</span></td>"
+          + '<td data-l="Validité">' + echapper(p.valide_au
+              ? "jusqu'au " + jour(p.valide_au) : "non renseignée") + "</td>"
+          + '<td data-l="État">' + pastille(ETATS_PIECE[p.etat]) + "</td>"
+          + '<td data-l="Ouvrir"><button class="bouton creux mini" data-piece="' + echapper(p.id)
+          + '" aria-label="Ouvrir la pièce de ' + echapper(nomDe(noms, p.artisan_id))
+          + '">Ouvrir</button></td></tr>').join("")
+      : '<tr><td class="plein" colspan="6">'
+        + echapper("Aucune pièce dans cet état.") + "</td></tr>";
+    $("compte-pieces").textContent = vus.length + " sur " + nombreLu(lignes.length, LIMITE);
+    $("corps-pieces").querySelectorAll("button[data-piece]").forEach((b) =>
+      b.addEventListener("click", () => {
+        ouvert = lignes.find((x) => x.id === b.dataset.piece) || null;
+        dessinerPiece(noms, dessiner);
+      }));
+  };
+
+  $("f-piece").addEventListener("input", dessiner);
+  dessiner();
+}
+
+function dessinerPiece(noms, redessiner) {
+  const z = $("detail-piece");
+  if (!ouvert) { z.innerHTML = ""; return; }
+  const p = ouvert;
+
+  z.innerHTML = '<div class="carte"><h3>' + echapper(GENRES_PIECE[p.genre] || p.genre)
+    + '<span class="quand">' + echapper((ETATS_PIECE[p.etat] || ["Inconnu"])[0]) + "</span></h3>"
+    + "<p>Déposée par <b>" + echapper(nomDe(noms, p.artisan_id)) + "</b> le "
+    +   echapper(jourHeure(p.depose_le)) + "</p>"
+    + "<p>" + echapper(p.nom_origine || "Fichier sans nom") + " · " + echapper(poids(p.taille_octets))
+    +   (p.type_mime ? " · " + echapper(p.type_mime) : "") + "</p>"
+    + (p.controle_le ? "<p>Contrôlée le " + echapper(jourHeure(p.controle_le)) + "</p>" : "")
+    + (p.motif_refus ? '<div class="detail">' + echapper(p.motif_refus) + "</div>" : "")
+    + '<div class="actions" id="zone-lien">'
+    +   '<button class="bouton creux mini" id="lien-piece">Préparer le lien du document</button>'
+    + "</div>"
+    + '<div class="champ"><label for="p-du">Valide à partir du <span class="opt">facultatif</span></label>'
+    +   '<input id="p-du" type="date" value="' + echapper(p.valide_du || "") + '"></div>'
+    + '<div class="champ"><label for="p-au">Valide jusqu\'au <span class="opt">facultatif</span></label>'
+    +   '<input id="p-au" type="date" value="' + echapper(p.valide_au || "") + '"></div>'
+    + '<div class="champ"><label for="p-motif">Motif du refus</label>'
+    +   '<textarea id="p-motif" aria-describedby="e-p-motif" '
+    +   'placeholder="Ce que l\'artisan doit redéposer, et pourquoi.">'
+    +   echapper(p.motif_refus || "") + "</textarea>"
+    +   '<p class="err" id="e-p-motif"></p></div>'
+    + '<div class="actions">'
+    +   '<button class="bouton plein mini" id="p-accepter">Accepter</button>'
+    +   '<button class="bouton creux mini" id="p-refuser">Refuser</button>'
+    +   '<button class="bouton creux mini" id="p-fermer">Fermer</button>'
+    + "</div>"
+    + '<p class="aide">Le document vit dans un espace de stockage privé&nbsp;: le lien '
+    + "préparé ici est valable 60 secondes, et il n'est ni partageable ni indexable.</p>"
+    + "</div>";
+
+  $("p-fermer").addEventListener("click", () => { ouvert = null; dessinerPiece(noms, redessiner); });
+
+  $("lien-piece").addEventListener("click", async (ev) => {
+    const b = ev.currentTarget;
+    b.disabled = true; b.textContent = "Un instant…";
+    try {
+      const { data, error } = await sb.storage.from("pieces").createSignedUrl(p.chemin, 60);
+      if (error) throw error;
+      $("zone-lien").innerHTML = '<a class="bouton creux mini" href="' + echapper(data.signedUrl)
+        + '" target="_blank" rel="noopener">Ouvrir le document</a>';
+      $("zone-lien").querySelector("a").focus();
+    } catch (e) {
+      b.disabled = false; b.textContent = "Préparer le lien du document";
+      dire("ko", "Document illisible.",
+        echapper(e && e.message ? e.message : "Le fichier n'est pas dans l'espace de stockage."));
+    }
+  });
+
+  const ecrire = async (bouton, champs, phrase) => {
+    bouton.disabled = true;
+    const avant = bouton.textContent;
+    bouton.textContent = "Un instant…";
+    try {
+      const { data, error } = await sb.from("pieces").update(champs).eq("id", p.id).select().single();
+      if (error) throw error;
+      Object.assign(p, data || {});
+      dire("ok", phrase, "La base a inscrit qui a contrôlé, et quand.");
+      redessiner();
+      dessinerPiece(noms, redessiner);
+    } catch (e) {
+      bouton.disabled = false; bouton.textContent = avant;
+      dire("ko", "Contrôle impossible.", echapper(pourquoi(e)));
+    }
+  };
+
+  $("p-accepter").addEventListener("click", (ev) => {
+    const du = $("p-du").value || null, au = $("p-au").value || null;
+    if (du && au && au < du) {
+      dire("ko", "Ces deux dates ne vont pas ensemble.",
+        "La fin de validité est avant son début.");
+      $("p-au").focus();
+      return;
+    }
+    ecrire(ev.currentTarget,
+      { etat: "acceptee", valide_du: du, valide_au: au, motif_refus: null },
+      "Pièce acceptée.");
+  });
+
+  $("p-refuser").addEventListener("click", (ev) => {
+    const champ = $("p-motif"), m = champ.value.trim();
+    if (m.length < 3) {
+      $("e-p-motif").textContent = "Écris le motif : sans lui, l'artisan ne sait pas quoi redéposer.";
+      $("e-p-motif").classList.add("vu");
+      champ.setAttribute("aria-invalid", "true");
+      champ.focus();
+      return;
+    }
+    $("e-p-motif").classList.remove("vu");
+    champ.removeAttribute("aria-invalid");
+    ecrire(ev.currentTarget, { etat: "refusee", motif_refus: m }, "Pièce refusée.");
+  });
+
+  z.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+
+/* ------------------------------------------------------ les mises en relation */
+
+async function panneauDemandes() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">Un instant…</p>';
+  const { data, error } = await sb.from("demandes")
+    .select("id,cree_le,demandeur_id,destinataire_id,metier,chantier_commune,"
+          + "debut,fin,message,etat,vue_le,repondu_le,motif,expire_le")
+    .order("cree_le", { ascending: false }).limit(LIMITE);
+  if (error) { z.innerHTML = bloquer("Les mises en relation ne sont pas lisibles.", pourquoi(error)); return; }
+
+  const lignes = data || [];
+  const noms = await nommer(lignes.flatMap((d) => [d.demandeur_id, d.destinataire_id]));
+
+  if (!lignes.length) {
+    z.innerHTML = "<h2>Les mises en relation</h2>"
+      + vide("Aucune demande n'a encore été envoyée.");
+    return;
+  }
+
+  z.innerHTML = "<h2>Les mises en relation</h2>"
+    + '<p class="aide">Consultation seule. Un administrateur ne répond jamais à la place '
+    + "d'un confrère&nbsp;: accepter un chantier engage une entreprise, et la base réserve "
+    + "ces changements d'état aux deux parties.</p>"
+    + '<div id="detail-demande"></div>'
+    + '<div class="tableau"><table><thead><tr>'
+    +   "<th>Envoyée le</th><th>Demandeur</th><th>Confrère visé</th><th>Métier</th>"
+    +   "<th>Chantier</th><th>État</th><th>Ouvrir</th>"
+    + '</tr></thead><tbody id="corps-demandes"></tbody></table></div>'
+    + '<p class="compte-lignes">' + echapper(nombreLu(lignes.length, LIMITE)) + "</p>";
+
+  const dessiner = () => {
+    $("corps-demandes").innerHTML = lignes.map((d) => "<tr>"
+      + '<td data-l="Envoyée le"><span class="mono">' + echapper(jour(d.cree_le)) + "</span></td>"
+      + '<td data-l="Demandeur"><b>' + echapper(nomDe(noms, d.demandeur_id)) + "</b></td>"
+      + '<td data-l="Confrère visé"><b>' + echapper(nomDe(noms, d.destinataire_id)) + "</b></td>"
+      + '<td data-l="Métier">' + echapper(metiers[d.metier] || d.metier || "Non précisé") + "</td>"
+      + '<td data-l="Chantier">' + echapper(d.chantier_commune || "Commune non précisée")
+      +   '<br><span class="mono">' + echapper(jour(d.debut)) + " au " + echapper(jour(d.fin)) + "</span></td>"
+      + '<td data-l="État">' + pastille(ETATS_DEMANDE[d.etat]) + "</td>"
+      + '<td data-l="Ouvrir"><button class="bouton creux mini" data-dem="' + echapper(d.id)
+      + '" aria-label="Ouvrir la demande du ' + echapper(jour(d.cree_le)) + '">Ouvrir</button></td>'
+      + "</tr>").join("");
+    $("corps-demandes").querySelectorAll("button[data-dem]").forEach((b) =>
+      b.addEventListener("click", () => {
+        ouvert = lignes.find((x) => x.id === b.dataset.dem) || null;
+        dessinerDemande(noms);
+      }));
+  };
+  dessiner();
+}
+
+function dessinerDemande(noms) {
+  const z = $("detail-demande");
+  if (!ouvert) { z.innerHTML = ""; return; }
+  const d = ouvert;
+  z.innerHTML = '<div class="carte"><h3>'
+    + echapper(nomDe(noms, d.demandeur_id)) + " vers " + echapper(nomDe(noms, d.destinataire_id))
+    + '<span class="quand">' + echapper((ETATS_DEMANDE[d.etat] || ["Inconnu"])[0]) + "</span></h3>"
+    + "<p>" + echapper(metiers[d.metier] || d.metier || "Métier non précisé") + " · "
+    +   echapper(d.chantier_commune || "commune non précisée") + " · du "
+    +   echapper(jour(d.debut)) + " au " + echapper(jour(d.fin)) + "</p>"
+    + "<p>Envoyée le " + echapper(jourHeure(d.cree_le))
+    +   (d.vue_le ? " · vue le " + echapper(jourHeure(d.vue_le)) : " · pas encore vue")
+    +   (d.repondu_le ? " · réponse le " + echapper(jourHeure(d.repondu_le)) : "") + "</p>"
+    + (d.expire_le ? "<p>Elle expire le " + echapper(jourHeure(d.expire_le))
+        + ", au début du chantier.</p>" : "")
+    + (d.motif ? "<p>Motif de la réponse&nbsp;:</p><div class=\"detail\">"
+        + echapper(d.motif) + "</div>" : "")
+    + '<div class="actions">'
+    +   '<button class="replier" id="voir-message" aria-expanded="false" '
+    +   'aria-controls="message-demande">Afficher le message</button>'
+    +   '<button class="bouton creux mini" id="d-fermer">Fermer</button></div>'
+    + '<div id="message-demande" hidden></div>'
+    + '<p class="aide">Le message est écrit par un artisan pour un autre. On ne l\'ouvre '
+    + "que s'il y a une raison de le faire, et l'ouverture n'est pas anodine.</p></div>";
+
+  $("d-fermer").addEventListener("click", () => { ouvert = null; dessinerDemande(noms); });
+  $("voir-message").addEventListener("click", (ev) => {
+    const b = ev.currentTarget, zone = $("message-demande");
+    const montre = b.getAttribute("aria-expanded") === "true";
+    if (montre) {
+      zone.hidden = true; zone.innerHTML = "";
+      b.setAttribute("aria-expanded", "false"); b.textContent = "Afficher le message";
+    } else {
+      zone.innerHTML = '<div class="detail">'
+        + echapper(d.message || "Cette demande a été envoyée sans message.") + "</div>";
+      zone.hidden = false;
+      b.setAttribute("aria-expanded", "true"); b.textContent = "Masquer le message";
+    }
+  });
+  z.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+
+/* ---------------------------------------------------------- les signalements */
+
+async function panneauSignalements() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">Un instant…</p>';
+  const { data, error } = await sb.from("signalements")
+    .select("id,message_id,artisan_vise,signale_par,cree_le,motif,detail,traite_le,decision")
+    .order("cree_le", { ascending: false }).limit(LIMITE);
+  if (error) { z.innerHTML = bloquer("Les signalements ne sont pas lisibles.", pourquoi(error)); return; }
+
+  const lignes = data || [];
+  const noms = await nommer(lignes.flatMap((s) => [s.artisan_vise, s.signale_par]));
+
+  if (!lignes.length) {
+    z.innerHTML = "<h2>Les signalements</h2>"
+      + vide("Aucun signalement n'a été déposé.");
+    return;
+  }
+
+  z.innerHTML = "<h2>Les signalements</h2>"
+    + '<p class="aide">Un signalement se traite en écrivant la décision prise. Rien ne '
+    + "s'efface&nbsp;: le signalement et sa décision restent, c'est ce qui permet de "
+    + "relire une modération six mois plus tard.</p>"
+    + '<div class="filtres"><div><label for="f-signal">État</label><select id="f-signal">'
+    +   '<option value="ouverts">Non traités</option>'
+    +   '<option value="">Tous</option>'
+    +   '<option value="traites">Traités</option></select></div></div>'
+    + '<div id="detail-signal"></div>'
+    + '<div class="tableau"><table><thead><tr>'
+    +   "<th>Signalé le</th><th>Personne visée</th><th>Signalé par</th><th>Motif</th>"
+    +   "<th>État</th><th>Ouvrir</th>"
+    + '</tr></thead><tbody id="corps-signal"></tbody></table></div>'
+    + '<p class="compte-lignes" id="compte-signal"></p>';
+
+  const dessiner = () => {
+    const f = $("f-signal").value;
+    const vus = lignes.filter((s) =>
+      f === "ouverts" ? !s.traite_le : f === "traites" ? !!s.traite_le : true);
+    $("corps-signal").innerHTML = vus.length
+      ? vus.map((s) => "<tr>"
+          + '<td data-l="Signalé le"><span class="mono">' + echapper(jour(s.cree_le)) + "</span></td>"
+          + '<td data-l="Personne visée"><b>'
+          +   echapper(s.artisan_vise ? nomDe(noms, s.artisan_vise) : "Un message, pas une personne")
+          + "</b></td>"
+          + '<td data-l="Signalé par">' + echapper(nomDe(noms, s.signale_par)) + "</td>"
+          + '<td data-l="Motif">' + echapper(MOTIFS_SIGNALEMENT[s.motif] || s.motif) + "</td>"
+          + '<td data-l="État">'
+          +   pastille(s.traite_le ? ["Traité", "ok"] : ["À traiter", "att"]) + "</td>"
+          + '<td data-l="Ouvrir"><button class="bouton creux mini" data-sig="' + echapper(s.id)
+          + '" aria-label="Ouvrir le signalement du ' + echapper(jour(s.cree_le))
+          + '">Ouvrir</button></td></tr>').join("")
+      : '<tr><td class="plein" colspan="6">'
+        + echapper("Aucun signalement dans cet état.") + "</td></tr>";
+    $("compte-signal").textContent = vus.length + " sur " + nombreLu(lignes.length, LIMITE);
+    $("corps-signal").querySelectorAll("button[data-sig]").forEach((b) =>
+      b.addEventListener("click", () => {
+        ouvert = lignes.find((x) => String(x.id) === b.dataset.sig) || null;
+        dessinerSignalement(noms, dessiner);
+      }));
+  };
+
+  $("f-signal").addEventListener("input", dessiner);
+  dessiner();
+}
+
+function dessinerSignalement(noms, redessiner) {
+  const z = $("detail-signal");
+  if (!ouvert) { z.innerHTML = ""; return; }
+  const s = ouvert;
+
+  z.innerHTML = '<div class="carte"><h3>'
+    + echapper(MOTIFS_SIGNALEMENT[s.motif] || s.motif)
+    + '<span class="quand">' + (s.traite_le ? "traité" : "à traiter") + "</span></h3>"
+    + "<p>Signalé le " + echapper(jourHeure(s.cree_le)) + " par <b>"
+    +   echapper(nomDe(noms, s.signale_par)) + "</b></p>"
+    + "<p>Vise " + (s.artisan_vise
+        ? "<b>" + echapper(nomDe(noms, s.artisan_vise)) + "</b>"
+        : "un message de la messagerie, sans personne nommée") + "</p>"
+    + (s.detail ? '<div class="detail">' + echapper(s.detail) + "</div>" : "")
+    + (s.traite_le
+        ? "<p>Traité le " + echapper(jourHeure(s.traite_le)) + "</p>"
+          + '<div class="detail">' + echapper(s.decision || "Aucune décision écrite.") + "</div>"
+          + '<div class="actions"><button class="bouton creux mini" id="s-fermer">Fermer</button></div>'
+        : '<div class="champ"><label for="s-decision">Décision prise</label>'
+          + '<textarea id="s-decision" aria-describedby="e-s-decision" '
+          + 'placeholder="Ce qui a été fait, et pourquoi."></textarea>'
+          + '<p class="err" id="e-s-decision"></p></div>'
+          + '<div class="actions">'
+          + '<button class="bouton plein mini" id="s-traiter">Marquer traité</button>'
+          + '<button class="bouton creux mini" id="s-fermer">Fermer</button></div>')
+    + "</div>";
+
+  $("s-fermer").addEventListener("click", () => { ouvert = null; dessinerSignalement(noms, redessiner); });
+
+  if (!s.traite_le) {
+    const champ = $("s-decision");
+    champ.focus();
+    $("s-traiter").addEventListener("click", async (ev) => {
+      const d = champ.value.trim();
+      if (d.length < 3) {
+        $("e-s-decision").textContent = "Écris la décision : un signalement classé sans mot ne se relit pas.";
+        $("e-s-decision").classList.add("vu");
+        champ.setAttribute("aria-invalid", "true");
+        champ.focus();
+        return;
+      }
+      $("e-s-decision").classList.remove("vu");
+      champ.removeAttribute("aria-invalid");
+      const b = ev.currentTarget;
+      b.disabled = true; b.textContent = "Un instant…";
+      try {
+        const { data, error } = await sb.from("signalements")
+          .update({ traite_le: new Date().toISOString(), decision: d })
+          .eq("id", s.id).select().single();
+        if (error) throw error;
+        Object.assign(s, data || {});
+        dire("ok", "Signalement traité.", "La décision est enregistrée avec sa date.");
+        redessiner();
+        dessinerSignalement(noms, redessiner);
+      } catch (e) {
+        b.disabled = false; b.textContent = "Marquer traité";
+        dire("ko", "Enregistrement impossible.", echapper(pourquoi(e)));
+      }
+    });
+  }
+  z.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+
+/* --------------------------------------------------------- le journal d'audit */
+
+async function panneauJournal() {
+  const z = $("panneau");
+  z.innerHTML = '<p class="chargement">Un instant…</p>';
+  const { data, error } = await sb.from("journal")
+    .select("id,quand,acteur_id,action,table_cible,ligne_cible,avant,apres")
+    .order("quand", { ascending: false }).limit(LIMITE_JOURNAL);
+  if (error) { z.innerHTML = bloquer("Le journal n'est pas lisible.", pourquoi(error)); return; }
+
+  const lignes = data || [];
+  if (!lignes.length) {
+    z.innerHTML = "<h2>Le journal d'audit</h2>"
+      + vide("Le journal est vide : aucune action enregistrée n'a encore eu lieu.");
+    return;
+  }
+
+  /* Les acteurs du journal ne sont pas tous des artisans : un administrateur
+     est un `profils`, pas un `artisans`. On interroge donc les deux, et on
+     retombe sur l'identifiant brut quand ni l'un ni l'autre ne repond. */
+  const ids = [...new Set(lignes.map((l) => l.acteur_id).filter(Boolean))];
+  const noms = await nommer(ids);
+  if (ids.length) {
+    const { data: pr } = await sb.from("profils").select("id,prenom").in("id", ids);
+    (pr || []).forEach((p) => { if (!noms[p.id]) noms[p.id] = p.prenom; });
+  }
+
+  z.innerHTML = "<h2>Le journal d'audit</h2>"
+    + '<p class="aide">Écrit par la base, jamais par une page. Personne ne peut le modifier '
+    + "ni en effacer une ligne, administrateur compris&nbsp;: c'est ce qui lui donne sa "
+    + "valeur le jour où il faut expliquer une décision.</p>"
+    + '<div class="tableau"><table><thead><tr>'
+    +   "<th>Quand</th><th>Qui</th><th>Action</th><th>Sur</th><th>Détail</th>"
+    + '</tr></thead><tbody id="corps-journal"></tbody></table></div>'
+    + '<p class="compte-lignes">' + echapper(nombreLu(lignes.length, LIMITE_JOURNAL)) + "</p>";
+
+  $("corps-journal").innerHTML = lignes.map((l) => "<tr>"
+    + '<td data-l="Quand"><span class="mono">' + echapper(jourHeure(l.quand)) + "</span></td>"
+    + '<td data-l="Qui">' + echapper(l.acteur_id
+        ? (noms[l.acteur_id] || "Compte " + String(l.acteur_id).slice(0, 8))
+        : "La base elle-même") + "</td>"
+    + '<td data-l="Action"><b>' + echapper(l.action) + "</b></td>"
+    + '<td data-l="Sur"><span class="mono">' + echapper(l.table_cible)
+    +   (l.ligne_cible ? " · " + echapper(String(l.ligne_cible).slice(0, 8)) : "") + "</span></td>"
+    + '<td data-l="Détail"><button class="replier" data-j="' + echapper(l.id)
+    +   '" aria-expanded="false" aria-controls="j-' + echapper(l.id)
+    +   '">Avant et après</button>'
+    +   '<div id="j-' + echapper(l.id) + '" hidden></div></td>'
+    + "</tr>").join("");
+
+  $("corps-journal").querySelectorAll("button[data-j]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const l = lignes.find((x) => String(x.id) === b.dataset.j);
+      const zone = $("j-" + b.dataset.j);
+      if (b.getAttribute("aria-expanded") === "true") {
+        zone.hidden = true; zone.innerHTML = "";
+        b.setAttribute("aria-expanded", "false"); b.textContent = "Avant et après";
+        return;
+      }
+      zone.innerHTML = '<div class="detail"><p class="json">Avant : '
+        + echapper(l.avant ? JSON.stringify(l.avant, null, 1) : "rien")
+        + "\nAprès : " + echapper(l.apres ? JSON.stringify(l.apres, null, 1) : "rien")
+        + "</p></div>";
+      zone.hidden = false;
+      b.setAttribute("aria-expanded", "true"); b.textContent = "Replier";
+    }));
+}
+
+/* ------------------------------------------------------------- l'ecran ferme */
+
+function ecranReserve() {
+  ecran.innerHTML = '<h1>Cette page est <span class="em">réservée</span>.</h1>'
+    + '<p class="lead">Ton compte est bien connecté, mais il ne porte pas le droit '
+    + "d'administration.</p>"
+    + '<div class="carte"><h3>Ce n\'est pas un bouton caché<span class="quand">sécurité</span></h3>'
+    + "<p>La page n'affiche rien parce que la base ne renvoie rien. Les fiches, les pièces, "
+    + "les demandes, les signalements et le journal sont fermés ligne par ligne à tout "
+    + "compte qui n'est pas administrateur&nbsp;: ouvrir la console du navigateur ne "
+    + "change rien à ce refus.</p>"
+    + "<p>Le droit d'administration se pose depuis le tableau de bord de la base, jamais "
+    + "depuis une page.</p></div>"
+    + '<div class="actions"><a class="bouton plein" href="/espace">Aller à mon espace</a></div>';
+}
+
+/* ---------------------------------------------------------------- demarrage */
+
+/* On ne telecharge PAS la bibliotheque pour decouvrir qu'il n'y a pas de
+   session : Supabase range la sienne dans le stockage local sous une cle
+   connue. C'est le motif de connexion/index.html, repris ici tel quel. Le
+   try/catch traite le cas ou le stockage est refuse : dans le doute on
+   telecharge, plutot que de renvoyer un compte valide a la connexion. */
+function traceDeSession() {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (/^sb-.*-auth-token$/.test(localStorage.key(i))) return true;
+    }
+    return false;
+  } catch (e) { return true; }
+}
+
+(async () => {
+  try {
+    if (!traceDeSession()) { location.replace("/connexion"); return; }
+    const c = await client();
+    const { data: s } = await c.auth.getSession();
+    if (!s || !s.session) { location.replace("/connexion"); return; }
+
+    $("sortir").hidden = false;
+    $("vers-espace").hidden = false;
+    $("sortir").addEventListener("click", async () => {
+      await c.auth.signOut(); location.replace("/connexion");
+    });
+
+    /* On demande a la BASE si ce compte est administrateur. La reponse ne
+       protege rien : elle sert seulement a afficher une phrase juste au lieu
+       de six panneaux vides. La protection, elle, est dans les politiques. */
+    const { data: adm, error } = await c.rpc("est_admin");
+    if (error) {
+      ecran.innerHTML = "";
+      dire("ko", "Le droit d'administration n'est pas vérifiable.",
+        echapper(pourquoi(error))
+        + '<br><br><a href="/espace" style="color:var(--accent-texte)">Aller à mon espace</a>');
+      return;
+    }
+    if (adm !== true) { ecranReserve(); return; }
+
+    await chargerMetiers();
+    rendre();
+  } catch (e) {
+    ecran.innerHTML = "";
+    dire("ko", "Le back office n'est pas prêt.",
+      "La base n'a pas répondu comme attendu."
+      + (e && e.message ? " <br><small>" + echapper(e.message) + "</small>" : "")
+      + '<br><br><a href="/connexion" style="color:var(--accent-texte)">Revenir à la connexion</a>');
+  }
+})();
+</script>

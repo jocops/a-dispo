@@ -1,0 +1,523 @@
+<title>Connexion - À dispo</title>
+<!--
+  LA PAGE DE CONNEXION.
+  Devis N°2, NON SIGNE : « Création de compte, connexion, mot de passe oublié ».
+  Construite parce que les quatre modules d'agenda, eux, SONT payes au devis
+  N°1 et ne peuvent pas exister sans comptes.
+
+  DEUX CHEMINS, ET PAS TROIS. Google, parce que la majorite des artisans ont
+  une adresse Gmail et que c'est un clic. L'adresse mail avec mot de passe,
+  parce que beaucoup ont une adresse d'entreprise chez OVH ou Orange et que
+  leur imposer Google serait leur fermer la porte. Rien d'autre : chaque
+  fournisseur ajoute est une piece a maintenir et un ecran de plus a lire.
+
+  UN SEUL FORMULAIRE POUR S'INSCRIRE ET SE CONNECTER. Deux onglets « connexion »
+  et « inscription » font hesiter : l'artisan ne sait pas s'il a deja un compte,
+  il y a six mois qu'il a vu le QR code. On demande l'adresse, et c'est la
+  REPONSE DE LA BASE qui dit s'il faut creer ou entrer. Il ne choisit rien.
+
+  CE QUE LA PAGE NE FAIT PAS. Elle ne cree pas la fiche : c'est la fonction
+  `ma_fiche()` qui s'en charge cote base, au premier passage, et qui gere le
+  cas de deux onglets ouverts en meme temps. Une creation cote navigateur
+  aurait produit des doublons le jour ou quelqu'un double-clique.
+
+  LE MOT DE PASSE N'EST JAMAIS LU ICI. Il part directement a Supabase, qui le
+  hache. Aucun champ, aucun journal, aucune mesure ne le touche.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
+     Bloc identique sur les sept écrans applicatifs. Source : CHARTE-CLAIRE.md,
+     relevé et mesuré le 14/09/2026. Tout ratio cité est calculé par la formule
+     WCAG 2.1, alpha composité sur son fond réel. */
+
+  /* Verrouille les contrôles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Le gabarit de outils/build.py déclare
+     encore `meta color-scheme = dark` : la propriété CSS l'emporte sur la
+     balise, et c'est ici qu'elle se pose. */
+  color-scheme:light;
+
+  /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
+     (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
+     teinte nulle). */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de dégradé */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
+     #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 480px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:grid;place-items:center}
+img,svg{max-width:100%}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE. */
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important}
+}
+
+.carte{width:100%;max-width:420px;padding:clamp(26px,6vw,40px) var(--gut)}
+
+/* LA MISE EN PAGE CHANGE AVEC LA LARGEUR, ELLE NE S'ETIRE PAS.
+   Sous 900 px : une colonne, l'ordre du document, rien d'autre.
+   Au dessus : le nom et la promesse tiennent la gauche, les deux chemins
+   d'entrée tiennent la droite. Une carte de 420 px perdue au centre de
+   1 440 px n'est pas une mise en page de bureau, c'est une mise en page de
+   téléphone agrandie. */
+@media(min-width:900px){
+  .carte{max-width:1020px;display:grid;align-items:center;
+    grid-template-columns:minmax(0,1fr) minmax(0,25.5rem);
+    column-gap:clamp(2.5rem,6vw,6rem);
+    padding-block:clamp(40px,7vh,72px)}
+  .col-mot{grid-column:1}
+  .col-entree{grid-column:2}
+  .pied{grid-column:1 / -1;margin-top:34px}
+  .b-google{margin-top:0}
+}
+
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:24px;line-height:1;margin-bottom:26px}
+/* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE. Le `à` ambre donne 9,31:1 sur le nuit
+   et 1,66:1 sur le papier : il passe donc à l'ambre-lettre, 5,85:1 sur le sol. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(24px,5vw,31px);line-height:1.16}
+/* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
+   Le mot reste en encre (18,46:1) et l'ambre passe DESSOUS, en surlignage.
+   Là où la barre couvre la lettre, l'encre sur l'ambre vaut 10,06:1. Les deux
+   états sont mesurés, contrairement à un mot écrit en ambre : 1,84:1. */
+h1 .em{color:var(--cream);
+  background:linear-gradient(var(--accent),var(--accent)) 0 86%/100% .26em no-repeat}
+.lead{color:var(--cream-mut);font-size:15.5px;margin:12px 0 0;max-width:36ch}
+
+.bouton{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  border-radius:999px;padding:14px 22px;min-height:48px;cursor:pointer;
+  border:1px solid transparent;text-decoration:none}
+/* UN BOUTON ETEINT RESTE LISIBLE, ET L'OPACITE EST ECARTEE POUR L'OBTENIR.
+   Sur fond clair le sens de l'erreur s'inverse : `opacity:.55` posé sur
+   l'encre tombe à 3,5:1 sur carte blanche, et sur un libellé terne à 2,2:1.
+   On pose donc des couleurs mesurées : #546279 sur #EFEADF = 5,15:1. */
+.bouton:disabled,.bouton[disabled]{background:var(--surface-2);color:var(--cream-dim);
+  border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:disabled svg,.bouton[disabled] svg{opacity:.45}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:3px}
+
+/* LE BOUTON GOOGLE SUR FOND CLAIR.
+   Sur la charte sombre il se détachait par son aplat blanc : 18,46:1 contre le
+   nuit. Sur du papier chaud, blanc sur blanc ne donne que 1,11:1, il disparaît.
+   Il est donc tenu par son FILET et non par son fond : `--cream-dim` #546279
+   vaut 5,57:1 sur le sol et 6,18:1 sur le blanc, très au dessus des 3,0 exigés
+   d'une limite de composant. Le libellé garde le gris 900 de Google, #1F1F1F,
+   mesuré à 16,48:1 sur blanc, et le logo garde ses quatre couleurs de marque :
+   c'est une marque déposée, elle ne se reteint pas. Il reste le chemin
+   secondaire, sans crier : l'ambre plein est réservé au bouton principal. */
+.b-google{background:var(--bg-2);color:#1F1F1F;border-color:var(--cream-dim);
+  box-shadow:var(--ombre-1);margin-top:26px}
+.b-google:hover:enabled{background:var(--surface);box-shadow:var(--ombre-2)}
+.note-google{margin:10px 0 0;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
+
+/* LE CHEMIN PRINCIPAL : l'ambre en remplissage, l'encre dessus, 10,06:1. */
+.b-primaire{background:var(--accent);color:var(--encre);border-color:var(--accent-2);
+  box-shadow:var(--ombre-1);margin-top:6px}
+.b-primaire:hover:enabled{background:var(--accent-2);box-shadow:var(--ombre-2)}
+
+.ou{display:flex;align-items:center;gap:14px;margin:22px 0 18px;
+  color:var(--cream-dim);font-size:12.5px}
+.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--line)}
+
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;
+  margin:0 0 5px}
+/* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND. Mesure : `--surface`
+   posé sur le sol ne donne que 1,02:1, et sur une carte blanche 1,03:1 : le
+   fond ne dit rien. Le filet `--cream-dim` vaut 5,57:1 sur le sol. */
+input{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--cream-dim);border-radius:12px;padding:13px 15px;
+  min-height:48px;outline:none}
+/* LE FOCUS NE PEUT PLUS ETRE AMBRE. Une bordure `--accent` sur du blanc vaut
+   1,84:1 contre les 3,0 exigés, et le halo ne rattrape rien : `--accent-soft`
+   à .22 donne 1,14:1, à .35 encore 1,23. L'ambre-lettre, lui, vaut 6,48:1. */
+input:focus{border-color:var(--accent-texte);box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder{color:var(--cream-dim);opacity:1}
+input[aria-invalid="true"]{border-color:var(--alerte);box-shadow:0 0 0 3px var(--alerte-soft)}
+.champ{margin-bottom:13px}
+.champ.cache{display:none}
+
+.aide{font-size:12.5px;color:var(--cream-dim);margin:7px 0 0;line-height:1.5}
+.lien{background:none;border:none;color:var(--accent-texte);font:inherit;font-size:12.5px;
+  padding:0;cursor:pointer;text-decoration:underline}
+.lien:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px;border-radius:4px}
+
+/* LES ETATS. Chargement, erreur, succès : aucun n'est muet, aucun n'est une
+   couleur seule. Le titre en gras porte le sens, la couleur le confirme. */
+.etat{border-radius:12px;padding:13px 16px;margin:18px 0 0;font-size:14.2px;display:none;
+  border:1px solid var(--line);background:var(--bg-2);box-shadow:var(--ombre-1)}
+.etat.vu{display:block}
+.etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)}
+.etat.ko b{color:var(--alerte)}
+
+.pied{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--cream-dim);line-height:1.6}
+/* Un lien de la même couleur que son texte n'est plus un lien sur fond clair :
+   il est souligné, et pas seulement teinté. */
+.pied a{color:var(--cream-dim);text-decoration:underline}
+.pied a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px;border-radius:4px}
+</style>
+
+<div class="carte">
+  <!-- DEUX ENVELOPPES, ET RIEN D'AUTRE. Elles ne servent qu'a la mise en page :
+       sous 900 px elles n'ont aucun style et l'ordre du document est inchange,
+       au dessus elles deviennent les deux colonnes. Aucun identifiant ne bouge,
+       donc aucune ligne de script ne change. -->
+  <div class="col-mot">
+  <span class="marque">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+      <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span><span class="a">à</span> dispo</span>
+  </span>
+
+  <h1>Ton espace <span class="em">à dispo</span>.</h1>
+  <p class="lead" id="lead">Entre ton adresse. On regarde si tu as déjà un compte,
+  tu n'as rien à choisir.</p>
+  </div><!-- /.col-mot -->
+
+  <div class="col-entree">
+  <button class="bouton b-google" id="google" type="button">
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.6 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.2-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.7 7l7.6 5.9c4.4-4.1 6.8-10.1 6.8-17.4z"/>
+      <path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-2.9-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.8l7.8-6.1z"/>
+      <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.3-5.6l-7.6-5.9c-2.1 1.4-4.8 2.3-7.7 2.3-6.4 0-11.7-3.7-13.6-8.8l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/>
+    </svg>
+    Continuer avec Google
+  </button>
+  <p class="note-google" id="note-google" hidden></p>
+
+  <div class="ou">ou avec ton adresse</div>
+
+  <form id="f" novalidate>
+    <div class="champ">
+      <label for="email">Ton adresse mail</label>
+      <input id="email" type="email" inputmode="email" autocomplete="email"
+             placeholder="jean@monentreprise.fr" required>
+    </div>
+
+    <!-- Le mot de passe n'apparait qu'apres que la base a dit s'il faut en
+         creer un ou en saisir un. Le demander avant, c'est demander a l'artisan
+         de se souvenir s'il a un compte : il ne sait pas. -->
+    <div class="champ cache" id="c-mdp">
+      <label for="mdp" id="l-mdp">Ton mot de passe</label>
+      <input id="mdp" type="password" autocomplete="current-password" minlength="8">
+      <p class="aide" id="aide-mdp"></p>
+    </div>
+
+    <button class="bouton b-primaire" id="valider" type="submit">Continuer</button>
+  </form>
+
+  <div class="etat ok" id="s-ok" role="status" aria-live="polite"></div>
+  <div class="etat ko" id="s-ko" role="alert"></div>
+  </div><!-- /.col-entree -->
+
+  <div class="pied">
+    Réservé aux entreprises du bâtiment. On vérifie ton SIRET à l'inscription.
+    <a href="/aide">Des questions&nbsp;?</a>
+  </div>
+</div>
+
+<script type="module">
+/* La base du projet. La cle publique est publique par nature : la protection
+   vient des autorisations posees sur les tables, pas du secret de la cle.
+   Verifie le 13/09/2026 : une lecture de `contacts` avec cette cle, sans
+   session, rend une liste VIDE. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+/* Apres connexion, on part vers l'accompagnement. C'est lui qui decide quoi
+   montrer selon l'etape deja atteinte : l'artisan qui revient ne recommence
+   pas, il continue. */
+const APRES = "/espace";
+
+const $ = (id) => document.getElementById(id);
+const R_EMAIL = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i;
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+}
+
+/* --------- Supabase, charge seulement quand il sert ---------
+   Le module pese quelques dizaines de kilo-octets. Le charger au clic plutot
+   qu'au chargement evite de le faire descendre a quelqu'un qui ne fait que
+   passer, souvent en 4G sur un chantier. */
+let client = null;
+async function supabase() {
+  if (client) return client;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  client = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return client;
+}
+
+/* --------- Google ---------
+
+   POURQUOI ON DEMANDE AVANT DE CLIQUER. `signInWithOAuth` fait NAVIGUER le
+   navigateur vers Supabase. Si le fournisseur n'y est pas active, Supabase
+   repond un objet JSON brut, et l'artisan atterrit sur une page blanche
+   couverte de code :
+     {"code":400,"error_code":"validation_failed",
+      "msg":"Unsupported provider: provider is not enabled"}
+   Le try/catch ci-dessous ne peut RIEN y faire : la page est deja partie quand
+   l'erreur arrive. Mesure du 14/09/2026 sur ce projet : seul `email` est actif,
+   `google` vaut false. Un bouton qui promet et qui tombe la-dessus est un
+   bouton mort, et la regle du projet est qu'on le DIT plutot qu'on le cache.
+
+   Le point /auth/v1/settings est public et se lit avec la cle publique : il
+   rend la liste des fournisseurs actifs. On le consulte au chargement, une
+   seule fois, et le bouton dit la verite avant d'etre touche. */
+
+let googleActif = null;
+
+async function fournisseurGoogleActif() {
+  if (googleActif !== null) return googleActif;
+  const r = await fetch(BASE + "/auth/v1/settings", { headers: { apikey: CLE } });
+  if (!r.ok) throw new Error("reglages illisibles");
+  const d = await r.json();
+  googleActif = !!(d && d.external && d.external.google);
+  return googleActif;
+}
+
+/* Au chargement : si le fournisseur n'est pas la, le bouton s'eteint et dit
+   pourquoi, exactement comme les agendas non raccordes dans /espace. Si le
+   reglage est illisible (reseau coupe, service en panne), on ne touche a rien :
+   on ne punit pas l'artisan pour une panne qui n'est pas la sienne, et le
+   controle au clic ci-dessous reste en place. */
+(async () => {
+  try {
+    if (await fournisseurGoogleActif()) return;
+    const b = $("google"), n = $("note-google");
+    b.disabled = true;
+    b.setAttribute("aria-describedby", "note-google");
+    n.textContent = "Pas encore raccordé : la connexion Google demande des "
+      + "identifiants à créer chez Google. En attendant, entre ton adresse mail "
+      + "juste en dessous, ça marche aussi bien.";
+    n.hidden = false;
+  } catch (e) { /* reglages illisibles : on laisse le bouton tel quel */ }
+})();
+
+$("google").addEventListener("click", async () => {
+  const b = $("google");
+  b.disabled = true;
+  try {
+    /* Deuxieme garde, pour le cas ou le chargement n'a pas pu conclure. */
+    if (!(await fournisseurGoogleActif())) {
+      throw new Error("La connexion Google n'est pas encore raccordée.");
+    }
+    const sb = await supabase();
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: location.origin + APRES }
+    });
+    if (error) throw error;
+  } catch (e) {
+    b.disabled = false;
+    dire("ko", "La connexion Google n'est pas encore disponible.",
+      "Entre ton adresse mail juste en dessous, ça marche aussi bien." +
+      (e && e.message ? " <br><small>" + e.message + "</small>" : ""));
+  }
+});
+
+/* --------- Adresse mail ---------
+   `mode` vaut null tant qu'on ne sait pas, puis 'entrer' ou 'creer'. C'est la
+   BASE qui tranche, jamais l'artisan. */
+let mode = null;
+
+$("f").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const email = $("email").value.trim();
+  const mdp = $("mdp").value;
+
+  if (!R_EMAIL.test(email)) {
+    $("email").setAttribute("aria-invalid", "true");
+    dire("ko", "Vérifie ton adresse.", "Il manque quelque chose.");
+    return;
+  }
+  $("email").setAttribute("aria-invalid", "false");
+
+  const b = $("valider");
+  /* L'ETAT DE CHARGEMENT. Sans lui, le bouton restait ecrit « Continuer »
+     pendant tout l'aller-retour avec la base : desactive, donc muet. Le
+     libelle d'origine est relu ici et non recopie, pour qu'il suive le texte
+     du bouton le jour ou il change. */
+  const etiquette = b.textContent;
+  const rendre = () => { b.disabled = false; b.textContent = etiquette; };
+
+  /* PREMIER TEMPS, ET IL NE CHARGE RIEN. Reveler le champ du mot de passe ne
+     demande aucune bibliotheque : le faire apres `await supabase()` rendait le
+     formulaire muet tant que le module n'etait pas descendu, ce qui sur un
+     chantier en 4G se compte en secondes. Il repond maintenant instantanement.
+
+     On ne cherche PAS a savoir si le compte existe avant de demander le mot de
+     passe. Supabase repond « identifiants invalides » dans les deux cas, compte
+     existant ou non, et c'est voulu de leur part : repondre differemment
+     permettrait de savoir quelles adresses sont inscrites. On demande donc le
+     mot de passe en proposant les deux issues. */
+  if (mode === null) {
+    mode = "inconnu";
+    $("c-mdp").classList.remove("cache");
+    $("mdp").focus();
+    $("l-mdp").textContent = "Ton mot de passe";
+    $("aide-mdp").innerHTML =
+      "Première visite&nbsp;? Choisis-en un, il sera créé. " +
+      "Huit caractères minimum. " +
+      "<button type='button' class='lien' id='oubli'>Mot de passe oublié</button>";
+    $("lead").textContent = "Entre ton mot de passe. Si tu n'as pas encore de compte, il sera créé.";
+    $("oubli").addEventListener("click", oublie);
+    return;
+  }
+
+  b.disabled = true;
+  b.textContent = "Un instant…";
+  try {
+    const sb = await supabase();
+
+    if (!mdp || mdp.length < 8) {
+      $("mdp").setAttribute("aria-invalid", "true");
+      dire("ko", "Huit caractères minimum.", "C'est la seule exigence.");
+      rendre();
+      return;
+    }
+    $("mdp").setAttribute("aria-invalid", "false");
+
+    /* SECOND TEMPS : on tente d'entrer. Si la base refuse, on tente de creer.
+       L'ordre compte : tenter la creation d'abord renverrait « adresse deja
+       prise » a quelqu'un qui a simplement mal tape son mot de passe. */
+    const { error: e1 } = await sb.auth.signInWithPassword({ email, password: mdp });
+    if (!e1) { location.assign(APRES); return; }
+
+    const { data, error: e2 } = await sb.auth.signUp({
+      email, password: mdp,
+      options: { emailRedirectTo: location.origin + APRES }
+    });
+
+    if (e2) {
+      /* Cas mesure le 13/09/2026 : le projet Supabase avait les inscriptions
+         FERMEES, et l'artisan recevait « verifie ton mot de passe » alors que
+         son mot de passe n'y etait pour rien. Un message faux fait chercher au
+         mauvais endroit. */
+      if (/signup.*disabled|not allowed/i.test(e2.message || "") ||
+          e2.code === "signup_disabled") {
+        dire("ko", "Les inscriptions ne sont pas encore ouvertes.",
+          "Reviens bientôt. Si tu as déjà un compte, vérifie ton mot de passe.");
+        rendre();
+        return;
+      }
+      /* Le compte existe et le mot de passe ne va pas. On ne dit pas « ce
+         compte existe » : ce serait confirmer qu'une adresse est inscrite a
+         qui essaie au hasard. */
+      dire("ko", "Ça ne passe pas.",
+        "Vérifie ton mot de passe, ou demande à le réinitialiser.");
+      rendre();
+      return;
+    }
+
+    /* Supabase peut demander une confirmation par mail avant d'ouvrir la
+       session. Dans ce cas il n'y a pas de session, et on le dit. */
+    if (data && data.session) { location.assign(APRES); return; }
+    dire("ok", "Compte créé.",
+      "On vient de t'envoyer un mail. Clique sur le lien qu'il contient pour " +
+      "activer ton espace. Rien reçu dans deux minutes ? Regarde dans les indésirables.");
+    rendre();
+
+  } catch (e) {
+    dire("ko", "Ça n'a pas marché.",
+      "Réessaie dans un instant." + (e && e.message ? " <br><small>" + e.message + "</small>" : ""));
+    rendre();
+  }
+});
+
+async function oublie() {
+  const email = $("email").value.trim();
+  if (!R_EMAIL.test(email)) { dire("ko", "Entre d'abord ton adresse.", ""); return; }
+  try {
+    const sb = await supabase();
+    await sb.auth.resetPasswordForEmail(email,
+      { redirectTo: location.origin + "/connexion?reinit=1" });
+  } catch (e) { /* on ne dit rien de plus : voir ci-dessous */ }
+  /* On repond PAREIL que l'adresse existe ou non. Dire « adresse inconnue »
+     permettrait de savoir qui est inscrit. */
+  dire("ok", "C'est envoyé.",
+    "Si un compte existe avec cette adresse, tu vas recevoir un lien pour " +
+    "choisir un nouveau mot de passe.");
+}
+
+/* Deja connecte ? On ne lui remontre pas la porte d'entree.
+   MAIS on ne telecharge pas la bibliotheque pour le decouvrir : Supabase range
+   sa session dans le stockage local sous une cle connue. S'il n'y en a pas, il
+   n'y a rien a verifier, et la page reste legere pour le visiteur de passage,
+   qui est le cas le plus frequent. */
+(async () => {
+  let trace = false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { trace = true; break; }
+    }
+  } catch (e) { /* stockage refuse : on ne verifie pas, la page reste normale */ }
+  if (!trace) return;
+  try {
+    const sb = await supabase();
+    const { data } = await sb.auth.getSession();
+    if (data && data.session) location.replace(APRES);
+  } catch (e) { /* session expiree : page normale */ }
+})();
+</script>

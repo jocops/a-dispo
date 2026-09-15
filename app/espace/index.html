@@ -1,0 +1,2079 @@
+<title>Mon espace - À dispo</title>
+<!--
+  L'ESPACE ARTISAN ET SON ACCOMPAGNEMENT.
+  Devis N°2, NON SIGNE, sauf la verification du SIRET qui est au devis N°1.
+
+  CE QUI GOUVERNE CET ECRAN : ON NE REDEMANDE JAMAIS CE QU'ON SAIT DEJA.
+  L'etape atteinte est une colonne de la base, pas une variable de page.
+  L'artisan qui revient trois jours plus tard reprend ou il s'etait arrete. Un
+  parcours qui recommence a zero a chaque visite se solde par un abandon, et
+  celui-la ne reviendra pas une troisieme fois.
+
+  L'ORDRE DES ETAPES SUIT L'EFFORT CROISSANT. Le prenom coute dix secondes, le
+  SIRET trente, les competences deux minutes, l'agenda demande d'aller chercher
+  un mot de passe. Demander le plus dur en premier, c'est perdre les gens sur
+  le premier ecran.
+
+  CHAQUE ETAPE S'ENREGISTRE EN SORTANT. Pas de bouton « enregistrer » final :
+  un artisan interrompu par un client sur un chantier ne perd rien.
+
+  CE QUI N'EST PAS ENCORE BRANCHE, ET QUI EST DIT COMME TEL. Les quatre
+  raccordements d'agenda demandent chacun une piece a creer hors de ce code :
+  des identifiants chez Google, une application declaree chez Microsoft. Tant
+  qu'elles n'existent pas, les boutons sont ETEINTS et la page dit pourquoi.
+  Un bouton qui ne fait rien sans explication use la confiance. Le depot d'un
+  fichier .ics, LUI, marche des aujourd'hui : c'est la seule des cinq voies
+  qui ne demande rien a personne, et l'ecran des disponibilites y renvoie.
+
+  ------------------------------------------------------------------------
+  REFONTE DU 14/09/2026 : L'AGENDA, ET LE PASSAGE EN CHARTE CLAIRE.
+
+  L'AGENDA. Il etait une grille du mois ou chaque case portait deux boutons
+  « M » et « A » de onze pixels : soixante cibles minuscules a viser au pouce,
+  avec des gants, sur un chantier. C'etait de la saisie de donnees.
+  Il est maintenant construit sur le geste reel : un artisan est LIBRE par
+  defaut et bloque des PLAGES, pas des demi-journees isolees. On touche le
+  debut, on touche la fin, la barre dit CE QUE CA CHANGE (combien de
+  demi-journees resteront libres, et a partir de quand), et UN seul bouton
+  l'ecrit. Les raccourcis ne font que preparer cette meme selection : rien ne
+  part sur un doigt qui a glisse, et tout se defait.
+  La vue CHANGE avec la largeur : liste des trois prochaines semaines sous
+  860 px (cibles a 48 px), grille du mois au-dessus, bilan a cote a 1100.
+  Detail complet dans le pave au-dessus de la section AGENDA, plus bas.
+
+  LA CHARTE CLAIRE. Les seize variables ont garde leurs noms et change de
+  valeurs : le bleu nuit devient l'encre, et L'AMBRE PASSE DU TEXTE AU
+  REMPLISSAGE, parce qu'en lettre sur du papier clair il vaut 1,84 : 1. Quand
+  un accent doit etre LU, c'est --accent-texte #765A0E. Mesure sur les pages
+  RENDUES, a sept largeurs : aucune paire de texte sous 4,5 : 1, aucun
+  debordement horizontal, et six tailles de police rendues, pas une de plus.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* On verrouille les controles natifs, l'ascenseur et le remplissage
+     automatique du navigateur : sans cette ligne, un navigateur en theme
+     sombre repeint les champs et notre mesure ne vaut plus rien. */
+  color-scheme:light;
+
+  /* --- LES 16 VARIABLES DE LA CHARTE, MEMES NOMS, VALEURS CLAIRES --- */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posee dessus, et le haut du degrade */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases du calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et elements enfonces */
+
+  --cream:#0C1421;           /* l'encre principale.   18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* le secondaire.         8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* le terne.              6,18 sur carte,  5,15 au pire */
+
+  /* L'ambre ne change pas de valeur, il change d'emploi : REMPLISSAGE. */
+  --accent:#E8B93E;
+  --accent-2:#D9A72E;
+  --accent-soft:rgba(232,185,62,.22);
+
+  --vert:#196740;            /* reussite.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);
+  --alerte:#A93C24;          /* alerte.    6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  --line:rgba(12,20,33,.14);
+  --gut:clamp(1.1rem,4.5vw,3rem);
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre posee SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre ou un trait */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+
+  /* --- SIX TAILLES DE POLICE RENDUES, PAS UNE DE PLUS ---
+     Un ecran qui en compte quatorze n'a plus de hierarchie : tout se vaut, et
+     l'oeil ne sait plus ou se poser. Toute taille de cette page sort d'ici. */
+  --t1:clamp(27px,5.4vw,36px);  /* le titre, et le seul grand chiffre */
+  --t2:20px;                    /* les intertitres, la marque */
+  --t3:16px;                    /* le corps, les champs, le bouton plein */
+  --t4:14px;                    /* le secondaire, les libelles, les onglets */
+  --t5:12.5px;                  /* l'aide, la legende, les etiquettes */
+  --t6:11px;                    /* le micro : dates, compteurs, demi-journees */
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:var(--t3);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:660px;margin:0 auto;padding:clamp(24px,5vw,48px) var(--gut) 96px}
+/* L'espace termine respire plus large que les formulaires : une grille de mois
+   etranglee a 660 px redevient de la saisie de donnees. */
+.wrap.large{max-width:1060px}
+
+/* Le mouvement se coupe quand le systeme le demande. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;
+    scroll-behavior:auto!important}
+}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  flex-wrap:wrap;margin-bottom:26px}
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:var(--t2);line-height:1}
+/* Le mot-marque suppose un fond fonce : le 'a' ambre donne 1,66 sur ce papier.
+   Il passe donc en ambre de texte, mesure a 5,85 : 1. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+.sortir{background:var(--bg-2);border:1px solid var(--line);color:var(--cream-mut);
+  font:inherit;font-size:var(--t5);border-radius:999px;padding:9px 15px;cursor:pointer;
+  min-height:44px}
+.sortir:hover{color:var(--cream);border-color:var(--cream-dim)}
+
+/* La progression. Elle dit ou on en est ET combien il reste. */
+.pas{display:flex;gap:5px;margin:0 0 8px}
+.pas i{height:4px;flex:1;border-radius:2px;background:var(--surface-2)}
+.pas i.fait{background:var(--vert)}
+.pas i.ici{background:var(--accent)}
+.reste{font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-dim);
+  margin:0 0 26px;letter-spacing:.02em}
+
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:var(--t1);line-height:1.08;letter-spacing:-.015em}
+/* L'ambre ne peut pas etre une lettre sur du clair (1,84 : 1). Il devient le
+   trait pose SOUS le mot : l'encre reste a 18,46 sur le papier et a 10,06 sur
+   la bande ambre. L'accent est garde, la lisibilite aussi. */
+h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
+  background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
+  padding:0 .05em}
+.lead{color:var(--cream-mut);font-size:var(--t3);margin:12px 0 0;max-width:46ch}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t2);margin:34px 0 0;
+  line-height:1.2}
+
+.champ{margin:18px 0 0}
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);margin:0 0 6px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:var(--t5)}
+input,select,textarea{width:100%;font:inherit;font-size:var(--t3);color:var(--cream);
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:13px 15px;outline:none;-webkit-appearance:none;appearance:none}
+textarea{min-height:92px;resize:vertical}
+/* Le chevron est peint DANS l'adresse de l'image : aucune variable CSS ne
+   l'atteint. En bleu-gris clair il tombait a 1,94 sur le champ. */
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+/* Aucun voile d'ambre n'atteint les 3,0 exiges d'un indicateur de focus :
+   l'ambre plein plafonne a 1,84. Le focus passe donc en ambre de texte. */
+input:focus,select:focus,textarea:focus{border-color:var(--accent-texte);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--cream-dim)}
+input[aria-invalid="true"]{border-color:var(--alerte)}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:430px){.deux{grid-template-columns:1fr}}
+.err{color:var(--alerte);font-size:var(--t4);margin-top:6px;display:none}
+.err.vu{display:block}
+.aide{font-size:var(--t5);color:var(--cream-dim);margin:7px 0 0;line-height:1.5}
+.aide b{color:var(--cream-mut)}
+
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t3);
+  border-radius:999px;padding:0 26px;min-height:48px;cursor:pointer;
+  border:1px solid transparent;transition:background .15s,color .15s}
+/* Un seul bouton plein par ecran. C'est lui qu'on cherche du regard. */
+.bouton.plein{background:var(--accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.bouton.plein:hover{background:var(--accent-2)}
+.bouton.creux{background:var(--bg-2);color:var(--cream);border-color:var(--line)}
+.bouton.creux:hover{border-color:var(--cream-dim)}
+/* Jamais d'opacite pour eteindre : sur du clair, une demi-opacite fait tomber
+   meme l'encre la plus forte a 3,49 : 1. On eteint avec des couleurs mesurees. */
+.bouton:disabled{background:var(--surface-2);color:var(--cream-dim);
+  border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px}
+.pied-actions{display:flex;gap:12px;align-items:center;margin:30px 0 0;flex-wrap:wrap}
+
+/* Les etiquettes qu'on ajoute : competences, outillage, permis, materiel. */
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0}
+.tag{display:inline-flex;align-items:stretch;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:0 0 0 15px;font-size:var(--t4);
+  min-height:44px;align-items:center}
+/* Une croix de vingt-huit pixels se rate avec des gants : 44, comme le reste. */
+.tag button{background:none;border:none;color:var(--cream-mut);cursor:pointer;
+  font-size:var(--t4);line-height:1;padding:0;border-radius:999px;
+  width:44px;min-height:44px;flex:none}
+.tag button:hover{color:var(--alerte);background:var(--alerte-soft)}
+/* Le champ d'ajout : `all:unset` en style en ligne remettait sa hauteur a 22 px
+   et aucune regle de feuille ne pouvait le rattraper, l'attribut l'emportant. */
+.tag .ajout{appearance:none;-webkit-appearance:none;background:none;border:0;outline:none;
+  font:inherit;font-size:var(--t4);color:var(--cream);width:116px;min-height:44px;padding:0;
+  box-shadow:none;border-radius:0}
+.tag .ajout::placeholder{color:var(--cream-dim)}
+.tag .ajout:focus-visible{outline:2px solid var(--accent-texte);outline-offset:-2px;border-radius:999px}
+.suggest{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
+.suggest button{background:none;border:1px dashed var(--line);color:var(--cream-mut);
+  font:inherit;font-size:var(--t5);border-radius:999px;padding:7px 15px;cursor:pointer;
+  min-height:44px}
+.suggest button:hover{border-color:var(--accent-texte);color:var(--accent-texte);
+  border-style:solid}
+.suggest button:focus-visible,.tag button:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* Une carte se distingue par son filet et son ombre, jamais par un aplat plus
+   fonce : un gris derriere une carte blanche salit le papier chaud. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:17px 19px;margin:12px 0 0;box-shadow:var(--ombre-1)}
+/* « Eteinte » se dit par la texture, pas par l'opacite. */
+.carte.eteinte{background:var(--surface-2);border-style:dashed;box-shadow:none}
+.carte h3{font-family:"Signika",sans-serif;font-size:var(--t2);font-weight:700;margin:0 0 4px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.25}
+.carte p{margin:.35rem 0;font-size:var(--t4);color:var(--cream-mut)}
+.carte p.mono{font-family:"JetBrains Mono",monospace;font-size:var(--t5)}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:var(--t6);
+  color:var(--cream-mut);background:var(--bg-2);border:1px solid var(--line);
+  padding:3px 9px;border-radius:999px;margin-left:auto;white-space:nowrap;font-weight:400}
+
+.etat{border-radius:14px;padding:14px 17px;margin:22px 0 0;font-size:var(--t4);display:none}
+.etat.vu{display:block}
+.etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35);color:var(--cream)}
+.etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35);color:var(--cream)}
+.etat b{font-family:"Signika",sans-serif;display:block}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+.etat a{color:var(--accent-texte)}
+
+.chargement{color:var(--cream-dim);font-size:var(--t4);padding:40px 0;text-align:center}
+
+/* ---- Les onglets de l'espace ---- */
+.onglets{display:flex;gap:4px;margin:0 0 26px;border-bottom:1px solid var(--line);
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.onglet{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-mut);
+  font:inherit;font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);
+  padding:12px 14px;cursor:pointer;white-space:nowrap;margin-bottom:-1px;min-height:44px}
+.onglet.ici{color:var(--cream);border-bottom-color:var(--accent);border-bottom-width:3px}
+.onglet:focus-visible{outline:2px solid var(--accent-texte);outline-offset:-2px}
+
+/* ==========================================================================
+   L'AGENDA.
+   Ce qu'il etait : soixante cases « M » et « A » a viser au pouce. C'etait de
+   la saisie de donnees. Ce qu'il est : on SELECTIONNE UNE PLAGE, on voit ce
+   qu'elle change, et UN bouton l'ecrit.
+   La vue CHANGE avec la largeur, elle ne se comprime pas : sous 860 px, les
+   trois prochaines semaines en liste, une ligne par jour, cibles a 48 px ;
+   au-dessus, la grille du mois, ou la vue mois reprend son sens.
+   ========================================================================== */
+.dispo-grille{display:grid;gap:22px}
+/* La grille du mois passe a 860 px ; le bilan ne vient se poser A COTE qu'a
+   1100, la ou les sept colonnes gardent assez de largeur pour porter le mot
+   « Après-midi » en entier au lieu de le couper. */
+@media(min-width:1100px){
+  .dispo-grille{grid-template-columns:minmax(0,1fr) 270px;gap:30px;align-items:start}
+}
+/* Les deux autres volets gardent la mesure d'un texte : une carte de 1060 px
+   de large ne se lit pas. */
+.mesure{max-width:660px}
+
+/* Le bilan : la consequence du geste, en chiffres qui existent. */
+.bilan{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;
+  padding:18px 20px;box-shadow:var(--ombre-1)}
+/* Il est premier dans le document ; a 1100 px il passe dans la colonne de
+   droite sans qu'on ait a le deplacer. */
+@media(min-width:1100px){.bilan{position:sticky;top:22px;order:2}}
+.bilan-n{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:var(--t1);
+  line-height:1;color:var(--cream);display:block;letter-spacing:-.02em}
+.bilan-quoi{font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);
+  margin:6px 0 0;color:var(--cream)}
+.bilan-sous{font-size:var(--t5);color:var(--cream-dim);margin:3px 0 0}
+.jauge{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;
+  margin:14px 0 0;display:flex}
+.jauge i{display:block;height:100%;background:var(--accent)}
+.jauge i.ext{background:var(--agenda-fond)}
+.bilan-ligne{display:flex;justify-content:space-between;gap:10px;font-size:var(--t5);
+  color:var(--cream-mut);margin:10px 0 0;border-top:1px solid var(--line);padding-top:10px}
+.bilan-ligne b{font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--cream);
+  white-space:nowrap}
+/* Une date entiere ne tient pas en fin de ligne dans une colonne de 270 px :
+   elle passe dessous au lieu de sortir de la carte. */
+.bilan-ligne.bloc{display:block}
+.bilan-ligne.bloc b{white-space:normal;display:block;margin:3px 0 0;font-size:var(--t4)}
+
+.agenda-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  flex-wrap:wrap;margin:0 0 12px}
+.agenda-quand{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t2);
+  line-height:1.2}
+.nav-mois{display:flex;gap:8px;align-items:center}
+.rond{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+  background:var(--bg-2);color:var(--cream);font-size:var(--t2);cursor:pointer;
+  line-height:1;box-shadow:var(--ombre-1)}
+.rond:hover{border-color:var(--cream-dim)}
+.rond:disabled{background:var(--surface-2);color:var(--cream-dim);cursor:not-allowed;box-shadow:none}
+.rond:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* La grille du mois. La premiere colonne porte le numero de semaine : sur un
+   chantier on ne dit pas « du 15 au 21 », on dit « la 38 ».
+   Cette colonne fait 44 px et non 38 : le numero de semaine est le PREMIER des
+   deux gestes qui bloquent une semaine entiere, et sur une tablette tactile en
+   vue mois il etait mesure a 38 px de large, six de moins que les 44 que tient
+   le reste de l'ecran. Le cout mesure a 861 px, la vue mois la plus etroite :
+   99,6 px par colonne de jour au lieu de 100,5. */
+.mois{display:grid;grid-template-columns:44px repeat(7,minmax(0,1fr));gap:6px}
+.cal-j{text-align:center;font-family:"JetBrains Mono",monospace;font-size:var(--t6);
+  color:var(--cream-dim);padding-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+.sem{background:none;border:1px dashed var(--line);border-radius:10px;
+  font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-mut);
+  cursor:pointer;padding:0;min-height:44px}
+.sem:hover{background:var(--accent-soft);color:var(--cream);border-color:var(--accent-texte)}
+.sem:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+/* Semaine entierement passee : eteinte par la couleur, jamais par l'opacite. */
+.sem:disabled{color:var(--cream-dim);cursor:not-allowed;border-style:dotted}
+.sem:disabled:hover{background:none;color:var(--cream-dim);border-color:var(--line)}
+.jour{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;
+  padding:6px 5px 7px;display:flex;flex-direction:column;gap:4px;box-shadow:var(--ombre-1);
+  min-width:0}
+.jour.we{background:var(--surface-2);box-shadow:none}
+.jour.vide{background:none;border:0;box-shadow:none}
+.num{font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-dim);
+  text-align:center;line-height:20px;height:20px;border-radius:999px;display:block}
+.jour.auj .num{background:var(--cream);color:var(--bg-2);font-weight:600}
+
+/* La liste des trois prochaines semaines, sous 860 px. */
+.liste{display:flex;flex-direction:column;gap:5px}
+.sem-tete{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:20px 0 7px;padding-top:14px;border-top:1px solid var(--line)}
+.sem-tete:first-child{margin-top:0;padding-top:0;border-top:0}
+.sem-nom{font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-mut);
+  text-transform:uppercase;letter-spacing:.08em}
+.sem-choix{background:none;border:1px dashed var(--line);color:var(--cream-mut);font:inherit;
+  font-size:var(--t5);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px}
+.sem-choix:hover{border-color:var(--accent-texte);color:var(--accent-texte);border-style:solid}
+.sem-choix:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.ligne{display:grid;grid-template-columns:52px minmax(0,1fr) minmax(0,1fr);gap:5px}
+.ligne.we .date{color:var(--cream-dim)}
+.date{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-mut);
+  line-height:1.25;padding-left:2px}
+.date b{font-size:var(--t4);font-family:"Signika",sans-serif;color:var(--cream)}
+.ligne.auj .date b{background:var(--cream);color:var(--bg-2);border-radius:999px;
+  padding:0 8px}
+
+/* La demi-journee. Elle DIT son etat : l'aplat seul vaudrait 1,84 sur du
+   blanc, il est donc double d'un libelle, d'une graisse et d'une hachure. */
+.demi{border:1px solid var(--line);border-radius:10px;background:var(--surface);
+  color:var(--cream-mut);font:inherit;font-family:"Karla",sans-serif;font-size:var(--t6);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:0 5px;min-height:34px;text-align:center;line-height:1.15;min-width:0;
+  transition:background .12s,border-color .12s}
+.liste .demi{min-height:48px;font-size:var(--t4)}
+@media(pointer:coarse){.demi{min-height:44px}}
+.demi:hover{border-color:var(--accent-texte);background:var(--bg-2)}
+.demi:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px;position:relative;z-index:2}
+/* Occupe, pose a la main : aplat ambre, encre dessus. 10,06 : 1. */
+.demi.pris{background:var(--accent);border-color:var(--accent-2);color:var(--encre);font-weight:700}
+.demi.pris:hover{background:var(--accent-2)}
+/* Occupe, venu de l'agenda : l'ambre est reserve a ce qu'on peut defaire.
+   Aplat neutre mesure a 12,23, plus une hachure, parce que la couleur seule
+   ne doit jamais porter l'information. */
+.demi.ext{background:var(--agenda-fond);border-color:rgba(12,20,33,.22);color:var(--encre);font-weight:700;
+  cursor:not-allowed;
+  background-image:repeating-linear-gradient(45deg,rgba(12,20,33,.13) 0 3px,transparent 3px 8px)}
+/* Deja passe. Ce n'est plus une offre : ca se lit, ca ne se vise pas. Eteint
+   par des couleurs mesurees et non par une opacite, comme le reste de l'ecran :
+   #546279 sur #EFEADF vaut 5,15 : 1, au-dessus des 4,5 exiges. */
+.demi.passe{background:var(--surface-2);border-color:var(--line);color:var(--cream-dim);
+  font-weight:400;cursor:not-allowed}
+.demi.passe:hover{background:var(--surface-2);border-color:var(--line)}
+.demi.choisi{background:var(--accent-soft);border-color:var(--accent-texte);color:var(--cream);
+  box-shadow:inset 0 0 0 1px var(--accent-texte)}
+.demi.choisi.pris{background:var(--accent);box-shadow:inset 0 0 0 2px var(--accent-texte)}
+.demi .cf{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* La barre d'action : le seul endroit de l'ecran qui ecrit dans la base.
+   Collee en bas tant qu'on choisit, pour que la consequence reste sous les
+   yeux pendant qu'on fait defiler. */
+.barre{position:sticky;bottom:10px;z-index:5;margin:16px 0 0;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--ombre-3);padding:14px 16px;display:flex;gap:14px;
+  align-items:center;flex-wrap:wrap}
+.barre[hidden]{display:none}
+.barre-txt{flex:1 1 190px;min-width:0}
+.barre-quoi{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t4);
+  color:var(--cream);margin:0}
+.barre-suite{font-size:var(--t5);color:var(--cream-mut);margin:2px 0 0}
+.barre .bouton{flex:0 0 auto}
+.barre-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lien{background:none;border:none;color:var(--accent-texte);font:inherit;font-size:var(--t4);
+  padding:8px 6px;cursor:pointer;text-decoration:underline;min-height:44px}
+.lien:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.lien-rouge{background:none;border:none;color:var(--alerte);font:inherit;
+  font-size:var(--t4);padding:8px 4px;cursor:pointer;text-decoration:underline;min-height:44px}
+.lien-rouge:focus-visible{outline:2px solid var(--alerte);outline-offset:2px}
+
+.raccourcis{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:18px 0 0}
+.raccourcis .quoi{font-size:var(--t5);color:var(--cream-dim);margin-right:2px}
+
+.legende-cal{display:flex;flex-wrap:wrap;gap:8px 18px;margin:16px 0 0;
+  font-size:var(--t5);color:var(--cream-mut)}
+.legende-cal i{display:inline-block;width:14px;height:14px;border-radius:4px;
+  border:1px solid var(--line);margin-right:7px;vertical-align:-3px;background:var(--surface)}
+.legende-cal i.pris{background:var(--accent);border-color:var(--accent-2)}
+.legende-cal i.ext{background:var(--agenda-fond);border-color:rgba(12,20,33,.22);
+  background-image:repeating-linear-gradient(45deg,rgba(12,20,33,.13) 0 3px,transparent 3px 8px)}
+
+input[type=file]{font-size:var(--t5);padding:12px;background:var(--surface);
+  border:1px dashed var(--line);border-radius:10px;width:100%;color:var(--cream-mut)}
+input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* La barre de l'espace. Defilement horizontal plutot qu'un menu replie : sur un
+   chantier l'artisan a une main, et un menu demande deux gestes au lieu d'un. */
+.nav-app{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 20px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.nav-app::-webkit-scrollbar{display:none}
+.nav-app a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 15px;
+  border-radius:999px;font-weight:600;font-size:var(--t4);color:var(--cream-mut);
+  text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.nav-app a:hover{background:var(--surface-2);color:var(--cream)}
+/* L'ecran courant est un APLAT ambre avec l'encre dessus : 10,06 : 1. En
+   lettre ambre sur le papier, il serait tombe a 1,84. */
+.nav-app a[aria-current="page"]{background:var(--accent);color:var(--encre)}
+.nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none;
+  border:1px dashed var(--line)}
+.nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.nav-note{margin:-12px 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <span class="marque">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </span>
+    <button class="sortir" id="sortir" hidden>Se déconnecter</button>
+  </div>
+
+  <!-- LA BARRE DE L'ESPACE. Elle n'existe que pour qui a une session : un
+       visiteur de passage sur une fiche publique n'a rien a faire de cinq liens
+       qui le renverraient tous vers la connexion. Et tant que le parcours n'est
+       pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
+       au lieu de mener sur du vide. -->
+  <nav class="nav-app" id="nav-app" data-ici="espace" aria-label="Mon espace" hidden>
+    <a href="/espace" data-ecran="espace">Mon espace</a>
+    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
+    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
+    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
+    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
+  </nav>
+  <p class="nav-note" id="nav-note" hidden></p>
+
+  <div id="ecran"><p class="chargement">Un instant…</p></div>
+
+  <div class="etat ok" id="s-ok"></div>
+  <div class="etat ko" id="s-ko"></div>
+</div>
+
+<script type="module">
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+const $ = (i) => document.getElementById(i);
+const ecran = $("ecran");
+
+/* L'ORDRE DES ETAPES SUIT L'EFFORT CROISSANT : dix secondes, puis trente, puis
+   deux minutes, puis aller chercher un mot de passe chez Apple. Commencer par
+   le plus dur, c'est perdre les gens sur le premier ecran. */
+const ETAPES = ["identite", "entreprise", "metier", "abonnement", "agenda"];
+const DUREE  = { identite: "30 secondes", entreprise: "1 minute", metier: "2 minutes",
+                 abonnement: "1 minute", agenda: "3 minutes" };
+
+let sb = null, fiche = null, metiers = [], atouts = [];
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  d.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+async function client() {
+  if (sb) return sb;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return sb;
+}
+
+async function enregistrer(champs) {
+  const { error } = await sb.from("artisans").update(champs).eq("id", fiche.id);
+  if (error) throw error;
+  Object.assign(fiche, champs);
+}
+
+/* --------------------------------------------------------- la progression */
+function barre(courante) {
+  const i = ETAPES.indexOf(courante);
+  let h = '<div class="pas">';
+  ETAPES.forEach((e, k) => {
+    h += '<i class="' + (k < i ? "fait" : k === i ? "ici" : "") + '"></i>';
+  });
+  h += "</div>";
+  const reste = ETAPES.length - i;
+  h += '<p class="reste">Étape ' + (i + 1) + " sur " + ETAPES.length
+     + " · environ " + DUREE[courante]
+     + (reste > 1 ? " · il reste " + (reste - 1) + " étape" + (reste > 2 ? "s" : "") : " · dernière")
+     + "</p>";
+  return h;
+}
+
+/* ----------------------------------------------------------- les ecrans */
+
+function ecranIdentite() {
+  ecran.innerHTML = barre("identite")
+    + '<h1>D\'abord, <span class="em">qui tu es</span>.</h1>'
+    + '<p class="lead">Trois champs. Ton nom de famille ne sera jamais affiché publiquement.</p>'
+    + '<div class="deux">'
+    +   '<div class="champ"><label for="prenom">Prénom</label>'
+    +     '<input id="prenom" autocomplete="given-name" value="' + echapper(fiche.prenom) + '"></div>'
+    +   '<div class="champ"><label for="nom">Nom</label>'
+    +     '<input id="nom" autocomplete="family-name" value="' + echapper(fiche.nom) + '"></div>'
+    + '</div>'
+    + '<div class="champ"><label for="tel">Téléphone <span class="opt">facultatif</span></label>'
+    +   '<input id="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" value="'
+    +   echapper(fiche.telephone) + '">'
+    +   '<p class="aide">Il ne sera pas affiché sur ta fiche. Les autres te contactent par la messagerie.</p></div>'
+    + '<p class="err" id="e-id"></p>'
+    + '<div class="pied-actions"><button class="bouton plein" id="suite">Continuer</button></div>';
+
+  $("suite").addEventListener("click", async () => {
+    const prenom = $("prenom").value.trim(), nom = $("nom").value.trim(),
+          tel = $("tel").value.trim();
+    if (prenom.length < 2 || nom.length < 2) {
+      $("e-id").textContent = "Ton prénom et ton nom, même courts."; $("e-id").classList.add("vu");
+      return;
+    }
+    if (tel && !/^[0-9 +().-]{6,20}$/.test(tel)) {
+      $("e-id").textContent = "Ce numéro ne semble pas valide."; $("e-id").classList.add("vu");
+      return;
+    }
+    $("suite").disabled = true;
+    try {
+      await enregistrer({ prenom, nom, telephone: tel || null, etape: "entreprise" });
+      taire(); rendre();
+    } catch (e) { $("suite").disabled = false; dire("ko", "Enregistrement impossible.", e.message || ""); }
+  });
+}
+
+function ecranEntreprise() {
+  const dejaVerifie = !!fiche.siret_verifie_le;
+  ecran.innerHTML = barre("entreprise")
+    + '<h1>Ton <span class="em">entreprise</span>.</h1>'
+    + '<p class="lead">On le vérifie à l\'annuaire officiel : c\'est ce qui garantit '
+    + 'à tout le monde qu\'on est entre professionnels.</p>'
+    + '<div class="champ"><label for="siret">Numéro SIRET</label>'
+    +   '<input id="siret" inputmode="numeric" maxlength="20" placeholder="123 456 789 00012" value="'
+    +   echapper(fiche.siret) + '">'
+    +   '<p class="aide">14 chiffres, sur ton avis de situation. Les espaces ne gênent pas.</p></div>'
+    + '<p class="aide" id="siret-etat" role="status" aria-live="polite"></p>'
+    + '<p class="err" id="e-siret"></p>'
+    + '<div id="resultat"></div>'
+    + '<div class="pied-actions">'
+    +   '<button class="bouton plein" id="suite">Continuer</button>'
+    + '</div>';
+
+  if (dejaVerifie) montrerEntreprise({
+    etat: fiche.siret_etat === "non_diffusible" ? "NON_DIFFUSIBLE" : "VALIDE",
+    denomination: fiche.denomination, commune: fiche.commune,
+    code_postal: fiche.code_postal, libelle_activite: fiche.activite
+  });
+
+  /* LE CUL-DE-SAC QU'ON A CORRIGE, ET CE QU'IL EN RESTE. « Continuer » etait
+     desactive tant qu'on n'avait pas clique sur « Verifier », et RIEN ne le
+     disait : on tapait son numero, le bouton restait eteint, et on ne savait
+     pas pourquoi. Mesure du 14/09/2026 sur un numero parfaitement valide (une
+     entreprise active du batiment) : impossible de passer a l'etape suivante.
+     Deux boutons pour une seule intention, c'etait un de trop. La verification
+     part maintenant TOUTE SEULE des que quatorze chiffres sont la, et
+     « Continuer » la refait si elle n'a pas eu lieu : le bouton « Verifier »
+     n'avait plus rien a faire de plus, et il entrait en concurrence avec le
+     seul geste de l'ecran. Les six verdicts, eux, n'ont pas bouge.
+     L'avancement se dit dans `siret-etat`, annonce aux lecteurs d'ecran. */
+  const champ = $("siret");
+
+  /* La verification part toute seule des que 14 chiffres sont la : dans le cas
+     normal, l'artisan n'a jamais a y penser. */
+  champ.addEventListener("input", () => {
+    const n = champ.value.replace(/\D/g, "");
+    if (n.length === 14 && !fiche.siret_verifie_le) verifierSiret();
+  });
+
+  $("suite").addEventListener("click", async () => {
+    $("suite").disabled = true;
+    try {
+      if (!fiche.siret_verifie_le) {
+        await verifierSiret();
+        /* La verification a echoue : elle a deja dit pourquoi a l'ecran, on
+           reste ici plutot que d'avancer sur une entreprise non verifiee. */
+        if (!fiche.siret_verifie_le) { $("suite").disabled = false; return; }
+      }
+      await enregistrer({ etape: "metier" });
+      taire(); rendre();
+    }
+    catch (e) { $("suite").disabled = false; dire("ko", "Enregistrement impossible.", e.message || ""); }
+  });
+}
+
+/* Le controle de la cle, AVANT tout appel : une faute de frappe se detecte
+   ici, sans deranger l'annuaire ni faire attendre l'artisan. La regle est la
+   meme que dans outils/siret.py, et elle est ecrite aux deux endroits parce
+   que l'un tourne dans un navigateur et l'autre pas. */
+function cleValide(s) {
+  if (!/^\d{14}$/.test(s)) return false;
+  if (s.startsWith("356000000"))
+    return [...s].reduce((a, c) => a + +c, 0) % 5 === 0;
+  let t = 0;
+  [...s].reverse().forEach((c, i) => {
+    let n = +c;
+    if (i % 2 === 1) { n *= 2; if (n > 9) n -= 9; }
+    t += n;
+  });
+  return t % 10 === 0;
+}
+
+function montrerEntreprise(r) {
+  const nom = r.denomination || "Entreprise active";
+  $("resultat").innerHTML =
+    '<div class="carte"><h3>' + echapper(nom) + "</h3>"
+    + (r.commune ? "<p>" + echapper([r.code_postal, r.commune].filter(Boolean).join(" ")) + "</p>" : "")
+    + (r.libelle_activite ? "<p>" + echapper(r.libelle_activite) + "</p>" : "")
+    + (r.etat === "NON_DIFFUSIBLE"
+        ? '<p>Tes informations ne sont pas publiques à l\'annuaire. '
+          + 'Tu saisiras toi-même le nom à afficher sur ta fiche.</p>' : "")
+    + "</div>";
+}
+
+async function verifierSiret() {
+  const brut = $("siret").value, siret = brut.replace(/\D/g, "");
+  const err = $("e-siret"); err.classList.remove("vu"); $("resultat").innerHTML = "";
+  if (siret.length !== 14) {
+    err.textContent = "Un SIRET compte 14 chiffres. Celui-ci en compte " + siret.length + ".";
+    err.classList.add("vu"); return;
+  }
+  if (!cleValide(siret)) {
+    err.textContent = "Ce numéro ne peut pas exister : il y a sans doute une faute de frappe.";
+    err.classList.add("vu"); return;
+  }
+  const dit = $("siret-etat"); if (dit) dit.textContent = "On regarde à l'annuaire…";
+  try {
+    const rep = await fetch("https://recherche-entreprises.api.gouv.fr/search?q="
+      + siret + "&page=1&per_page=1");
+    const j = await rep.json();
+    const e = (j.results || [])[0];
+    if (!e) {
+      err.textContent = "L'annuaire ne connaît pas encore ce numéro. Si ton entreprise "
+        + "vient d'être immatriculée, c'est normal : réessaie dans quelques jours.";
+      err.classList.add("vu"); return;
+    }
+    const etab = (e.matching_etablissements || [])[0] || {};
+    if (e.etat_administratif !== "A") {
+      err.textContent = "Cette entreprise est enregistrée comme cessée. Si tu as changé "
+        + "de structure, utilise le numéro de la nouvelle."; err.classList.add("vu"); return;
+    }
+    if ((etab.etat_administratif || "A") !== "A") {
+      const courant = (e.siege || {}).siret;
+      err.textContent = "Ton entreprise est active, mais cet établissement-là est fermé."
+        + (courant ? " Ton numéro actuel est le " + courant + "." : "");
+      err.classList.add("vu"); return;
+    }
+    const diffuse = (e.statut_diffusion || "O") === "O"
+      && !/NON[- ]DIFFUSIBLE/i.test(e.nom_complet || "");
+    const donnees = {
+      siret,
+      siret_etat: diffuse ? "valide" : "non_diffusible",
+      denomination: diffuse ? e.nom_complet : null,
+      activite: e.libelle_activite_principale || e.activite_principale || null,
+      commune: etab.libelle_commune || (e.siege || {}).libelle_commune || null,
+      code_postal: diffuse ? (etab.code_postal || (e.siege || {}).code_postal || null) : null,
+      siret_verifie_le: new Date().toISOString()
+    };
+    await enregistrer(donnees);
+    montrerEntreprise({ etat: diffuse ? "VALIDE" : "NON_DIFFUSIBLE", ...donnees,
+                        libelle_activite: donnees.activite });
+    if (dit) dit.textContent = "";
+    const s = $("suite"); if (s) s.disabled = false;
+  } catch (e) {
+    /* L'annuaire ne repond pas. Ce n'est pas la faute de l'artisan : on le
+       laisse continuer, et on reverifiera. Bloquer une inscription sur une
+       panne qui n'est pas la sienne, c'est le perdre. */
+    err.textContent = "L'annuaire ne répond pas pour le moment. Tu peux continuer, "
+      + "on vérifiera ton numéro dès qu'il revient.";
+    err.classList.add("vu");
+    try { await enregistrer({ siret }); } catch (x) {}
+    const s = $("suite"); if (s) s.disabled = false;
+  } finally { const d2 = $("siret-etat"); if (d2 && d2.textContent === "On regarde à l'annuaire…") d2.textContent = ""; }
+}
+
+const SUGGESTIONS = {
+  competence: ["Rénovation", "Neuf", "Dépannage", "Isolation", "Second œuvre", "Gros œuvre"],
+  outillage: ["Perforateur", "Échafaudage", "Poste à souder", "Laser rotatif", "Compresseur"],
+  permis: ["CACES nacelle", "CACES chariot", "Permis BE", "Habilitation électrique", "Travail en hauteur"],
+  materiel: ["Camion benne", "Nacelle", "Remorque", "Bétonnière", "Échafaudage roulant"]
+};
+const GENRES = [["competence", "Ce que tu sais faire"], ["outillage", "Ton outillage"],
+                ["permis", "Tes permis et habilitations"], ["materiel", "Le matériel que tu peux prêter"]];
+
+function ecranMetier() {
+  let h = barre("metier")
+    + '<h1>Ton <span class="em">métier</span>.</h1>'
+    + '<p class="lead">C\'est ce qui te rend trouvable. Plus c\'est rempli, '
+    + 'plus tu ressors.</p>'
+    + '<div class="champ"><label for="metier">Métier principal</label><select id="metier">'
+    + '<option value="">Choisis…</option>';
+  metiers.forEach((m) => {
+    h += '<option value="' + echapper(m.code) + '"'
+       + (fiche.metier === m.code ? " selected" : "") + ">" + echapper(m.libelle) + "</option>";
+  });
+  h += '<option value="__autre"' + (!fiche.metier && fiche.metier_libre ? " selected" : "")
+     + ">Un autre métier</option></select></div>"
+     + '<div class="champ" id="c-libre" ' + (!fiche.metier && fiche.metier_libre ? "" : "hidden") + '>'
+     +   '<label for="metier_libre">Lequel&nbsp;?</label>'
+     +   '<input id="metier_libre" maxlength="60" placeholder="Cordiste, poseur de cuisines…" value="'
+     +   echapper(fiche.metier_libre) + '"></div>'
+     + '<div class="champ"><label for="presentation">En deux phrases, ce que tu fais '
+     +   '<span class="opt">facultatif</span></label>'
+     +   '<textarea id="presentation" maxlength="600" placeholder="Vingt ans de couverture, '
+     +   'surtout de l\'ardoise et du zinc. Je travaille seul ou en renfort.">'
+     +   echapper(fiche.presentation) + "</textarea></div>"
+     + '<div class="champ"><label for="rayon">Jusqu\'où tu te déplaces</label>'
+     +   '<select id="rayon">';
+  /* La base accepte 5 a 200 km, cet ecran n'en propose que sept. Une valeur
+     venue d'ailleurs (reprise, import, CRM) ne figurerait dans aucune option :
+     le navigateur retomberait alors sur la premiere, et le prochain
+     enregistrement ramenerait un rayon de 120 km a 10 sans rien dire. On
+     ajoute donc la valeur reelle a la liste quand elle en sort. */
+  const rayons = [10, 20, 30, 50, 80, 120, 200];
+  if (fiche.rayon_km && rayons.indexOf(fiche.rayon_km) < 0) {
+    rayons.push(fiche.rayon_km); rayons.sort((a, b) => a - b);
+  }
+  rayons.forEach((k) => {
+    h += '<option value="' + k + '"' + (fiche.rayon_km === k ? " selected" : "") + ">" + k + " km</option>";
+  });
+  h += "</select></div>";
+  GENRES.forEach(([g, titre]) => {
+    h += '<div class="champ"><label>' + titre + ' <span class="opt">facultatif</span></label>'
+       + '<div class="tags" id="tags-' + g + '"></div>'
+       + '<div class="suggest" id="sug-' + g + '"></div></div>';
+  });
+  h += '<p class="err" id="e-met"></p>'
+     + '<div class="pied-actions"><button class="bouton plein" id="suite">Continuer</button></div>';
+  ecran.innerHTML = h;
+
+  $("metier").addEventListener("change", () => {
+    $("c-libre").hidden = $("metier").value !== "__autre";
+  });
+  GENRES.forEach(([g]) => dessinerTags(g));
+
+  $("suite").addEventListener("click", async () => {
+    const m = $("metier").value, libre = $("metier_libre").value.trim();
+    if (!m) { $("e-met").textContent = "Choisis ton métier."; $("e-met").classList.add("vu"); return; }
+    if (m === "__autre" && libre.length < 2) {
+      $("e-met").textContent = "Écris ton métier, c'est ce qu'on cherche à savoir.";
+      $("e-met").classList.add("vu"); return;
+    }
+    $("suite").disabled = true;
+    try {
+      await enregistrer({
+        metier: m === "__autre" ? null : m,
+        metier_libre: m === "__autre" ? libre : null,
+        presentation: $("presentation").value.trim() || null,
+        rayon_km: +$("rayon").value,
+        etape: "abonnement"
+      });
+      taire(); rendre();
+    } catch (e) { $("suite").disabled = false; dire("ko", "Enregistrement impossible.", e.message || ""); }
+  });
+}
+
+function dessinerTags(genre) {
+  const zone = $("tags-" + genre), sug = $("sug-" + genre);
+  const miens = atouts.filter((a) => a.genre === genre);
+  zone.innerHTML = miens.map((a) =>
+    '<span class="tag">' + echapper(a.libelle)
+    + '<button type="button" data-id="' + a.id + '" aria-label="Retirer">×</button></span>').join("")
+    + '<span class="tag" style="border-style:dashed">'
+    + '<input class="ajout" placeholder="Ajouter…" aria-label="Ajouter" data-genre="'
+    + genre + '"></span>';
+  sug.innerHTML = SUGGESTIONS[genre]
+    .filter((s) => !miens.some((a) => a.libelle === s))
+    .map((s) => '<button type="button" data-ajout="' + echapper(s) + '">+ ' + echapper(s) + "</button>").join("");
+
+  zone.querySelectorAll("button[data-id]").forEach((b) =>
+    b.addEventListener("click", () => retirer(+b.dataset.id, genre)));
+  zone.querySelector("input").addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") { ev.preventDefault(); ajouter(genre, ev.target.value); ev.target.value = ""; }
+  });
+  sug.querySelectorAll("button").forEach((b) =>
+    b.addEventListener("click", () => ajouter(genre, b.dataset.ajout)));
+}
+
+async function ajouter(genre, libelle) {
+  libelle = (libelle || "").trim();
+  if (libelle.length < 2) return;
+  if (atouts.some((a) => a.genre === genre && a.libelle === libelle)) return;
+  try {
+    const { data, error } = await sb.from("artisan_atouts")
+      .insert({ artisan_id: fiche.id, genre, libelle }).select().single();
+    if (error) throw error;
+    atouts.push(data); dessinerTags(genre);
+  } catch (e) { dire("ko", "Impossible d'ajouter.", e.message || ""); }
+}
+async function retirer(id, genre) {
+  try {
+    const { error } = await sb.from("artisan_atouts").delete().eq("id", id);
+    if (error) throw error;
+    atouts = atouts.filter((a) => a.id !== id); dessinerTags(genre);
+  } catch (e) { dire("ko", "Impossible de retirer.", e.message || ""); }
+}
+
+/* ==========================================================================
+   L'ECRAN D'ABONNEMENT, ET LE RACCORDEMENT DU PAIEMENT.
+
+   CE QUI A CHANGE, ET POURQUOI. Cet ecran annoncait « Pas encore raccorde »
+   en dur, dans le code de la page. C'etait vrai le jour ou ca a ete ecrit, et
+   c'etait faux le lendemain du raccordement, sans que personne s'en apercoive.
+   Il DEMANDE maintenant a la fonction de peripherie si elle est raccordee, et
+   il dit ce qu'elle repond. Un ecran qui recopie un etat finit toujours par
+   mentir.
+
+   CE QUI N'A PAS CHANGE, ET QUI NE DOIT PAS CHANGER. Le prix ne s'ecrit nulle
+   part : il n'est pas arrete. Afficher un montant plausible reviendrait a
+   l'inventer, et l'artisan le citerait. Le jour venu, il vivra chez le
+   prestataire sous une reference d'offre, et cette page continuera de ne pas
+   le connaitre.
+
+   LE NAVIGATEUR NE CONFIRME JAMAIS UN PAIEMENT. Cette page ouvre une session
+   et envoie l'artisan chez le prestataire. Elle n'ecrit rien dans son
+   abonnement, et revenir sur le site ne lui donne aucun acces : c'est la
+   fonction `evenements-paiement` qui ouvre l'acces, sur message signe.
+
+   QUATRE ETATS, ET AUCUN ECRAN BLANC : on attend (« Un instant… »), c'est
+   raccorde (un vrai bouton), ce n'est pas raccorde (carte eteinte qui dit
+   pourquoi), ou on n'a pas pu savoir (carte eteinte qui le dit aussi). Dans
+   les quatre cas, « Continuer sans payer » reste actif : une panne de notre
+   cote ne doit jamais bloquer une inscription.
+   ========================================================================== */
+
+/* Meme projet que la base : l'adresse se deduit, elle ne se tient pas a jour
+   dans une seconde constante qu'on oublierait de changer. */
+const FONCTION_PAIEMENT = BASE + "/functions/v1/ouvrir-paiement";
+
+/* Le jeton de la session en cours. La fonction verifie elle-meme qui appelle
+   aupres de Supabase : la page ne lui apprend rien qu'elle croit sur parole. */
+async function jetonSession() {
+  const { data } = await sb.auth.getSession();
+  return data && data.session ? data.session.access_token : "";
+}
+
+/* On demande a la fonction si le paiement est raccorde. Toute panne (fonction
+   pas encore deployee, reseau coupe, reponse illisible) rend « inconnu » :
+   jamais « pret », parce qu'un faux « pret » afficherait un bouton mort. */
+async function etatPaiement() {
+  try {
+    const jeton = await jetonSession();
+    if (!jeton) return { etat: "inconnu", detail: "pas de session" };
+    const r = await fetch(FONCTION_PAIEMENT, {
+      headers: { apikey: CLE, Authorization: "Bearer " + jeton }
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j) return { etat: "inconnu", detail: "réponse " + r.status };
+    /* Le detail technique part dans la console, pas a l'ecran : le nom d'une
+       variable d'environnement absente ne veut rien dire pour un artisan. */
+    if (j.manque && j.manque.length) console.log("paiement, ce qui manque :", j.manque);
+    return { etat: j.pret ? "pret" : "non_branche", detail: "" };
+  } catch (e) {
+    return { etat: "inconnu", detail: (e && e.message) || "" };
+  }
+}
+
+/* L'abonnement en cours, s'il y en a un. Zero ligne veut dire « aucun
+   abonnement encore ouvert » : c'est un etat normal, pas une erreur. La vue
+   filtre par la securite par ligne, la page ne filtre rien elle-meme.
+   Si la migration n'a pas encore ete jouee sur la base, la vue n'existe pas :
+   on rend null et l'ecran se contente de ce qu'il sait. */
+async function monAbonnement() {
+  try {
+    const { data, error } = await sb.from("mon_abonnement")
+      .select("etat,libelle,message").limit(1);
+    if (error) return null;
+    return (data && data[0]) || null;
+  } catch (e) { return null; }
+}
+
+/* La duree de l'essai vient de la base (`reglages.essai_mois`), pas d'une
+   phrase ecrite a la main : un nombre recopie dans du texte ne se met jamais
+   a jour. Null veut dire « pas arrete », et alors on ne promet rien. */
+async function moisOfferts() {
+  try {
+    const { data, error } = await sb.rpc("reglage", { p_cle: "essai_mois" });
+    if (error) return null;
+    const n = Array.isArray(data) ? data[0] : data;
+    return typeof n === "number" && n > 0 ? n : null;
+  } catch (e) { return null; }
+}
+
+function ecranAbonnement() {
+  ecran.innerHTML = barre("abonnement")
+    + '<h1>Ton <span class="em">abonnement</span>.</h1>'
+    + '<p class="lead">Tu peux arrêter depuis ton espace, sans nous écrire.</p>'
+    /* L'attente est du texte, jamais une animation. */
+    + '<div id="abo-corps"><p class="chargement">Un instant…</p></div>'
+    + '<div class="pied-actions">'
+    +   '<button class="bouton plein" id="suite">Continuer sans payer</button></div>';
+
+  $("suite").addEventListener("click", async () => {
+    $("suite").disabled = true;
+    try { await enregistrer({ etape: "agenda" }); taire(); rendre(); }
+    catch (e) { $("suite").disabled = false; dire("ko", "Enregistrement impossible.", e.message || ""); }
+  });
+
+  /* Les trois lectures partent ensemble : trois allers-retours a la suite
+     feraient attendre trois fois plus longtemps, souvent en 4G.
+     Le `catch` final n'est pas une precaution de style : sans lui, la moindre
+     erreur inattendue laisserait « Un instant… » a l'ecran pour toujours. On
+     retombe alors sur l'etat « on n'a pas pu savoir », qui dit la verite. */
+  Promise.all([etatPaiement(), monAbonnement(), moisOfferts()])
+    .then(([paiement, abo, mois]) => rendreAbonnement(paiement, abo, mois))
+    .catch(() => rendreAbonnement({ etat: "inconnu", detail: "" }, null, null));
+}
+
+function rendreAbonnement(paiement, abo, mois) {
+  const zone = $("abo-corps");
+  if (!zone) return;                       /* l'artisan a change d'ecran entre-temps */
+
+  /* L'essai : la phrase se construit a partir du nombre, et il n'y a pas de
+     phrase quand il n'y a pas de nombre. */
+  const essai = mois === 1 ? "Le premier mois est offert."
+              : mois > 1 ? "Les " + mois + " premiers mois sont offerts."
+              : "";
+  const badge = mois === 1 ? "1er mois offert"
+              : mois > 1 ? mois + " mois offerts"
+              : "offre unique";
+
+  let h = '<div class="carte"><h3>Offre unique<span class="quand">' + badge + "</span></h3>"
+        + '<p>Accès à tout : tes disponibilités, la recherche, les fiches, la messagerie.</p>'
+        + (essai ? "<p>" + essai + "</p>" : "")
+        /* LE PRIX N'EST PAS ECRIT, ET C'EST VOULU. Il n'est pas arrete. */
+        + '<p><b>Le tarif est en cours d\'arbitrage.</b> Tant qu\'il n\'est pas fixé, '
+        + 'rien ne t\'est demandé et rien ne te sera prélevé.</p></div>';
+
+  /* L'etat de l'abonnement, quand il y en a un. Le message vient de la base
+     (`abonnement_etats`), source unique : la page ne reecrit pas les six cas
+     dans un aiguillage qui divergerait du jour ou l'un d'eux change. */
+  if (abo) {
+    /* On affiche le LIBELLE, jamais le code d'etat : les codes de la base
+       s'ecrivent sans accent (« impaye », « resilie »), et un artisan n'a pas
+       a lire nos identifiants techniques. */
+    h += '<div class="carte"><h3>' + echapper(abo.libelle || "Ton abonnement") + "</h3>"
+       + "<p>" + echapper(abo.message || "") + "</p></div>";
+  }
+
+  const dejaRegle = abo && (abo.etat === "actif" || abo.etat === "impaye");
+
+  if (dejaRegle) {
+    /* Rien a payer : on n'affiche pas un bouton qui creerait un second
+       prelevement. */
+    h += '<div class="carte"><h3>Paiement en ligne<span class="quand">à jour</span></h3>'
+       + '<p>Ton abonnement est déjà en cours. Tu n\'as rien à payer maintenant.</p></div>';
+  } else if (paiement.etat === "pret") {
+    h += '<div class="carte"><h3>Paiement en ligne<span class="quand">disponible</span></h3>'
+       + '<p>Tu seras redirigé vers notre prestataire de paiement. '
+       + 'Tes coordonnées bancaires ne passent jamais par nous.</p>'
+       + '<div class="pied-actions">'
+       +   '<button class="bouton plein" id="payer">M\'abonner</button></div>'
+       /* Le compte rendu de l'action est annonce aux lecteurs d'ecran : sans
+          aria-live, un artisan qui n'y voit pas resterait devant un bouton
+          revenu a son etat normal, sans savoir ce qui s'est passe. */
+       + '<p class="aide" id="payer-etat" role="status" aria-live="polite"></p></div>';
+  } else if (paiement.etat === "non_branche") {
+    /* Le motif est dit en clair, dans la langue de l'artisan. Le detail
+       technique est deja parti dans la console pour nous. */
+    h += '<div class="carte eteinte"><h3>Paiement en ligne<span class="quand">bientôt</span></h3>'
+       + '<p>Le prestataire de paiement n\'est pas encore raccordé. '
+       + 'Tu n\'as aucune carte à saisir aujourd\'hui.</p>'
+       + '<p class="mono">Pas encore raccordé : le prestataire n\'est pas choisi.</p></div>';
+  } else {
+    h += '<div class="carte eteinte"><h3>Paiement en ligne<span class="quand">indisponible</span></h3>'
+       + '<p>On n\'arrive pas à joindre le service de paiement pour le moment. '
+       + 'Ce n\'est pas de ton fait, et ça ne bloque rien : tu peux continuer.</p></div>';
+  }
+
+  zone.innerHTML = h;
+
+  const bouton = $("payer");
+  /* UN SEUL BOUTON PLEIN PAR ECRAN. Quand le paiement est raccorde, le geste
+     de l'ecran est « M'abonner » et « Continuer sans payer » passe en creux ;
+     sinon c'est l'inverse. Deux boutons pleins se concurrencent, et l'oeil ne
+     sait plus lequel est le geste. */
+  const suite = $("suite");
+  if (suite) suite.className = "bouton " + (bouton ? "creux" : "plein");
+  if (!bouton) return;
+  bouton.addEventListener("click", async () => {
+    const dit = $("payer-etat");
+    bouton.disabled = true; bouton.textContent = "Un instant…";
+    dit.textContent = "";
+    try {
+      const jeton = await jetonSession();
+      if (!jeton) { location.replace("/connexion"); return; }
+      const r = await fetch(FONCTION_PAIEMENT, {
+        method: "POST",
+        headers: {
+          apikey: CLE, Authorization: "Bearer " + jeton,
+          "Content-Type": "application/json"
+        },
+        /* AUCUN MONTANT N'EST ENVOYE, et la fonction refuserait d'en recevoir
+           un : le prix vit chez le prestataire, sous une reference d'offre. */
+        body: JSON.stringify({})
+      });
+      const j = await r.json().catch(() => null);
+      if (j && j.ok && j.url) { location.assign(j.url); return; }
+      if (j && j.ok && j.deja_actif) {
+        dire("ok", "Ton abonnement est déjà en cours.", echapper(j.message || ""));
+        ecranAbonnement(); return;
+      }
+      const quoi = j && j.erreur ? j.erreur.message : "Le service n'a pas répondu comme attendu.";
+      dit.textContent = quoi;
+      dire("ko", "L'abonnement n'a pas pu être ouvert.",
+        "Tu peux continuer sans payer : rien ne t'est demandé aujourd'hui.");
+      if (j && j.erreur) console.log("paiement refusé :", j.erreur);
+    } catch (e) {
+      dit.textContent = "La connexion n'a pas abouti.";
+      dire("ko", "L'abonnement n'a pas pu être ouvert.",
+        "Ce n'est pas de ton fait. Tu peux continuer sans payer.");
+    } finally {
+      const b = $("payer");
+      if (b) { b.disabled = false; b.textContent = "M'abonner"; }
+    }
+  });
+}
+
+/* Les quatre raccordements. Chacun demande une piece a creer HORS de ce code :
+   des identifiants chez Google, une application declaree chez Microsoft. Tant
+   qu'elles n'existent pas, le bouton est eteint ET LA PAGE DIT POURQUOI. Un
+   bouton qui ne fait rien sans explication use la confiance. */
+const AGENDAS = [
+  { cle: "google",    nom: "Google Agenda",
+    quoi: "Un clic, et tes jours occupés remontent tout seuls.",
+    pret: false, manque: "identifiants Google à créer" },
+  { cle: "microsoft", nom: "Microsoft Outlook",
+    quoi: "Compte personnel ou compte d'entreprise, les deux marchent.",
+    pret: false, manque: "application à déclarer chez Microsoft" },
+  { cle: "apple",     nom: "Calendrier Apple",
+    quoi: "Par mot de passe dédié. On t'explique où le trouver, c'est deux minutes.",
+    pret: false, manque: "raccordement à écrire" },
+  { cle: "ics",       nom: "Une adresse d'abonnement",
+    quoi: "L'adresse .ics de ton agenda, relue toute seule chaque jour.",
+    pret: false, manque: "relais à écrire, un navigateur n'ayant pas le droit "
+                       + "d'aller chercher un fichier sur un autre domaine" }
+];
+
+function ecranAgenda() {
+  /* UNE VOIE QUI MARCHE, PUIS CE QUI VIENDRA. Cet ecran alignait cinq cartes
+     qui disaient toutes « bientot » : l'artisan en sortait sans rien avoir pu
+     faire. Le depot d'un fichier .ics, lui, se lit ICI, dans le navigateur,
+     sans compte developpeur ni validation : c'est la seule des cinq voies
+     ouverte aujourd'hui, et elle passe donc en premier, seule carte vive. */
+  let h = barre("agenda")
+    + '<h1>Branche ton <span class="em">agenda</span>.</h1>'
+    + '<p class="lead">Tes jours occupés remontent tout seuls. '
+    + '<b>On ne lit que le libre et l\'occupé</b> : jamais les titres, jamais les lieux, '
+    + 'jamais les participants.</p>'
+    + '<div class="carte"><h3>Déposer un fichier .ics<span class="quand">ça marche</span></h3>'
+    +   '<p>Exporte ton agenda depuis Google, Outlook ou Apple, et dépose le fichier ici.</p>'
+    +   '<input type="file" id="ics" accept=".ics,text/calendar" '
+    +     'aria-label="Fichier de calendrier .ics">'
+    +   '<p class="aide" id="ics-etat" role="status" aria-live="polite"></p></div>';
+  AGENDAS.forEach((a) => {
+    h += '<div class="carte' + (a.pret ? "" : " eteinte") + '"><h3>' + a.nom
+       + '<span class="quand">' + (a.pret ? "disponible" : "bientôt") + "</span></h3>"
+       + "<p>" + a.quoi + "</p>"
+       + (a.pret ? "" : '<p class="mono">Pas encore raccordé : ' + a.manque + ".</p>")
+       + "</div>";
+  });
+  h += '<div class="pied-actions">'
+     + '<button class="bouton plein" id="suite">Terminer</button></div>'
+     + '<p class="aide">Rien n\'est obligatoire ici : tu peux poser tes '
+     + 'disponibilités à la main, et brancher un agenda plus tard.</p>';
+  ecran.innerHTML = h;
+  $("ics").addEventListener("change", (ev) => {
+    if (ev.target.files && ev.target.files[0]) importerIcs(ev.target.files[0]);
+  });
+  $("suite").addEventListener("click", async () => {
+    $("suite").disabled = true;
+    try { await enregistrer({ etape: "fini" }); taire(); rendre(); }
+    catch (e) { $("suite").disabled = false; dire("ko", "Enregistrement impossible.", e.message || ""); }
+  });
+}
+
+/* ==========================================================================
+   L'ESPACE, UNE FOIS L'ACCOMPAGNEMENT FINI.
+   Trois volets, et le premier est le produit : poser ses disponibilites.
+   ========================================================================== */
+
+let volet = "dispos";
+let occupations = [];
+let agendas = [];
+
+/* ==========================================================================
+   L'AGENDA. REFONTE DU 14/09/2026.
+
+   CE QU'IL ETAIT : une grille du mois, et dans chaque case deux boutons « M »
+   et « A » de onze pixels. A 375 px, cela faisait une soixantaine de cibles a
+   viser au pouce, sur un chantier, avec des gants. C'etait de la saisie de
+   donnees, pas un produit.
+
+   LE GESTE REEL, ET C'EST LUI QUI COMMANDE LE DESSIN :
+   1. un artisan est LIBRE par defaut. Le calendrier part vide et se remplit de
+      ce qui est PRIS ;
+   2. il ne bloque presque jamais une demi-journee isolee : il bloque un
+      chantier, donc une PLAGE. On touche le debut, on touche la fin ;
+   3. sur telephone le mois entier n'a aucun interet : ce sont les trois
+      prochaines semaines qui comptent. La vue CHANGE avec la largeur, elle ne
+      se comprime pas (liste sous 860 px, grille du mois au-dessus) ;
+   4. le geste doit montrer sa CONSEQUENCE avant d'etre ecrit : la barre dit
+      combien de demi-journees resteront libres, et a partir de quand.
+
+   POURQUOI TOUT PASSE PAR UNE SELECTION. Les raccourcis (une semaine, tous
+   les vendredis, tout ce qui est bloque) ne font rien d'autre que PREPARER
+   cette meme selection. Aucun d'eux n'ecrit tout seul : il n'existe donc aucun
+   geste destructeur qui parte sur un doigt qui a glisse, et il n'y a qu'un
+   seul chemin vers la base, donc un seul endroit ou se tromper.
+
+   CE QU'ON N'INVENTE PAS. On ne dit ni combien de gens ont cherche, ni
+   combien de demandes ont ete manquees : ces nombres n'existent pas. On dit ce
+   qu'on sait compter, et rien d'autre.
+   ========================================================================== */
+
+const HORIZON = 21;          /* trois semaines : au-dela, personne ne sait */
+const MATIN = [8, 12], APRES = [13, 18];
+
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août",
+              "septembre","octobre","novembre","décembre"];
+const MOIS_C = ["janv.","févr.","mars","avr.","mai","juin","juil.","août",
+                "sept.","oct.","nov.","déc."];
+const JOURS = ["L","M","M","J","V","S","D"];
+const JOURS_L = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const JOURS_C = ["lun","mar","mer","jeu","ven","sam","dim"];
+
+let moisVu = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+let debutListe = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); })();
+let vueMois = false;         /* decide par la largeur, jamais par le peripherique */
+
+let selection = new Set();   /* cles « 2026-09-15|matin » */
+let ancre = null;
+let origine = null;          /* d'ou vient la selection : un raccourci, ou la main */
+let ignores = 0;             /* creneaux d'agenda traverses par la plage */
+let passes = 0;              /* demi-journees deja finies traversees par la plage */
+let derniere = null;         /* de quoi defaire le dernier ecrit */
+let etatCal = "chargement";  /* chargement | pret | erreur : jamais d'ecran blanc */
+let erreurCal = "";
+
+/* ------------------------------------------------------------- les dates */
+const cle = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0")
+                 + "-" + String(d.getDate()).padStart(2,"0");
+const jour0 = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const plusJours = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const indexJour = (d) => (d.getDay() + 6) % 7;                 /* lundi = 0 */
+const lundiDe = (d) => plusJours(d, -indexJour(d));
+const cleCase = (d, demi) => cle(d) + "|" + demi;
+function deCle(k) {
+  const [j, demi] = k.split("|"), [A, M, J] = j.split("-").map(Number);
+  return { date: new Date(A, M - 1, J), demi };
+}
+/* Le numero de semaine ISO. Sur un chantier on ne dit pas « du 15 au 21 »,
+   on dit « la 38 » : c'est le mot du metier, pas un ornement. */
+function numSemaine(d) {
+  const t = jour0(d); t.setDate(t.getDate() + 3 - indexJour(t));
+  const p = new Date(t.getFullYear(), 0, 4);
+  return 1 + Math.round(((t - p) / 86400000 - 3 + ((p.getDay() + 6) % 7)) / 7);
+}
+
+function creneau(jour, demi) {
+  const [h1, h2] = demi === "matin" ? MATIN : APRES;
+  const a = new Date(jour); a.setHours(h1, 0, 0, 0);
+  const b = new Date(jour); b.setHours(h2, 0, 0, 0);
+  return [a, b];
+}
+/* Occupe si une occupation CHEVAUCHE le creneau, pas seulement si elle
+   l'englobe : un rendez-vous de 11 h a 14 h occupe le matin ET l'apres-midi. */
+function estOccupe(jour, demi) {
+  const [a, b] = creneau(jour, demi);
+  return occupations.find((o) => new Date(o.debut) < b && new Date(o.fin) > a);
+}
+const modifiable = (o) => !o || o.saisie === true;
+/* UNE DEMI-JOURNEE FINIE N'EST PLUS UNE OFFRE, et le bilan l'excluait deja de
+   son compte. La grille du mois, elle, la laissait CHOISIR puis ECRIRE :
+   mesure du 14/09/2026 a 1440 px, 26 des 60 demi-journees affichees etaient
+   passees, aucune n'etait fermee, et bloquer la semaine 36 ecrivait douze
+   lignes en base pour faire bouger le compteur de zero. Deux gestes complets,
+   un felicitations, et rien. On la ferme donc au meme endroit que le reste. */
+const estPasse = (jour, demi) => creneau(jour, demi)[1] <= new Date();
+
+/* --------------------------------------------------------- les deux vues */
+function fenetreVue() {
+  if (vueMois) return [new Date(moisVu.getFullYear(), moisVu.getMonth(), 1),
+                       new Date(moisVu.getFullYear(), moisVu.getMonth() + 1, 1)];
+  return [new Date(debutListe), plusJours(debutListe, HORIZON)];
+}
+/* On charge l'union de ce qu'on affiche ET des 21 prochains jours : le bilan
+   parle toujours de la meme periode, meme quand on est parti voir decembre. */
+function fenetreCharge() {
+  const h0 = jour0(new Date()), h1 = plusJours(h0, HORIZON);
+  const [a, b] = fenetreVue();
+  return [plusJours(new Date(Math.min(a, h0)), -7),
+          plusJours(new Date(Math.max(b, h1)), 7)];
+}
+
+/* On ne charge QUE ce qu'on regarde : un artisan qui remplit son annee aurait
+   sinon des centaines de lignes a descendre a chaque ouverture, souvent en 4G. */
+async function chargerOccupations() {
+  const [a, b] = fenetreCharge();
+  try {
+    const { data, error } = await sb.from("occupations").select("*")
+      .eq("artisan_id", fiche.id)
+      .gte("debut", a.toISOString()).lt("debut", b.toISOString());
+    if (error) throw error;
+    occupations = data || [];
+    etatCal = "pret";
+  } catch (e) {
+    /* On le DIT, on ne laisse pas une grille vide faire croire a un agenda
+       libre : un artisan qui se croit libre partout rate ses appels. */
+    etatCal = "erreur"; erreurCal = (e && e.message) || "";
+  }
+}
+
+/* ------------------------------------------------------------- le bilan
+   Ce qu'on sait compter, sur une periode fixe : les 21 prochains jours.
+   Une demi-journee deja finie n'est plus une offre : on ne la compte pas. */
+function bilan(ajouts, retraits) {
+  const maintenant = new Date(), h0 = jour0(maintenant);
+  let total = 0, pris = 0, ext = 0, prochaine = null;
+  for (let i = 0; i < HORIZON; i++) {
+    const d = plusJours(h0, i);
+    for (const demi of ["matin", "apres"]) {
+      if (creneau(d, demi)[1] <= maintenant) continue;
+      total++;
+      const k = cleCase(d, demi), o = estOccupe(d, demi);
+      let occupe = !!o;
+      if (o && !o.saisie) ext++;
+      if (retraits && retraits.has(k) && o && o.saisie) occupe = false;
+      if (ajouts && ajouts.has(k)) occupe = true;
+      if (occupe) pris++;
+      else if (!prochaine) prochaine = { date: d, demi };
+    }
+  }
+  return { total, pris, ext, libre: total - pris, prochaine };
+}
+
+const ditDemi = (demi) => demi === "matin" ? "matin" : "après-midi";
+function ditQuand(date, demi) {
+  const ecart = Math.round((jour0(date) - jour0(new Date())) / 86400000);
+  if (ecart === 0) return "aujourd'hui, " + ditDemi(demi);
+  if (ecart === 1) return "demain, " + ditDemi(demi);
+  return JOURS_L[indexJour(date)] + " " + date.getDate() + " "
+       + MOIS_C[date.getMonth()] + ", " + ditDemi(demi);
+}
+function ditPlage(cases) {
+  if (!cases.length) return "";
+  const t = cases.map((c) => c.date.getTime());
+  const a = new Date(Math.min.apply(null, t)), b = new Date(Math.max.apply(null, t));
+  if (cle(a) === cle(b)) return "le " + a.getDate() + " " + MOIS[a.getMonth()];
+  if (a.getMonth() === b.getMonth())
+    return "du " + a.getDate() + " au " + b.getDate() + " " + MOIS[b.getMonth()];
+  return "du " + a.getDate() + " " + MOIS_C[a.getMonth()]
+       + " au " + b.getDate() + " " + MOIS_C[b.getMonth()];
+}
+
+/* -------------------------------------------------------- la selection */
+function casesVues() {
+  const out = [], [a, b] = fenetreVue();
+  for (let d = new Date(a); d < b; d = plusJours(d, 1))
+    for (const demi of ["matin", "apres"]) out.push(cleCase(d, demi));
+  return out;
+}
+/* Un creneau venu de l'agenda ne se selectionne pas : il ne s'efface pas ici,
+   et le faire entrer dans la plage ferait mentir le compte affiche. Une
+   demi-journee deja finie non plus : on ne bloque que ce qui est a venir. */
+function retenable(k) {
+  const c = deCle(k);
+  if (estPasse(c.date, c.demi)) return false;
+  return modifiable(estOccupe(c.date, c.demi));
+}
+function poser(cles, dOu) {
+  const tout = cles.filter((k, i) => cles.indexOf(k) === i);
+  const gardees = tout.filter(retenable);
+  selection = new Set(gardees);
+  /* Deux raisons d'ecarter une case, donc deux comptes : « c'est passe » et
+     « ca vient de ton agenda » ne se disent pas avec la meme phrase, et les
+     additionner ferait mentir la barre. Les deux ensembles sont disjoints. */
+  passes = tout.filter((k) => { const c = deCle(k); return estPasse(c.date, c.demi); }).length;
+  ignores = tout.length - gardees.length - passes;
+  origine = dOu || null;
+  /* Une selection venue d'un raccourci n'a PAS d'ancre : le geste suivant
+     repart a zero. Sans cela, toucher une case apres « tous les vendredis »
+     tirerait une plage depuis le premier vendredi du mois, ce que personne
+     n'a demande. */
+  ancre = dOu ? null : (gardees.length ? gardees[0] : null);
+}
+function choisirPlage(k1, k2) {
+  const l = casesVues(), i = l.indexOf(k1), j = l.indexOf(k2);
+  if (i < 0 || j < 0) { poser([k2]); return; }
+  const a = Math.min(i, j);
+  poser(l.slice(a, Math.max(i, j) + 1));
+  ancre = k1;
+}
+function toucher(k) {
+  const c = deCle(k), o = estOccupe(c.date, c.demi);
+  if (estPasse(c.date, c.demi)) {
+    dire("ko", "Cette demi-journée est déjà passée.",
+      "On ne bloque que ce qui est encore à venir.");
+    return;
+  }
+  if (!modifiable(o)) {
+    dire("ko", "Ce créneau vient de ton agenda.",
+      "Modifie-le dans ton agenda, il redescendra ici tout seul.");
+    return;
+  }
+  taire(); derniere = null;
+  if (selection.has(k)) {
+    if (selection.size === 1) {
+      selection = new Set(); ancre = null; ignores = 0; passes = 0; origine = null;
+    } else poser([k]);
+  } else if (!ancre || !selection.size) poser([k]);
+  else choisirPlage(ancre, k);
+  peindre();
+}
+/* Les raccourcis ne font que PREPARER la selection. Le seul ecrit reste le
+   bouton de la barre : « tout effacer » ne part jamais sur un doigt qui glisse. */
+function choisirSemaine(cleLundi) {
+  const c = deCle(cleLundi + "|matin"), vues = casesVues(), dedans = [];
+  for (let i = 0; i < 7; i++) {
+    const d = plusJours(c.date, i);
+    for (const demi of ["matin", "apres"]) {
+      const k = cleCase(d, demi);
+      if (vues.indexOf(k) >= 0) dedans.push(k);
+    }
+  }
+  taire(); derniere = null;
+  poser(dedans, "semaine " + numSemaine(c.date));
+  peindre(); direSiRienRetenu();
+}
+function choisirVendredis() {
+  const dedans = casesVues().filter((k) => indexJour(deCle(k).date) === 4);
+  taire(); derniere = null;
+  poser(dedans, "tous les vendredis");
+  peindre(); direSiRienRetenu();
+}
+function choisirMesBlocs() {
+  const dedans = casesVues().filter((k) => {
+    const c = deCle(k), o = estOccupe(c.date, c.demi);
+    return o && o.saisie;
+  });
+  taire(); derniere = null;
+  poser(dedans, "ce que tu as bloqué");
+  peindre(); direSiRienRetenu();
+}
+function viderSelection() {
+  selection = new Set(); ancre = null; ignores = 0; passes = 0; origine = null; derniere = null;
+  peindre();
+}
+
+/* Un raccourci qui ne retient RIEN doit le dire. Sans cela, toucher « toute la
+   semaine » sur une semaine entierement passee ne fait rien du tout a l'ecran :
+   pas de barre, pas de message, un bouton qui semble casse. */
+function direSiRienRetenu() {
+  if (selection.size || !(ignores || passes)) return;
+  dire("ko", "Rien à bloquer dans cette sélection.",
+    passes && !ignores ? "Ces demi-journées sont déjà passées."
+    : ignores && !passes ? "Ces créneaux viennent de ton agenda."
+    : "Elles sont déjà passées, ou viennent de ton agenda.");
+}
+
+/* ------------------------------------------------------------ l'ecriture
+   Le SEUL endroit de cet ecran qui ecrit dans la base. */
+function partager() {
+  const bloquer = [], liberer = [];
+  selection.forEach((k) => {
+    const c = deCle(k), o = estOccupe(c.date, c.demi);
+    if (!o) bloquer.push(c); else if (o.saisie) liberer.push(o);
+  });
+  return { bloquer, liberer, mode: bloquer.length ? "bloquer" : "liberer" };
+}
+
+async function ecrire() {
+  const { bloquer, liberer, mode } = partager();
+  const cases = [...selection].map(deCle);
+  const b = $("ecrire");
+  if (b) { b.disabled = true; b.textContent = "Un instant…"; }
+  try {
+    if (mode === "bloquer") {
+      const lignes = bloquer.map((c) => {
+        const [a, f] = creneau(c.date, c.demi);
+        return { artisan_id: fiche.id, debut: a.toISOString(), fin: f.toISOString(), saisie: true };
+      });
+      const { data, error } = await sb.from("occupations").insert(lignes).select();
+      if (error) throw error;
+      occupations = occupations.concat(data || []);
+      derniere = { mode: "bloquer", n: lignes.length, quand: ditPlage(cases),
+                   ids: (data || []).map((r) => r.id), lignes };
+    } else {
+      const ids = liberer.map((o) => o.id);
+      const copies = liberer.map((o) => ({ artisan_id: fiche.id, debut: o.debut,
+                                           fin: o.fin, saisie: true }));
+      const { error } = await sb.from("occupations").delete().in("id", ids);
+      if (error) throw error;
+      occupations = occupations.filter((o) => ids.indexOf(o.id) < 0);
+      derniere = { mode: "liberer", n: ids.length, quand: ditPlage(cases), lignes: copies };
+    }
+    selection = new Set(); ancre = null; ignores = 0; passes = 0; origine = null;
+    dessinerCalendrier();
+  } catch (e) {
+    if (b) { b.disabled = false; }
+    dire("ko", mode === "bloquer" ? "Ces créneaux n'ont pas pu être bloqués."
+                                  : "Ces créneaux n'ont pas pu être libérés.",
+      (e && e.message) || "Réessaie dans un instant.");
+    rendreBarre();
+  }
+}
+
+/* Defaire. Un geste qui ne se defait pas se prend avec peur, et on ne l'utilise
+   plus : l'artisan repasse alors a la case par case. */
+async function defaire() {
+  const d = derniere; if (!d) return;
+  const b = $("defaire"); if (b) { b.disabled = true; b.textContent = "Un instant…"; }
+  try {
+    if (d.mode === "bloquer") {
+      const { error } = await sb.from("occupations").delete().in("id", d.ids);
+      if (error) throw error;
+      occupations = occupations.filter((o) => d.ids.indexOf(o.id) < 0);
+    } else {
+      const { data, error } = await sb.from("occupations").insert(d.lignes).select();
+      if (error) throw error;
+      occupations = occupations.concat(data || []);
+    }
+    derniere = null; dessinerCalendrier();
+    dire("ok", "C'est revenu comme avant.", "");
+  } catch (e) {
+    if (b) { b.disabled = false; b.textContent = "Annuler"; }
+    dire("ko", "Impossible de revenir en arrière.", (e && e.message) || "");
+  }
+}
+
+/* --------------------------------------------------------------- le dessin */
+function libelleCase(d, demi, o, choisi) {
+  /* Le libelle porte l'etat ENTIER : un lecteur d'ecran ne voit ni l'aplat
+     ambre, ni la hachure, ni le liseré de la selection. Et il ne doit pas
+     s'entendre dire « libre » sur une matinee qui a eu lieu la semaine
+     derniere : ce qui est passe se dit passe. */
+  const tete = JOURS_L[indexJour(d)] + " " + d.getDate() + " " + MOIS[d.getMonth()] + ", "
+             + ditDemi(demi) + " : ";
+  if (estPasse(d, demi)) return tete + "déjà passé";
+  return tete
+       + (!o ? "libre" : o.saisie ? "occupé, posé par toi" : "occupé, venu de ton agenda")
+       + (choisi ? ", choisi" : "");
+}
+function htmlDemi(d, demi, libelle) {
+  const o = estOccupe(d, demi), k = cleCase(d, demi), fini = estPasse(d, demi);
+  const classe = fini ? " passe" : o ? (o.saisie ? " pris" : " ext") : "";
+  return '<button type="button" class="demi' + classe + (selection.has(k) ? " choisi" : "") + '"'
+       + ' data-k="' + k + '"' + (fini || (o && !o.saisie) ? ' aria-disabled="true"' : "")
+       + ' aria-label="' + echapper(libelleCase(d, demi, o, selection.has(k))) + '">'
+       + '<span class="cf">' + libelle + "</span></button>";
+}
+function htmlJour(d, auj) {
+  const we = d.getDay() === 0 || d.getDay() === 6;
+  return '<div class="jour' + (we ? " we" : "") + (cle(d) === auj ? " auj" : "") + '">'
+       + '<span class="num">' + d.getDate() + "</span>"
+       + htmlDemi(d, "matin", "Matin") + htmlDemi(d, "apres", "Après-midi") + "</div>";
+}
+
+function htmlMois() {
+  const y = moisVu.getFullYear(), m = moisVu.getMonth();
+  const dec = indexJour(new Date(y, m, 1));
+  const nb = new Date(y, m + 1, 0).getDate();
+  const auj = cle(new Date());
+  const nomMois = MOIS[m].charAt(0).toUpperCase() + MOIS[m].slice(1);
+  let h = '<div class="agenda-tete"><span class="agenda-quand">' + nomMois + " " + y + "</span>"
+        + '<span class="nav-mois">'
+        + '<button class="rond" id="m-moins" aria-label="Mois précédent">‹</button>'
+        + '<button class="lien" id="m-auj">Aujourd\'hui</button>'
+        + '<button class="rond" id="m-plus" aria-label="Mois suivant">›</button>'
+        + "</span></div>"
+        + '<div class="mois">'
+        + '<span class="cal-j" aria-hidden="true">sem</span>';
+  JOURS.forEach((j) => { h += '<span class="cal-j" aria-hidden="true">' + j + "</span>"; });
+  const semaines = Math.ceil((dec + nb) / 7);
+  for (let s = 0; s < semaines; s++) {
+    const lundi = new Date(y, m, 1 - dec + s * 7);
+    /* Une semaine entierement finie n'a plus rien a selectionner : on eteint
+       le bouton au lieu de le laisser repondre « rien a bloquer ». La vue
+       liste n'en a pas besoin, elle ne commence jamais avant aujourd'hui. */
+    const finie = estPasse(plusJours(lundi, 6), "apres");
+    h += '<button type="button" class="sem" data-sem="' + cle(lundi) + '"'
+       + (finie ? " disabled" : "")
+       + ' aria-label="' + (finie ? "Semaine " + numSemaine(lundi) + ", déjà passée"
+                                  : "Choisir toute la semaine " + numSemaine(lundi)) + '">'
+       + numSemaine(lundi) + "</button>";
+    for (let c = 0; c < 7; c++) {
+      const n = s * 7 + c - dec + 1;
+      if (n < 1 || n > nb) { h += '<div class="jour vide"></div>'; continue; }
+      h += htmlJour(new Date(y, m, n), auj);
+    }
+  }
+  return h + "</div>";
+}
+
+function htmlListe() {
+  const auj = cle(new Date());
+  const fin = plusJours(debutListe, HORIZON - 1);
+  const recule = cle(debutListe) !== auj;
+  let h = '<div class="agenda-tete"><span class="agenda-quand">'
+        + debutListe.getDate() + " " + MOIS_C[debutListe.getMonth()]
+        + " → " + fin.getDate() + " " + MOIS_C[fin.getMonth()] + "</span>"
+        + '<span class="nav-mois">'
+        + (recule ? '<button class="lien" id="l-auj">Aujourd\'hui</button>' : "")
+        + '<button class="rond" id="l-moins" aria-label="Les trois semaines précédentes"'
+        + (recule ? "" : " disabled") + ">‹</button>"
+        + '<button class="rond" id="l-plus" aria-label="Les trois semaines suivantes">›</button>'
+        + "</span></div><div class=\"liste\">";
+  let sem = null;
+  for (let i = 0; i < HORIZON; i++) {
+    const d = plusJours(debutListe, i);
+    const n = numSemaine(d);
+    if (n !== sem) {
+      sem = n;
+      const l = lundiDe(d), df = plusJours(l, 6);
+      h += '<div class="sem-tete"><span class="sem-nom">Semaine ' + n + " · "
+         + l.getDate() + " au " + df.getDate() + " " + MOIS_C[df.getMonth()] + "</span>"
+         + '<button type="button" class="sem-choix" data-sem="' + cle(l) + '">'
+         + "Toute la semaine</button></div>";
+    }
+    const we = d.getDay() === 0 || d.getDay() === 6;
+    h += '<div class="ligne' + (we ? " we" : "") + (cle(d) === auj ? " auj" : "") + '">'
+       + '<span class="date" aria-hidden="true">' + JOURS_C[indexJour(d)]
+       + "<b>" + d.getDate() + "</b></span>"
+       + htmlDemi(d, "matin", "Matin") + htmlDemi(d, "apres", "Après-midi") + "</div>";
+  }
+  return h + "</div>";
+}
+
+function dessinerCalendrier() {
+  const zone = $("calendrier");
+  if (!zone) return;
+  if (etatCal === "chargement") {
+    zone.innerHTML = '<p class="chargement">On va chercher tes créneaux…</p>';
+    rendreRaccourcis(); rendreBilan(); rendreBarre(); return;
+  }
+  if (etatCal === "erreur") {
+    zone.innerHTML = '<div class="carte"><h3>Tes créneaux n\'ont pas pu être lus.</h3>'
+      + '<p>Tant qu\'on ne les a pas, on préfère ne rien afficher plutôt que de te '
+      + 'montrer un agenda vide qui te ferait croire que tu es libre partout.</p>'
+      + (erreurCal ? '<p class="mono">' + echapper(erreurCal) + "</p>" : "")
+      + '<div class="pied-actions"><button class="bouton plein" id="reessayer">Réessayer</button></div></div>';
+    $("reessayer").addEventListener("click", () => {
+      etatCal = "chargement"; dessinerCalendrier();
+      chargerOccupations().then(dessinerCalendrier);
+    });
+    rendreRaccourcis(); rendreBilan(); rendreBarre(); return;
+  }
+  zone.innerHTML = vueMois ? htmlMois() : htmlListe();
+
+  const sauter = (f) => { viderSelection(); f(); etatCal = "chargement"; dessinerCalendrier();
+                          chargerOccupations().then(dessinerCalendrier); };
+  /* On cable avec le `$` de la page, et non un raccourci local : un second nom
+     pour getElementById cachait ces six boutons a la recette, qui les comptait
+     morts alors qu'ils repondaient. Un seul nom, un seul endroit ou chercher. */
+  if ($("m-moins")) $("m-moins").addEventListener("click", () =>
+    sauter(() => { moisVu = new Date(moisVu.getFullYear(), moisVu.getMonth() - 1, 1); }));
+  if ($("m-plus")) $("m-plus").addEventListener("click", () =>
+    sauter(() => { moisVu = new Date(moisVu.getFullYear(), moisVu.getMonth() + 1, 1); }));
+  if ($("m-auj")) $("m-auj").addEventListener("click", () =>
+    sauter(() => { const d = new Date(); moisVu = new Date(d.getFullYear(), d.getMonth(), 1); }));
+  if ($("l-moins")) $("l-moins").addEventListener("click", () =>
+    sauter(() => {
+      const t = jour0(new Date()), v = plusJours(debutListe, -HORIZON);
+      debutListe = v < t ? t : v;
+    }));
+  if ($("l-plus")) $("l-plus").addEventListener("click", () =>
+    sauter(() => { debutListe = plusJours(debutListe, HORIZON); }));
+  if ($("l-auj")) $("l-auj").addEventListener("click", () =>
+    sauter(() => { debutListe = jour0(new Date()); }));
+
+  rendreRaccourcis(); rendreBilan(); rendreBarre();
+}
+
+/* Repeindre sans redessiner : une selection de trente cases ne doit pas
+   reconstruire la grille, sinon le focus du clavier saute a chaque touche. */
+function peindre() {
+  const zone = $("calendrier"); if (!zone) return;
+  zone.querySelectorAll("[data-k]").forEach((el) => {
+    const on = selection.has(el.dataset.k);
+    el.classList.toggle("choisi", on);
+    const c = deCle(el.dataset.k);
+    el.setAttribute("aria-label",
+      libelleCase(c.date, c.demi, estOccupe(c.date, c.demi), on));
+  });
+  /* Le bilan et les raccourcis ne bougent pas pendant qu'on choisit : ils
+     disent l'etat REEL, pas l'intention. Les recalculer a chaque pixel de
+     glissement ferait des milliers de dates par seconde pour rien. La
+     projection, elle, vit dans la barre. */
+  rendreBarre();
+}
+
+function rendreRaccourcis() {
+  const z = $("raccourcis"); if (!z) return;
+  /* Pas de grille a l'ecran, pas de raccourci : un bouton qui choisirait des
+     cases qu'on ne voit pas serait un bouton mort. */
+  if (etatCal !== "pret") { z.innerHTML = ""; return; }
+  /* On ne compte QUE ce que le raccourci retiendra vraiment : annoncer
+     « tout ce que tu as bloque (12) » puis n'en selectionner que quatre,
+     parce que huit sont passees, ferait mentir le bouton. */
+  const mesBlocs = casesVues().filter((k) => {
+    const c = deCle(k), o = estOccupe(c.date, c.demi);
+    return o && o.saisie && !estPasse(c.date, c.demi);
+  }).length;
+  /* Un bouton qui ne ferait rien n'est pas affiche : il n'y a rien a effacer
+     tant que rien n'est bloque. */
+  z.innerHTML = '<span class="quoi">Raccourcis</span>'
+    + '<button type="button" class="sem-choix" data-r="vendredis">Tous les vendredis</button>'
+    + (mesBlocs
+        ? '<button type="button" class="sem-choix" data-r="miens">Tout ce que tu as bloqué ('
+          + mesBlocs + ")</button>"
+        : "");
+}
+
+function rendreBilan() {
+  const z = $("bilan"); if (!z) return;
+  if (etatCal !== "pret") {
+    z.innerHTML = '<p class="bilan-quoi">' + (etatCal === "erreur"
+      ? "On ne sait pas où tu en es." : "On compte tes demi-journées…") + "</p>";
+    return;
+  }
+  const b = bilan(null, null);
+  const part = (n) => b.total ? Math.round(n / b.total * 100) : 0;
+  const mien = b.pris - b.ext;
+  z.innerHTML =
+      '<span class="bilan-n">' + b.libre + "</span>"
+    + '<p class="bilan-quoi">demi-journée' + (b.libre > 1 ? "s" : "") + " libre"
+      + (b.libre > 1 ? "s" : "") + "</p>"
+    + '<p class="bilan-sous">sur les ' + HORIZON + " prochains jours, soit "
+      + b.total + " demi-journées</p>"
+    + '<div class="jauge" aria-hidden="true"><i style="width:' + part(mien) + '%"></i>'
+      + '<i class="ext" style="width:' + part(b.ext) + '%"></i></div>'
+    + (mien ? '<div class="bilan-ligne"><span>Bloqué par toi</span><b>' + mien + "</b></div>" : "")
+    + (b.ext ? '<div class="bilan-ligne"><span>Venu de ton agenda</span><b>' + b.ext + "</b></div>" : "")
+    + (!b.pris ? '<div class="bilan-ligne"><span>Rien n\'est bloqué sur cette période.</span></div>' : "")
+    + '<div class="bilan-ligne bloc"><span>Prochaine demi-journée libre</span><b>'
+      + (b.prochaine ? echapper(ditQuand(b.prochaine.date, b.prochaine.demi))
+                     : "aucune sur la période")
+      + "</b></div>";
+}
+
+function rendreBarre() {
+  const barre = $("barre"), txt = $("barre-txt"), act = $("barre-actions");
+  if (!barre || !txt || !act) return;
+
+  /* L'etat « c'est fait », avec de quoi revenir en arriere. */
+  if (!selection.size && derniere) {
+    barre.hidden = false;
+    const apres = bilan(null, null);
+    txt.innerHTML = '<p class="barre-quoi">' + derniere.n + " demi-journée"
+      + (derniere.n > 1 ? "s " : " ")
+      + (derniere.mode === "bloquer" ? "bloquée" : "libérée") + (derniere.n > 1 ? "s, " : ", ")
+      + echapper(derniere.quand) + ".</p>"
+      + '<p class="barre-suite">Il te reste ' + apres.libre + " demi-journée"
+      + (apres.libre > 1 ? "s libres" : " libre") + " sur les " + HORIZON + " prochains jours.</p>";
+    act.innerHTML = '<button type="button" class="lien" id="defaire">Annuler</button>';
+    $("defaire").addEventListener("click", defaire);
+    return;
+  }
+  if (!selection.size) { barre.hidden = true; txt.innerHTML = ""; act.innerHTML = ""; return; }
+
+  barre.hidden = false;
+  const { bloquer, liberer, mode } = partager();
+  const n = mode === "bloquer" ? bloquer.length : liberer.length;
+  const cases = [...selection].map(deCle);
+  const ajouts = mode === "bloquer" ? new Set(bloquer.map((c) => cleCase(c.date, c.demi))) : null;
+  const retraits = mode === "liberer" ? new Set(selection) : null;
+  const apres = bilan(ajouts, retraits);
+
+  txt.innerHTML = '<p class="barre-quoi">' + n + " demi-journée" + (n > 1 ? "s" : "")
+      + " · " + echapper(origine || ditPlage(cases)) + "</p>"
+    + '<p class="barre-suite">'
+      + "Il t'en restera " + apres.libre + " libre" + (apres.libre > 1 ? "s" : "")
+      + (apres.prochaine ? ". Prochaine libre : " + echapper(ditQuand(apres.prochaine.date, apres.prochaine.demi)) : "")
+      + "."
+      + (ignores ? " " + ignores + " créneau" + (ignores > 1 ? "x" : "")
+                 + " de ton agenda ne bouge" + (ignores > 1 ? "nt" : "") + " pas." : "")
+      /* Les deux mises a l'ecart ne se disent pas avec la meme phrase : un
+         creneau d'agenda se modifie ailleurs, une demi-journee passee ne se
+         modifie plus nulle part. */
+      + (passes ? " " + passes + " demi-journée" + (passes > 1 ? "s" : "")
+                + " déjà passée" + (passes > 1 ? "s sont" : " est") + " laissée"
+                + (passes > 1 ? "s" : "") + " de côté." : "")
+      + "</p>";
+  act.innerHTML = '<button type="button" class="bouton plein" id="ecrire">'
+      + (mode === "bloquer" ? "Bloquer" : "Libérer") + "</button>"
+    + '<button type="button" class="lien" id="vider">Effacer</button>';
+  $("ecrire").addEventListener("click", ecrire);
+  $("vider").addEventListener("click", viderSelection);
+}
+
+/* Le glissement a la souris, en plus des deux touches. Sur telephone on ne
+   l'active pas : un glissement vertical y est deja le geste du defilement, et
+   le lui voler ferait un ecran qu'on ne peut plus quitter. */
+let presse = null, glisse = false;
+function brancherGrille(zone) {
+  zone.addEventListener("click", (ev) => {
+    const c = ev.target.closest ? ev.target.closest("[data-k]") : null;
+    if (c) { toucher(c.dataset.k); return; }
+    const s = ev.target.closest ? ev.target.closest("[data-sem]") : null;
+    if (s) { choisirSemaine(s.dataset.sem); return; }
+    const r = ev.target.closest ? ev.target.closest("[data-r]") : null;
+    if (r) { r.dataset.r === "vendredis" ? choisirVendredis() : choisirMesBlocs(); }
+  });
+  zone.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType !== "mouse" || ev.button !== 0) return;
+    const c = ev.target.closest ? ev.target.closest("[data-k]") : null;
+    if (c) { presse = c.dataset.k; glisse = false; }
+  });
+  zone.addEventListener("pointermove", (ev) => {
+    if (!presse || (ev.buttons & 1) !== 1) return;
+    const sous = document.elementFromPoint(ev.clientX, ev.clientY);
+    const b = sous && sous.closest ? sous.closest("[data-k]") : null;
+    if (!b || b.dataset.k === presse) return;
+    if (!glisse) { glisse = true; taire(); derniere = null; poser([presse]); }
+    choisirPlage(presse, b.dataset.k); peindre();
+  });
+}
+window.addEventListener("pointerup", () => { presse = null; });
+
+/* LA VUE SUIT LA LARGEUR, jamais le peripherique. Un telephone tenu a plat et
+   un petit portable offrent la meme place : ils doivent recevoir la meme page.
+   Et on ne comprime pas la grille du mois sous 860 px, on CHANGE de vue. */
+const LARGE = window.matchMedia("(min-width:860px)");
+vueMois = LARGE.matches;
+function surLargeur() {
+  if (vueMois === LARGE.matches) return;
+  vueMois = LARGE.matches;
+  if (volet !== "dispos" || !$("calendrier")) return;
+  /* L'ancre choisie dans l'autre vue n'y designe plus rien : on repart net. */
+  viderSelection();
+  etatCal = "chargement"; dessinerCalendrier();
+  chargerOccupations().then(dessinerCalendrier);
+}
+if (LARGE.addEventListener) LARGE.addEventListener("change", surLargeur);
+else if (LARGE.addListener) LARGE.addListener(surLargeur);
+
+/* ----------------------------------------------- l'import d'un fichier .ics
+   CE QUI MARCHE AUJOURD'HUI SANS PERSONNE. Un fichier depose se lit dans le
+   navigateur : ni compte developpeur, ni validation, ni delai. L'ABONNEMENT a
+   une adresse de calendrier, lui, demande un serveur, parce qu'un navigateur
+   n'a pas le droit d'aller chercher un fichier sur un autre domaine.
+   Cette voie est donc la seule des quatre qui fonctionne des maintenant. */
+function lireIcs(texte) {
+  /* Les lignes pliees : la norme coupe a 75 caracteres et reprend avec une
+     espace. Ne pas les recoller casse une date sur deux. */
+  const lignes = texte.replace(/\r\n/g, "\n").replace(/\n[ \t]/g, "").split("\n");
+  const out = []; let cour = null;
+  const dateDe = (v) => {
+    const m = v.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?$/);
+    if (!m) return null;
+    const [, A, Mo, J, H, Mi, S, Z] = m;
+    return Z ? new Date(Date.UTC(+A, +Mo-1, +J, +(H||0), +(Mi||0), +(S||0)))
+             : new Date(+A, +Mo-1, +J, +(H||0), +(Mi||0), +(S||0));
+  };
+  for (const l of lignes) {
+    if (l.startsWith("BEGIN:VEVENT")) { cour = {}; continue; }
+    if (l.startsWith("END:VEVENT")) {
+      /* `TRANSP:TRANSPARENT` veut dire « je reste disponible ». L'ignorer
+         rendrait l'artisan occupe sur ses propres rappels. */
+      if (cour && cour.debut && cour.fin && cour.transp !== "TRANSPARENT") out.push(cour);
+      cour = null; continue;
+    }
+    if (!cour) continue;
+    const i = l.indexOf(":"); if (i < 0) continue;
+    const nom = l.slice(0, i).split(";")[0].toUpperCase(), val = l.slice(i + 1).trim();
+    if (nom === "DTSTART") cour.debut = dateDe(val);
+    else if (nom === "DTEND") cour.fin = dateDe(val);
+    else if (nom === "TRANSP") cour.transp = val.toUpperCase();
+    /* On ne lit NI le titre, NI le lieu, NI les participants. La promesse
+       faite a l'artisan tient dans le code autant que dans le schema. */
+  }
+  return out.filter((e) => e.debut && e.fin && e.fin > e.debut);
+}
+
+async function importerIcs(fichier) {
+  const zone = $("ics-etat");
+  zone.textContent = "Lecture du fichier…";
+  try {
+    const texte = await fichier.text();
+    const evts = lireIcs(texte);
+    if (!evts.length) { zone.textContent = "Aucun créneau lisible dans ce fichier."; return; }
+    /* On borne a un an : un agenda exporte depuis 2015 remonterait des milliers
+       de lignes qui n'interessent personne. */
+    const limite = new Date(); limite.setFullYear(limite.getFullYear() + 1);
+    const debut = new Date(); debut.setMonth(debut.getMonth() - 1);
+    const garde = evts.filter((e) => e.fin > debut && e.debut < limite);
+
+    let agenda = agendas.find((a) => a.fournisseur === "ics" && a.libelle === fichier.name);
+    if (!agenda) {
+      const { data, error } = await sb.from("agendas")
+        .insert({ artisan_id: fiche.id, fournisseur: "ics", libelle: fichier.name })
+        .select().single();
+      if (error) throw error;
+      agenda = data; agendas.push(agenda);
+    }
+    /* On remplace ce qui venait de CE fichier, on ne touche pas a la saisie
+       manuelle : reimporter deux fois ne doit pas doubler les creneaux. */
+    await sb.from("occupations").delete().eq("agenda_id", agenda.id);
+    const lignes = garde.map((e) => ({
+      artisan_id: fiche.id, agenda_id: agenda.id,
+      debut: e.debut.toISOString(), fin: e.fin.toISOString(), saisie: false
+    }));
+    for (let i = 0; i < lignes.length; i += 400) {
+      const { error } = await sb.from("occupations").insert(lignes.slice(i, i + 400));
+      if (error) throw error;
+    }
+    await sb.from("agendas").update({ synchro_le: new Date().toISOString(), erreur: null })
+      .eq("id", agenda.id);
+    zone.textContent = garde.length + " créneau" + (garde.length > 1 ? "x" : "")
+      + " importé" + (garde.length > 1 ? "s" : "") + " depuis " + fichier.name + ".";
+    await chargerOccupations(); dessinerCalendrier(); rendreAgendas();
+  } catch (e) { zone.textContent = "Impossible de lire ce fichier. " + (e.message || ""); }
+}
+
+function rendreAgendas() {
+  const z = $("liste-agendas"); if (!z) return;
+  z.innerHTML = agendas.length
+    ? agendas.map((a) =>
+        '<div class="carte"><h3>' + echapper(a.libelle || a.fournisseur)
+        + '<span class="quand">' + (a.synchro_le
+            ? "à jour" : "jamais synchronisé") + "</span></h3>"
+        + '<p>Source : ' + echapper(a.fournisseur) + ". "
+        + '<button class="lien-rouge" data-debr="' + a.id + '">Débrancher</button></p></div>').join("")
+    : '<p class="aide">Aucun agenda branché pour l\'instant.</p>';
+  z.querySelectorAll("button[data-debr]").forEach((b) =>
+    b.addEventListener("click", () => debrancher(+b.dataset.debr)));
+}
+
+/* Debrancher efface les creneaux VENUS de cet agenda, et eux seuls. La saisie
+   manuelle reste : elle n'appartient pas a l'agenda. */
+async function debrancher(id) {
+  try {
+    await sb.from("occupations").delete().eq("agenda_id", id);
+    const { error } = await sb.from("agendas").delete().eq("id", id);
+    if (error) throw error;
+    agendas = agendas.filter((a) => a.id !== id);
+    await chargerOccupations(); dessinerCalendrier(); rendreAgendas();
+    dire("ok", "Agenda débranché.", "Les créneaux qui en venaient ont été effacés.");
+  } catch (e) { dire("ko", "Impossible de débrancher.", e.message || ""); }
+}
+
+/* ----------------------------------------------------------- les trois volets */
+function ecranFini() {
+  const nom = [fiche.prenom, fiche.nom].filter(Boolean).join(" ");
+  /* L'espace termine respire plus large que l'accompagnement : une grille de
+     mois etranglee a 660 px redeviendrait de la saisie de donnees. Les deux
+     autres volets gardent la mesure d'un texte, dans `.mesure`. */
+  const w = document.querySelector(".wrap"); if (w) w.classList.add("large");
+  ecran.innerHTML =
+    '<div class="onglets">'
+    + ['dispos','fiche','agendas'].map((v) =>
+        '<button class="onglet' + (volet === v ? " ici" : "") + '" data-v="' + v + '"'
+        + (volet === v ? ' aria-current="true"' : "") + ">"
+        + (v === "dispos" ? "Disponibilités" : v === "fiche" ? "Ma fiche" : "Mes agendas")
+        + "</button>").join("")
+    + "</div><div id='volet'></div>";
+  ecran.querySelectorAll(".onglet").forEach((b) =>
+    b.addEventListener("click", () => { volet = b.dataset.v; taire(); ecranFini(); }));
+
+  const z = $("volet");
+  if (volet === "dispos") {
+    /* UNE SEULE CHOSE IMPORTANTE SUR CET ECRAN : la plage qu'on bloque.
+       Un titre, une phrase, le calendrier, et un seul bouton plein, qui
+       n'apparait qu'une fois qu'il y a quelque chose a ecrire. */
+    z.innerHTML =
+        '<h1>Ce qui est <span class="em">déjà pris</span>.</h1>'
+      + '<p class="lead">Tu es libre par défaut. Touche le début d\'un chantier, puis sa fin&nbsp;: '
+      + 'un seul bouton bloque toute la plage.</p>'
+      + '<div class="dispo-grille">'
+      /* LE BILAN EST ANNONCE AVANT LA GRILLE, dans le document comme a la
+         lecture : « voila ou tu en es », puis « voila de quoi le changer ».
+         A 1100 px il passe a droite par `order`, sans changer cet ordre. */
+      +   '<aside class="bilan" id="bilan" aria-label="Ce que ça change"></aside>'
+      +   '<div id="zone-cal">'
+      +     '<div id="calendrier"><p class="chargement">On va chercher tes créneaux…</p></div>'
+      +     '<div class="barre" id="barre" hidden>'
+      +       '<div class="barre-txt" id="barre-txt" role="status" aria-live="polite"></div>'
+      +       '<div class="barre-actions" id="barre-actions"></div>'
+      +     '</div>'
+      +     '<div class="raccourcis" id="raccourcis"></div>'
+      +     '<div class="legende-cal">'
+      +       '<span><i class="pris"></i>Bloqué par toi</span>'
+      +       '<span><i class="ext"></i>Venu de ton agenda</span>'
+      +       '<span><i></i>Libre</span></div>'
+      +   '</div>'
+      + '</div>'
+      /* L'IMPORT EST LA MEILLEURE REPONSE, ET ON DIT CE QUI MARCHE VRAIMENT :
+         le fichier depose se lit ici, tout de suite ; les quatre raccordements
+         automatiques, eux, ne sont pas branches, et on ne fait pas semblant. */
+      + '<p class="aide">Ton agenda est ailleurs&nbsp;? '
+      + '<button type="button" class="lien" id="vers-agendas">Dépose ton fichier .ics</button> '
+      + ': il se lit ici, sans rien créer nulle part. Le raccordement automatique à Google, '
+      + 'Outlook et Apple, lui, n\'est pas encore branché.</p>';
+    brancherGrille($("zone-cal"));
+    $("vers-agendas").addEventListener("click", () => { volet = "agendas"; taire(); ecranFini(); });
+    etatCal = "chargement"; dessinerCalendrier();
+    chargerOccupations().then(dessinerCalendrier);
+  } else if (volet === "fiche") {
+    z.innerHTML = '<div class="mesure"><h1>Ta <span class="em">fiche</span>.</h1>'
+      + '<div class="carte"><h3>' + echapper(fiche.denomination || nom || "Ton entreprise")
+      +   '<span class="quand">' + (fiche.publie ? "en ligne" : "non publiée") + "</span></h3>"
+      +   "<p>" + echapper([fiche.code_postal, fiche.commune].filter(Boolean).join(" ")) + "</p>"
+      +   (fiche.siret ? '<p class="mono">SIRET ' + echapper(fiche.siret) + " · vérifié</p>" : "")
+      +   (fiche.presentation ? "<p>" + echapper(fiche.presentation) + "</p>" : "")
+      + "</div>"
+      + '<div class="pied-actions">'
+      +   '<button class="bouton plein" id="publier">'
+      +   (fiche.publie ? "Retirer ma fiche" : "Publier ma fiche") + "</button>"
+      +   '<button class="bouton creux" id="reprendre">Modifier</button></div></div>';
+    $("publier").addEventListener("click", async () => {
+      $("publier").disabled = true;
+      try { await enregistrer({ publie: !fiche.publie }); ecranFini();
+        dire("ok", fiche.publie ? "Ta fiche est en ligne." : "Ta fiche est retirée.", "");
+      } catch (e) { $("publier").disabled = false; dire("ko", "Impossible.", e.message || ""); }
+    });
+    $("reprendre").addEventListener("click", async () => {
+      try { await enregistrer({ etape: "identite" }); taire(); rendre(); } catch (e) {}
+    });
+  } else {
+    z.innerHTML = '<div class="mesure"><h1>Tes <span class="em">agendas</span>.</h1>'
+      + '<p class="lead"><b>On ne lit que le libre et l\'occupé</b> : jamais les titres, '
+      + 'jamais les lieux, jamais les participants.</p>'
+      + '<div id="liste-agendas"></div>'
+      + '<div class="carte"><h3>Déposer un fichier .ics'
+      +   '<span class="quand">ça marche</span></h3>'
+      +   '<p>Exporte ton agenda depuis Google, Outlook ou Apple, et dépose le fichier ici. '
+      +   'C\'est la seule voie qui fonctionne aujourd\'hui, sans rien créer nulle part.</p>'
+      +   '<input type="file" id="ics" accept=".ics,text/calendar" aria-label="Fichier de calendrier .ics">'
+      +   '<p class="aide" id="ics-etat" role="status" aria-live="polite"></p></div>'
+      + AGENDAS.map((a) =>
+          '<div class="carte eteinte"><h3>' + a.nom + '<span class="quand">bientôt</span></h3>'
+          + "<p>" + a.quoi + '</p><p class="mono">Pas encore raccordé : '
+          + a.manque + ".</p></div>").join("")
+      + "</div>";
+    $("ics").addEventListener("change", (ev) => {
+      if (ev.target.files && ev.target.files[0]) importerIcs(ev.target.files[0]);
+    });
+    rendreAgendas();
+  }
+}
+
+/* ------------------------------------------------------------- aiguillage */
+function rendre() {
+  const e = fiche.etape || "identite";
+  /* L'accompagnement garde la mesure d'un formulaire ; l'espace termine, lui,
+     s'elargit pour que la grille du mois tienne sans se comprimer. */
+  const w = document.querySelector(".wrap");
+  if (w) w.classList.toggle("large", ["identite","entreprise","metier","abonnement","agenda"].indexOf(e) < 0);
+  if (e === "identite") return ecranIdentite();
+  if (e === "entreprise") return ecranEntreprise();
+  if (e === "metier") return ecranMetier();
+  if (e === "abonnement") return ecranAbonnement();
+  if (e === "agenda") return ecranAgenda();
+  return ecranFini();
+}
+
+/* ---------------------------------------------------------------- demarrage */
+(async () => {
+  try {
+    const c = await client();
+    const { data: s } = await c.auth.getSession();
+    if (!s || !s.session) { location.replace("/connexion"); return; }
+
+    $("sortir").hidden = false;
+    $("sortir").addEventListener("click", async () => {
+      await c.auth.signOut(); location.replace("/connexion");
+    });
+
+    /* `ma_fiche()` cree la fiche au premier passage ET la rend, en une seule
+       fois. Un `insert` puis un `select` depuis le navigateur aurait produit
+       des doublons le jour ou deux onglets sont ouverts. */
+    const { data: f, error } = await c.rpc("ma_fiche");
+    if (error) throw error;
+    fiche = Array.isArray(f) ? f[0] : f;
+
+    const [{ data: m }, { data: a }] = await Promise.all([
+      c.from("metiers").select("code,libelle").eq("actif", true).order("ordre"),
+      c.from("artisan_atouts").select("*").eq("artisan_id", fiche.id)
+    ]);
+    metiers = m || []; atouts = a || [];
+    const { data: ag } = await c.from("agendas").select("*").eq("artisan_id", fiche.id);
+    agendas = ag || [];
+    rendre();
+  } catch (e) {
+    ecran.innerHTML = "";
+    dire("ko", "Ton espace n'est pas encore prêt.",
+      "La base n'a pas répondu comme attendu."
+      + (e && e.message ? "<br>" + echapper(e.message) : "")
+      + '<br><br><a href="/connexion">Revenir à la connexion</a>');
+  }
+})();
+
+/* --------- La barre de l'espace ---------
+   Elle ne depend d'aucune autre piece de la page : elle lit la session
+   directement dans le stockage local, comme le fait deja le chargement
+   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
+   qu'aucun n'ait a lui preter ses fonctions. */
+(function () {
+  var nav = document.getElementById("nav-app");
+  if (!nav || !window.localStorage) return;
+
+  var cle = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
+  }
+  if (!cle) return;                       // pas de session : la barre n'existe pas
+  var sess;
+  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!sess || !sess.access_token || !sess.user) return;
+
+  var ici = nav.getAttribute("data-ici") || "";
+  var liens = nav.querySelectorAll("a");
+  for (var j = 0; j < liens.length; j++) {
+    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
+  }
+  nav.hidden = false;
+
+  /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
+     rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
+  fetch(BASE + "/rest/v1/artisans?id=eq." + sess.user.id + "&select=etape",
+        { headers: { apikey: CLE, Authorization: "Bearer " + sess.access_token } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d[0] || d[0].etape === "fini") return;
+      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < bloques.length; k++) {
+        bloques[k].setAttribute("aria-disabled", "true");
+        bloques[k].setAttribute("tabindex", "-1");
+      }
+      var note = document.getElementById("nav-note");
+      if (note) {
+        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
+        note.hidden = false;
+      }
+    })
+    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+})();
+</script>

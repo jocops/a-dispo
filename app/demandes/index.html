@@ -1,0 +1,1480 @@
+<title>Mes mises en relation - À dispo</title>
+<!--
+  LE FIL DES MISES EN RELATION. Deux cotes : ce que j'ai demande, ce qu'on me
+  demande. Plus les notifications, plus la notation a double sens.
+
+  Devis 2027-02, NON SIGNE. Deux lignes, citees verbatim :
+  « Demande envoyée, acceptée ou refusée, avec notification des deux côtés »
+  (1,5 j) et « Chacun note l'autre : la qualité du travail, et les délais de
+  paiement » (1,5 j). Le seul devis qui engage est le N°20260910-1 du
+  10/09/2026, et aucune de ces deux lignes n'y figure. Ecrire cet ecran ne le
+  facture pas : le rattachement contractuel reste a trancher.
+
+  CE QUI GOUVERNE CET ECRAN : LA PAGE N'EST PAS L'AUTORITE.
+  Elle n'invente aucune regle d'etat. Les transitions sont tenues par le
+  declencheur `demandes_avant_maj` de
+  crm/supabase/migration-recherche-relations.sql : le destinataire seul
+  accepte, refuse ou ouvre ; le demandeur seul annule ; personne n'expire, sauf
+  une tache d'entretien qui ne tourne pas encore. La page N'AFFICHE QUE LES
+  ACTIONS PERMISES A CET ETAT-LA, et quand la base refuse, elle repete ce que
+  la base a dit plutot que de le traduire.
+
+  LES COORDONNEES NE S'OUVRENT QU'A L'ACCEPTATION, ET C'EST LA BASE QUI LE DIT.
+  Le telephone et le nom de famille ne sortent d'aucune vue et d'aucune
+  politique de lecture : ils ne sortent que de `coordonnees_confrere(demande)`,
+  qui leve une exception tant que la demande n'est pas acceptee. Cette page ne
+  peut donc PAS les montrer trop tot, meme si elle le voulait. Elle le dit a
+  l'ecran avant l'acceptation, et elle le redit au moment d'accepter : c'est la
+  promesse du produit, elle merite d'etre lue au moment ou elle s'applique.
+
+  D'OU L'ON ARRIVE, ET POURQUOI LE FORMULAIRE D'ENVOI EST ICI.
+  `/demandes?artisan=<identifiant>` ouvre la demande a ecrire vers ce
+  confrere : c'est le lien que artisan/index.html pose sur « Demander une mise
+  en relation ». Mesure du 13/09/2026 : aucune autre page du depot n'ecrit
+  dans la table `demandes` (zero `insert` dans recherche/index.html). Sans cet
+  ecran, ce bouton aboutirait a une liste sans rapport avec ce qu'il annonce,
+  ce qui est un bouton mort avec une etape de plus. Sans parametre, la page
+  n'est QUE le fil : on ne montre pas un formulaire que personne n'a demande.
+
+  POURQUOI UNE NOTE NE SE VOIT PAS TOUT DE SUITE. Les deux notes restent
+  invisibles tant que les deux ne sont pas posees. Si la premiere devenait
+  visible aussitot, le second ne noterait plus : il repondrait. La regle est
+  dans la base (colonne `publie_le`, declencheur `evaluations_apres_insert`) et
+  elle est expliquee a l'ecran en une phrase, parce qu'une regle qu'on subit
+  sans la comprendre passe pour une panne.
+
+  CE QUI N'EST PAS BRANCHE, ET QUI EST DIT EN CLAIR.
+    1. LA MIGRATION N'EST PAS JOUEE. Mesure du 13/09/2026, appel reel a
+       l'API REST du projet : `demandes`, `notifications` et `evaluations`
+       repondent 404 code PGRST205, et `peut_demander` 404 code PGRST202.
+       `metiers` et `fiches_publiques` repondent 200. Tant que la migration
+       n'est pas jouee, cette page affiche un ecran qui le NOMME, avec le
+       chemin du fichier a jouer. Aucun bouton ne fait semblant.
+    2. AUCUN MAIL NE PART. Aucun service d'envoi n'est choisi : les
+       notifications existent en base et s'affichent ici, elles ne sortent pas
+       du site. La carte est eteinte et le dit.
+    3. LES TACHES D'ENTRETIEN NE TOURNENT PAS. `expirer_demandes()` et
+       `publier_evaluations_echues()` ne sont accordees a aucun compte : rien
+       n'expire tout seul, et une note ne se publie aujourd'hui que lorsque
+       les deux confreres ont note. L'ecran l'ecrit la ou ca se voit.
+    4. AUCUN MONTANT, NULLE PART. Le droit d'envoyer une demande se mesure en
+       dates (`peut_demander()`), pas en euros. Le tarif est en cours
+       d'arbitrage : il n'est ecrit ni ici, ni en commentaire.
+
+  LA PAGE EST DECLAREE DANS outils/build.py. Releve du 14/09/2026 : l'entree
+  existe (source demandes/index.html vers dist/demandes/index.html), donc le
+  fichier part dans dist/. Ce commentaire disait le contraire, c'etait vrai le
+  13/09 et faux depuis. Declaree n'est pas deployee pour autant : /demandes ne
+  repond qu'apres un emballage et une mise en ligne.
+
+  VOCABULAIRE. Chantier, sous-traitance, confrere, entreprise. Le vocabulaire
+  de l'emploi est proscrit ici comme dans le reste du site, ou la mesure donne
+  zero occurrence : « a dispo » met en relation des entreprises independantes,
+  et l'article L8241-1 sanctionne le pret a but lucratif entre entreprises.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Les controles natifs, l'ascenseur et le remplissage automatique du
+     navigateur suivent ce mot : sans lui, ils restent peints en sombre. */
+  color-scheme:light;
+
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES --- */
+
+  /* Fonds. Blanc casse chaud, teinte 42 deg : la teinte du creme de marque
+     (41,5 deg). Le blanc pur a ete mesure et ecarte : 18,46 contre 16,66,
+     mais teinte nulle, donc aucune parente avec la marque. */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posee dessus, et le haut du degrade de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et elements enfonces */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, legendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de degrade */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'etiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalcules pour le clair : les valeurs sombres y sont
+     illisibles. #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* reussite et disponibilite.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet creme sombre pose sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : equilibre sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchange */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSEE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre. Meme teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintees au bleu nuit. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 500px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+/* Rien ne deborde sur le cote, et pas par un `overflow-x:hidden` sur body :
+   pose la, il masquerait le defaut au lieu de le corriger. On coupe les mots
+   trop longs a la source : une denomination sans espace, un message ecrit par
+   un confrere, un message d'erreur de la base. */
+img,svg{max-width:100%}
+.wrap{max-width:620px;margin:0 auto;padding:clamp(24px,5vw,48px) var(--gut) 80px}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:16px;
+  flex-wrap:wrap;margin-bottom:26px}
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:21px;line-height:1}
+/* Le mot-marque suppose un fond fonce : le « a » ambre vaut 9,31:1 sur le nuit
+   et 1,66:1 sur le papier clair. Il prend l'ambre de texte, 5,85:1 sur le sol. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+/* 40 px de haut au navigateur sans ce minimum, mesure a 375 px : quatre pixels
+   manquants sur la seule sortie de l'ecran, qui se vise au pouce. */
+.sortir{display:inline-flex;align-items:center;min-height:44px;background:none;
+  border:1px solid var(--line);color:var(--cream-dim);text-decoration:none;
+  font:inherit;font-size:12.5px;border-radius:999px;padding:9px 15px}
+.sortir:hover{border-color:var(--accent-texte);color:var(--accent-texte);background:var(--bg-2)}
+.sortir:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* HIERARCHIE. Le titre saute de 16 px de corps a 44 px : l'ecart se lit avant
+   le premier mot. Sur telephone il tient encore 30 px, soit 1,9 fois le corps. */
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(30px,6vw,44px);line-height:1.02;letter-spacing:-.022em}
+/* L'ambre SOUS le mot, jamais DANS le mot : en lettre il vaut 1,84:1 sur le
+   papier, en aplat sous la ligne de base l'encre reste a 16,66:1. */
+h1 .em{color:var(--cream);padding:0 .06em;
+  background:linear-gradient(180deg,transparent 62%,var(--accent) 62%)}
+.lead{color:var(--cream-mut);font-size:16px;margin:14px 0 0;max-width:52ch}
+.aide{font-size:12.5px;color:var(--cream-dim);margin:6px 0 0;line-height:1.5}
+.vide{color:var(--cream-dim);font-size:15px;margin:22px 0 0;line-height:1.6}
+
+/* ---- Les onglets, repris de l'espace au caractere pres ---- */
+.onglets{display:flex;gap:6px;margin:22px 0;border-bottom:1px solid var(--line);
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* 43,4 px de haut au navigateur avec un remplissage de 9 px, mesure entre 431
+   et 899 px : deux dixiemes sous la cible de 44 px. Le remplissage de 10 px
+   etait deja pose sous 430 px pour cette raison ; il vaut maintenant partout,
+   et l'onglet fait 45,4 px. */
+.onglet{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-dim);
+  font:inherit;font-family:"Signika",sans-serif;font-weight:600;font-size:14px;
+  padding:10px 13px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+/* L'onglet courant : l'ambre passe SOUS le mot, en trait plein, et le mot
+   lui-meme prend l'encre a 16,66:1. En lettre ambre il valait 1,84:1. */
+.onglet.ici{color:var(--cream);border-bottom-width:3px;border-bottom-color:var(--accent)}
+.onglet:focus-visible{outline:2px solid var(--accent-texte);outline-offset:-2px}
+/* Le compteur est CALCULE, jamais ecrit a la main : un nombre recopie dans une
+   phrase est faux des la premiere action. */
+/* L'aplat ambre porte l'encre : 10,06:1. Jamais de blanc dessus (1,84:1). */
+.pastille{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  background:var(--accent);color:var(--encre);border-radius:999px;
+  padding:1px 6px;margin-left:6px;vertical-align:1px}
+
+/* ---- La brique de contenu ---- */
+/* Une carte blanche sur le sol ne donne que 1,108:1 : le palier seul ne suffit
+   pas. Filet a 1,35 plus ombre douce, jamais un aplat plus fonce derriere. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:16px 18px;margin:12px 0 0;box-shadow:var(--ombre-1)}
+/* PAS D'OPACITE SUR UNE CARTE QUI PORTE UNE EXPLICATION : a .55 sur du clair
+   son texte tombe sous le seuil, or c'est justement ce qu'il faut lire. */
+.carte.eteinte{border-style:dashed;box-shadow:none}
+/* La carte qu'on vient de remettre sous les yeux. Une bordure ambre vaut
+   1,84:1 sur du blanc : elle passe en ambre de texte, 6,48:1, et l'ombre la
+   decolle du fil. */
+.carte.vise{border-color:var(--accent-texte);box-shadow:var(--ombre-2)}
+.carte:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.carte h3{font-family:"Signika",sans-serif;font-size:15px;margin:0 0 3px;
+  display:flex;align-items:flex-start;gap:9px}
+.carte h3 .nom{min-width:0;overflow-wrap:anywhere}
+.carte p{margin:.3rem 0;font-size:13.5px;color:var(--cream-mut)}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap;flex:none}
+/* L'etat porte TOUJOURS son mot : la couleur ne dit jamais rien toute seule.
+   Et jamais de rouge pour un refus : la charte reserve le gris neutre. */
+.carte .quand.ok{color:var(--vert);background:var(--vert-soft)}
+/* Le bleu-gris a 12 % donnait 1,08:1 sur une carte blanche : un fond absent.
+   Le puits de la charte claire, lui, porte le terne a 5,15:1. */
+.carte .quand.fin{color:var(--cream-dim);background:var(--surface-2)}
+.chantier{font-family:"Signika",sans-serif;font-weight:600;font-size:14.5px;
+  color:var(--cream);margin:8px 0 2px;overflow-wrap:anywhere}
+.meta{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-dim);
+  margin:2px 0 0;overflow-wrap:anywhere}
+/* Ce qu'un confrere a ecrit. Donnee libre : echappee avant d'entrer ici. */
+.cite{border-left:2px solid var(--line);padding:2px 0 2px 11px;margin:10px 0 0;
+  font-size:13.5px;color:var(--cream-mut);overflow-wrap:anywhere}
+.bloc{border-top:1px solid var(--line);margin:13px 0 0;padding:12px 0 0}
+
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  border-radius:999px;padding:14px 26px;cursor:pointer;border:1px solid transparent}
+/* L'aplat ambre porte l'encre : 10,06:1. Jamais de blanc dessus (1,84:1). */
+.bouton.plein{background:var(--accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.bouton.plein:hover{background:var(--accent-2)}
+.bouton.creux{background:transparent;color:var(--cream);border-color:var(--line)}
+/* Assez grand pour un pouce sur un chantier : 44 px de haut, mesure. */
+.bouton.petit{font-size:14px;padding:11px 18px}
+/* Jamais d'opacite sur du texte clair : a .5, l'encre la plus forte tombe a
+   3,49:1. Le terne sur le puits est mesure a 5,15:1. */
+.bouton:disabled{background:var(--surface-2);color:var(--cream-dim);
+  border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.actions{display:flex;gap:10px;align-items:center;margin:14px 0 0;flex-wrap:wrap}
+.pied-actions{display:flex;gap:10px;align-items:center;margin:26px 0 0;flex-wrap:wrap}
+
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;margin:0 0 5px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px}
+input,select,textarea{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none;
+  -webkit-appearance:none;appearance:none}
+textarea{min-height:80px;resize:vertical}
+/* Un champ de date garde sa hauteur sur iPhone, ou le controle natif se
+   dessine tout seul : sans ce minimum il retombe a 21 px de haut. */
+input[type=date]{min-height:48px;line-height:1.2}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+/* LE FOCUS SE SIGNALE EN AMBRE DE TEXTE, PAS EN AMBRE. Une bordure ambre sur
+   du blanc vaut 1,84:1 contre les 3,0 exiges d'un indicateur, et aucun voile ne
+   rattrape : --accent-soft a .22 donne 1,14:1, a .35 encore 1,23. */
+input:focus,select:focus,textarea:focus{border-color:var(--accent-texte);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--cream-dim)}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--alerte)}
+.champ{margin:14px 0 0}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:430px){.deux{grid-template-columns:1fr}}
+/* Les communes proposees par la base. Des BOUTONS, jamais des lignes
+   cliquables : on les atteint au clavier et un lecteur d'ecran les annonce. */
+.suggest{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
+.suggest button{background:none;border:1px dashed var(--line);color:var(--cream-dim);
+  font:inherit;font-size:12.5px;border-radius:999px;padding:11px 14px;cursor:pointer}
+.suggest button:hover{border-color:var(--accent-texte);color:var(--accent-texte)}
+.suggest button:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.err{color:var(--alerte);font-size:13px;margin-top:5px;display:none}
+.err.vu{display:block}
+
+/* ---- Les deux notes, de 1 a 5 ----
+   Des vrais boutons radio : les fleches du clavier les parcourent sans une
+   ligne de JavaScript, et le libelle est relie au champ par `for`. */
+fieldset{border:none;margin:14px 0 0;padding:0;min-width:0}
+fieldset[aria-invalid="true"] legend{color:var(--alerte)}
+legend{font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;padding:0;margin:0 0 6px}
+.notes{display:flex;gap:7px;flex-wrap:wrap}
+/* Le bouton radio se cache SANS garder le remplissage de la regle generique
+   `input` : mesure du 13/09/2026, sans `padding:0;border:0` il restait une
+   boite invisible de 28 px posee sur le premier libelle, et cliquer sur « 1 »
+   cochait « 5 ». Un champ cache par `display:none`, lui, sortirait du parcours
+   au clavier : on le reduit, on ne le supprime pas. */
+.notes input{position:absolute;opacity:0;width:1px;height:1px;
+  padding:0;border:0;margin:0;clip-path:inset(50%);overflow:hidden}
+.notes label{margin:0;min-width:46px;min-height:46px;display:inline-flex;
+  align-items:center;justify-content:center;background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;cursor:pointer;
+  font-family:"JetBrains Mono",monospace;font-weight:600;font-size:15px;color:var(--cream)}
+/* La case cochee est un APLAT ambre avec l'encre dessus : 10,06:1. Le cerne
+   prend --accent-2 pour detacher l'aplat du papier, qui ne vaut que 1,84:1. */
+.notes input:checked + label{background:var(--accent);border-color:var(--accent-2);
+  color:var(--encre);box-shadow:var(--ombre-1)}
+.notes input:focus-visible + label{outline:2px solid var(--accent-texte);outline-offset:2px}
+
+/* ---- Les notifications ---- */
+.notif{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:13px 15px;margin:10px 0 0;box-shadow:var(--ombre-1)}
+/* Une non-lue. Le voile ambre a 45 % donnait 1,31:1, soit rien : on la marque
+   par un APLAT ambre sur la tranche, double du mot « non lue » a cote. */
+.notif.neuf{border-left:4px solid var(--accent);padding-left:12px}
+.notif h3{font-family:"Signika",sans-serif;font-size:14.5px;margin:0 0 2px;
+  display:flex;align-items:flex-start;gap:9px}
+.notif h3 .nom{min-width:0;overflow-wrap:anywhere}
+.notif p{margin:.3rem 0 0;font-size:13.5px;color:var(--cream-mut);overflow-wrap:anywhere}
+.notif .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap;flex:none}
+
+.etat{border-radius:12px;padding:13px 16px;margin:18px 0 0;font-size:14.2px;display:none}
+.etat.vu{display:block}
+/* Les bordures d'etat sont RECONSTRUITES sur les couleurs sombres : le vert vif
+   a 35 % donnait 1,27:1 sur une carte blanche, le saumon 1,28:1. */
+.etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+.etat small{overflow-wrap:anywhere}
+
+/* L'attente se dit avec des mots, jamais avec une animation. */
+.chargement{color:var(--cream-dim);font-size:14px;padding:40px 0;text-align:center}
+
+@media(max-width:430px){
+  /* Mesure du 13/09/2026 a 375 px de large : les trois onglets demandent
+     392 px pour 340 px disponibles, et 285 px a 320 px. Une bande qui defile
+     cache le troisieme, or c'est celui qui porte les non-lues. On passe donc
+     a deux lignes plutot que de raccourcir des libelles qui disent exactement
+     ce qu'ils font. Deux lignes mesurees : 258 px, puis 128 px. */
+  .onglets{flex-wrap:wrap;overflow-x:visible}
+  /* Le remplissage de 10 px est desormais celui de toutes les largeurs : il
+     n'y a plus de regle a redire ici. L'onglet de espace/index.html reste a
+     9 px, soit 2 px de moins : divergence assumee, c'est la cible tactile qui
+     tranche, pas la ressemblance. */
+  /* Dans une demande, l'action tient toute la largeur : elle se vise d'un
+     pouce. Dans une notification, les deux boutons tiennent cote a cote
+     (130 px et 150 px pour 340 px) et empiler ferait trois ecrans de haut. */
+  .carte .actions .bouton{flex:1 1 100%}
+  .notes label{min-width:44px;min-height:44px;font-size:14px}
+}
+
+/* La barre de l'espace. Defilement horizontal plutot qu'un menu replie : sur un
+   chantier l'artisan a une main, et un menu demande deux gestes au lieu d'un. */
+.nav-app{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.nav-app::-webkit-scrollbar{display:none}
+/* Des pastilles, pas des liens de texte : le soulignement par defaut
+   traversait l'aplat ambre de l'ecran courant. Le survol et le focus gardent
+   chacun leur signe. */
+.nav-app a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 14px;
+  border-radius:999px;font-weight:600;font-size:.9375rem;color:var(--cream-mut);
+  text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.nav-app a:hover{background:var(--surface-2);color:var(--cream)}
+/* L'ecran ou l'on est : aplat ambre plein, encre dessus. 10,06:1. */
+.nav-app a[aria-current="page"]{background:var(--accent);color:var(--encre)}
+/* Jamais d'opacite sur du texte clair : a .45 l'encre tombe a 2,1:1.
+   Le gris terne, lui, est mesure a 5,15:1 sur la surface la plus foncee. */
+.nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none}
+.nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.nav-note{margin:-10px 0 16px;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
+
+/* ------------------------------------------------- LA MISE EN PAGE CHANGE
+   Sous 900 px : les onglets sont une barre horizontale au-dessus du fil, et
+   ils passent a deux lignes sous 430 px (mesure du 13/09 : trois onglets
+   demandent 392 px pour 340 disponibles). Au-dessus de 900 px : ils deviennent
+   une colonne a gauche, toujours visible, et le fil prend toute la place.
+   Ce n'est pas la meme barre etiree, c'est un autre dessin. */
+.fil-app{display:block}
+@media(min-width:900px){
+  .wrap{max-width:940px}
+  .fil-app{display:grid;grid-template-columns:200px minmax(0,1fr);
+    gap:clamp(28px,4vw,48px);align-items:start}
+  .onglets{flex-direction:column;gap:2px;margin:0;padding:0 16px 0 0;
+    border-bottom:none;border-right:1px solid var(--line);overflow:visible;
+    position:sticky;top:24px}
+  .onglet{width:100%;text-align:left;margin:0;padding:11px 13px;
+    border-bottom:none;border-left:3px solid transparent;border-radius:0 10px 10px 0}
+  .onglet.ici{border-bottom:none;border-left-color:var(--accent);background:var(--surface-2)}
+  .lead{max-width:62ch}
+}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE. */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <span class="marque">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </span>
+    <a class="sortir" href="/espace">Mon espace</a>
+  </div>
+
+  <!-- LA BARRE DE L'ESPACE. Elle n'existe que pour qui a une session : un
+       visiteur de passage sur une fiche publique n'a rien a faire de cinq liens
+       qui le renverraient tous vers la connexion. Et tant que le parcours n'est
+       pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
+       au lieu de mener sur du vide. -->
+  <nav class="nav-app" id="nav-app" data-ici="demandes" aria-label="Mon espace" hidden>
+    <a href="/espace" data-ecran="espace">Mon espace</a>
+    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
+    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
+    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
+    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
+  </nav>
+  <p class="nav-note" id="nav-note" hidden></p>
+
+  <div id="ecran"><p class="chargement">Un instant…</p></div>
+
+  <div class="etat ok" id="s-ok"></div>
+  <div class="etat ko" id="s-ko"></div>
+</div>
+
+<script type="module">
+/* La base du projet. La cle publique est publique par nature : la protection
+   vient des politiques posees sur les tables (securite par ligne), pas du
+   secret de la cle. Tout ce que cette page lit est filtre par `auth.uid()`,
+   et les coordonnees ne sortent que d'une fonction qui verifie l'acceptation. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+const $ = (i) => document.getElementById(i);
+const ecran = $("ecran");
+
+/* Le fichier qui manque quand la base ne repond pas. Ecrit une seule fois :
+   un chemin recopie a trois endroits finit par en devenir deux. */
+const MIGRATION = "crm/supabase/migration-recherche-relations.sql";
+
+/* Les six etats d'une demande, tels que la contrainte de la table les
+   enumere. Le mot est TOUJOURS affiche : la teinte ne porte aucune
+   information a elle seule. Cote destinataire, les deux etats ouverts se
+   disent autrement : « vue » ne dit rien a celui qui doit repondre, « a
+   repondre » lui dit ce qu'on attend de lui. */
+const ETATS = {
+  envoyee:  { mot: "en attente", teinte: "" },
+  vue:      { mot: "vue",        teinte: "" },
+  acceptee: { mot: "acceptée",   teinte: "ok" },
+  refusee:  { mot: "refusée",    teinte: "fin" },
+  annulee:  { mot: "annulée",    teinte: "fin" },
+  expiree:  { mot: "expirée",    teinte: "fin" }
+};
+const ATTENTE = ["envoyee", "vue"];
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août",
+              "septembre","octobre","novembre","décembre"];
+
+let sb = null;
+let moi = null;          /* l'identifiant du compte connecte */
+let maFiche = null;      /* { publie, etape } ou null si la fiche n'existe pas */
+let peutEnvoyer = false; /* reponse de peut_demander(), jamais une supposition */
+let absente = null;      /* le code rendu par la base quand la migration manque */
+let recues = [], envoyees = [], notifs = [], notes = [];
+let profils = {}, libelles = {};
+let onglet = "recues";
+let vise = null;         /* la demande a remettre sous les yeux apres un rendu */
+/* La fiche visee quand on arrive depuis /demandes?artisan=<identifiant>. */
+let cible = null, cibleFiche = null, ciblePubliee = null, communeChoisie = null;
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  /* Le defilement doux est coupe si le systeme demande moins d'animation :
+     `behavior:"smooth"` passe outre la feuille de style. */
+  d.scrollIntoView({ behavior: doux() ? "smooth" : "auto", block: "nearest" });
+}
+/* Une DECLARATION de fonction, pas une constante : elle est hissee, donc
+   utilisable par `dire()` ecrit au-dessus, quel que soit l'ordre d'appel. */
+function doux() { return !window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+async function client() {
+  if (sb) return sb;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return sb;
+}
+
+/* La base repond « table absente » (PGRST205) ou « fonction absente »
+   (PGRST202) tant que la migration n'est pas jouee. Ce n'est pas une panne :
+   c'est un etat, et il a son ecran. */
+function manquante(e) {
+  if (!e) return null;
+  const c = String(e.code || "");
+  return (c === "PGRST205" || c === "PGRST202" || c === "42P01" || c === "42883") ? c : null;
+}
+
+/* ------------------------------------------------------------- les dates
+   Une colonne `date` se lit caractere par caractere. La passer a `new Date()`
+   la lit en temps universel, et un chantier du 1er devient le 31 du mois
+   precedent une nuit sur deux. */
+function jour(iso) {
+  if (!iso) return "";
+  const p = String(iso).slice(0, 10).split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : String(iso);
+}
+function nbJours(debut, fin) {
+  const a = String(debut).slice(0, 10).split("-"), b = String(fin).slice(0, 10).split("-");
+  const d1 = Date.UTC(+a[0], +a[1] - 1, +a[2]), d2 = Date.UTC(+b[0], +b[1] - 1, +b[2]);
+  return Math.round((d2 - d1) / 86400000) + 1;
+}
+/* Le lendemain d'une date, calcule en temps universel pour ne pas glisser
+   d'un jour a l'heure d'ete. C'est la date a laquelle la notation s'ouvre :
+   la base invite a noter quand `fin < current_date`, donc le jour d'apres. */
+function lendemain(iso) {
+  const p = String(iso).slice(0, 10).split("-");
+  const d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + 1));
+  return String(d.getUTCDate()).padStart(2, "0") + "/"
+       + String(d.getUTCMonth() + 1).padStart(2, "0") + "/" + d.getUTCFullYear();
+}
+function passe(iso) {
+  const p = String(iso).slice(0, 10).split("-");
+  const d = Date.UTC(+p[0], +p[1] - 1, +p[2]);
+  const n = new Date();
+  return d < Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+}
+/* Un horodatage complet : le jour, et l'heure quand elle sert. */
+function moment(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  if (isNaN(d)) return "";
+  return "le " + (d.getDate() === 1 ? "1er" : d.getDate())
+       + " " + MOIS[d.getMonth()] + " " + d.getFullYear()
+       + " à " + d.getHours() + "h" + String(d.getMinutes()).padStart(2, "0");
+}
+function periode(d) {
+  const n = nbJours(d.debut, d.fin);
+  const quand = n === 1 ? "Le " + jour(d.debut) : "Du " + jour(d.debut) + " au " + jour(d.fin);
+  return quand + " · " + n + " jour" + (n > 1 ? "s" : "");
+}
+
+/* ------------------------------------------------------------ le chargement */
+async function charger() {
+  absente = null;
+
+  /* Ces deux-la viennent d'une migration deja jouee : ils repondent meme
+     quand le reste manque. La fiche sert a dire pourquoi personne ne peut
+     nous demander un chantier, les metiers a nommer celui de la demande. */
+  const [rf, rm] = await Promise.all([
+    sb.from("artisans").select("publie,etape").eq("id", moi).maybeSingle(),
+    sb.from("metiers").select("code,libelle")
+  ]);
+  maFiche = rf.error ? null : rf.data;
+  libelles = {};
+  (rm.data || []).forEach((m) => { libelles[m.code] = m.libelle; });
+
+  /* La securite par ligne rend les deux bouts : on est demandeur ici,
+     destinataire la. Le tri par cote se fait donc apres, pas dans la requete. */
+  const rd = await sb.from("demandes").select("*").order("cree_le", { ascending: false });
+  const code = manquante(rd.error);
+  if (code) { absente = code; return; }
+  if (rd.error) throw rd.error;
+
+  const toutes = rd.data || [];
+  envoyees = toutes.filter((d) => d.demandeur_id === moi);
+  recues   = toutes.filter((d) => d.destinataire_id === moi);
+
+  const rn = await sb.from("notifications").select("*")
+    .order("cree_le", { ascending: false }).limit(80);
+  notifs = rn.error ? [] : (rn.data || []);
+
+  /* Le droit d'envoyer se demande a la base, il ne se devine pas. Il se mesure
+     en dates, jamais en euros : le tarif est en cours d'arbitrage. */
+  const rp = await sb.rpc("peut_demander");
+  peutEnvoyer = !rp.error && rp.data === true;
+
+  /* Les notes ne se lisent que pour les mises en relation acceptees. La
+     politique rend la sienne toujours, et celle du confrere une fois publiee
+     seulement : ce que la page ne recoit pas n'existe pas pour elle. */
+  notes = [];
+  const ids = toutes.filter((d) => d.etat === "acceptee").map((d) => d.id);
+  if (ids.length) {
+    const re = await sb.from("evaluations").select("*").in("demande_id", ids);
+    if (!re.error) notes = re.data || [];
+  }
+
+  /* Le nom du confrere vient de la vue publique, et de nulle part ailleurs :
+     ni nom de famille, ni telephone, ni SIRET n'en sortent. Une fiche non
+     publiee ne rend rien, et la page le dit au lieu d'inventer un nom. */
+  profils = {};
+  const autres = [];
+  toutes.forEach((d) => {
+    const a = d.demandeur_id === moi ? d.destinataire_id : d.demandeur_id;
+    if (autres.indexOf(a) < 0) autres.push(a);
+  });
+  if (autres.length) {
+    const rv = await sb.from("fiches_publiques")
+      .select("id,prenom,denomination,metier,commune,departement").in("id", autres);
+    (rv.data || []).forEach((p) => { profils[p.id] = p; });
+  }
+
+  /* La fiche visee par l'adresse. `est_publie()` fait foi : la vue publique
+     peut ne rien rendre pour d'autres raisons, et repondre « non publiee »
+     a partir d'une liste vide serait une deduction, pas une mesure. */
+  if (cible) {
+    const rp2 = await sb.rpc("est_publie", { p_artisan: cible });
+    ciblePubliee = rp2.error ? null : rp2.data === true;
+    const rcf = await sb.from("fiches_publiques")
+      .select("id,prenom,denomination,metier,commune").eq("id", cible).maybeSingle();
+    cibleFiche = rcf.error ? null : rcf.data;
+  }
+}
+
+/* ------------------------------------------------------------- les ecrans */
+
+function rendre() {
+  if (absente) return ecranMigration();
+  ecranFil();
+  if (vise) {
+    const el = $("d-" + vise);
+    vise = null;
+    if (el) {
+      el.classList.add("vise");
+      el.focus({ preventScroll: true });
+      el.scrollIntoView({ behavior: doux() ? "smooth" : "auto", block: "center" });
+    }
+  }
+}
+
+/* L'ecran du jour, mesure le 13/09/2026 : les tables n'existent pas encore.
+   Il NOMME le fichier a jouer plutot que de laisser chercher. */
+function ecranMigration() {
+  ecran.innerHTML =
+    '<h1>Le fil attend <span class="em">une migration</span>.</h1>'
+    + '<p class="lead">Cet écran est écrit, la base ne porte pas encore les tables '
+    + 'qu\'il lit. Rien n\'est cassé : il manque un geste, et il est nommé ici.</p>'
+    + '<div class="carte eteinte"><h3><span class="nom">Demandes, notifications, notes</span>'
+    +   '<span class="quand">bientôt</span></h3>'
+    +   '<p>La base répond « introuvable » (code ' + echapper(absente) + ') pour '
+    +   '<b>demandes</b>, <b>notifications</b> et <b>evaluations</b>.</p>'
+    +   '<p>Pas encore raccordé : la migration <b>' + MIGRATION + '</b> '
+    +   'n\'est pas jouée sur le projet Supabase.</p></div>'
+    + '<div class="carte"><h3><span class="nom">Ce qui marche déjà</span></h3>'
+    +   '<p>Ta fiche, tes disponibilités et ton agenda répondent normalement. '
+    +   'Seul le fil des mises en relation attend.</p></div>'
+    + '<div class="pied-actions">'
+    +   '<a class="bouton plein" href="/espace">Revenir à mon espace</a></div>';
+}
+
+function ecranFil() {
+  const aTraiter = recues.filter((d) => ATTENTE.indexOf(d.etat) >= 0).length;
+  const nonLues  = notifs.filter((n) => !n.lu_le).length;
+  const ONGLETS = [
+    ["recues",   "On me demande",  aTraiter],
+    ["envoyees", "J'ai demandé",   0],
+    ["notifs",   "Notifications",  nonLues]
+  ];
+
+  ecran.innerHTML =
+    '<h1>Tes <span class="em">mises en relation</span>.</h1>'
+    + '<p class="lead">Ce que tu as demandé, et ce qu\'on te demande. '
+    + 'Les coordonnées ne s\'ouvrent qu\'à l\'acceptation, des deux côtés en même temps.</p>'
+    + '<div class="fil-app"><div class="onglets">'
+    + ONGLETS.map(([v, titre, n]) =>
+        '<button class="onglet' + (onglet === v ? " ici" : "") + '" data-v="' + v + '"'
+        + (onglet === v ? ' aria-current="true"' : "") + ">" + titre
+        + (n > 0 ? '<span class="pastille" aria-label="' + n + ' en attente">' + n + "</span>" : "")
+        + "</button>").join("")
+    + '</div><div id="volet"></div></div>';
+
+  ecran.querySelectorAll(".onglet").forEach((b) =>
+    b.addEventListener("click", () => { onglet = b.dataset.v; taire(); rendre(); }));
+
+  const z = $("volet");
+  z.addEventListener("click", surClic);
+  if (onglet === "recues") { voletRecues(z); marquerVues(); }
+  else if (onglet === "envoyees") voletEnvoyees(z);
+  else voletNotifications(z);
+}
+
+function voletRecues(z) {
+  if (!recues.length) {
+    /* Un ecran vide dit POURQUOI il est vide. Ici, deux raisons possibles, et
+       la base sait laquelle : sans fiche publiee, la politique d'insertion
+       refuse toute demande vers ce compte. */
+    let pourquoi;
+    if (!maFiche) {
+      pourquoi = 'Ta fiche n\'est pas encore commencée. Tant qu\'elle n\'existe pas, '
+        + 'personne ne peut te proposer de chantier.';
+    } else if (!maFiche.publie || maFiche.etape !== "fini") {
+      pourquoi = 'Ta fiche n\'est pas publiée. C\'est la condition pour qu\'un confrère '
+        + 'puisse te demander un chantier : la base refuse les demandes vers une fiche '
+        + 'qui n\'est pas en ligne.';
+    } else {
+      pourquoi = 'Personne ne t\'a encore demandé de chantier. Tu n\'as rien à faire : '
+        + 'les demandes arrivent ici, et tu es prévenu.';
+    }
+    z.innerHTML = '<p class="vide">' + pourquoi + "</p>"
+      + '<div class="pied-actions">'
+      + '<a class="bouton creux" href="/espace">Ouvrir ma fiche</a></div>';
+    return;
+  }
+  z.innerHTML = trier(recues).map((d) => carte(d, false)).join("");
+}
+
+function voletEnvoyees(z) {
+  let h = cible ? carteNouvelle() : "";
+
+  if (!envoyees.length) {
+    let pourquoi = 'Tu n\'as encore demandé de chantier à personne.';
+    if (!peutEnvoyer) {
+      /* Aucun montant : le droit d'envoyer se mesure en dates. */
+      pourquoi += ' Et l\'envoi n\'est pas encore ouvert sur ton compte : il demande '
+        + 'un abonnement ou un essai en cours, et ni l\'un ni l\'autre n\'est posé '
+        + 'aujourd\'hui. Le tarif est en cours d\'arbitrage : tant qu\'il ne l\'est pas, '
+        + 'rien ne t\'est demandé et le bouton d\'envoi reste éteint sur la fiche '
+        + 'des confrères.';
+    }
+    z.innerHTML = h + '<p class="vide">' + pourquoi + "</p>";
+  } else {
+    z.innerHTML = h + trier(envoyees).map((d) => carte(d, true)).join("");
+  }
+  if (cible) brancherNouvelle();
+}
+
+/* ===================================================================
+   LA DEMANDE QU'ON ECRIT, quand on arrive depuis la fiche d'un confrere
+   par /demandes?artisan=<identifiant>.
+
+   POURQUOI CE FORMULAIRE EST ICI ET PAS SUR LA FICHE. Mesure du
+   13/09/2026 : artisan/index.html pointe vers `/demandes?artisan=<id>`
+   pour « Demander une mise en relation », messages/index.html pointe
+   vers `/demandes`, et aucune autre page n'ecrit dans la table. Sans cet
+   ecran, le bouton de la fiche menerait a une liste sans rapport : un
+   bouton qui aboutit ailleurs que ce qu'il annonce est un bouton mort
+   avec une etape de plus.
+
+   CE QUE LA PAGE NE DECIDE PAS. Le droit d'envoyer vient de
+   `peut_demander()`, la publication de la fiche visee de `est_publie()`.
+   Les deux sont demandes a la base, et quand l'une repond non, le
+   formulaire n'est pas dessine : on ne fait pas remplir cinq champs pour
+   les refuser a l'envoi. =================================================== */
+function carteNouvelle() {
+  const nom = cibleFiche
+    ? (cibleFiche.denomination || cibleFiche.prenom || "ce confrère") : "ce confrère";
+  const titre = cible === moi
+    ? "Ta propre fiche" : "Demander un chantier à " + echapper(nom);
+  const tete = '<div class="carte" id="nouvelle" tabindex="-1">'
+    + '<h3><span class="nom">' + titre + "</span>"
+    + '<span class="quand">nouvelle demande</span></h3>';
+  const fermer = '<div class="actions">'
+    + '<button class="bouton creux petit" data-agir="fermer-nouvelle" data-id="0">'
+    + "Revenir au fil</button></div></div>";
+
+  if (cible === moi) {
+    return tete + "<p>C'est ta propre fiche. On ne se demande pas un chantier à soi-même.</p>"
+      + fermer;
+  }
+  if (ciblePubliee === false) {
+    return tete + '<p>La fiche de ce confrère n\'est pas publiée. Tant qu\'elle ne l\'est '
+      + 'pas, la base refuse toute demande vers lui.</p>' + fermer;
+  }
+  if (!peutEnvoyer) {
+    /* AUCUN MONTANT. La regle est une date, pas un prix, et le tarif n'est pas
+       arrete : on dit ce qui manque, pas ce que ca coutera. */
+    return tete.replace('class="carte"', 'class="carte eteinte"')
+      + '<p>Envoyer une demande suppose un essai ou un abonnement en cours, et aucun '
+      + 'des deux n\'est ouvert sur ton compte aujourd\'hui.</p>'
+      + '<p>Le tarif est en cours d\'arbitrage&nbsp;: rien ne t\'est demandé et rien '
+      + 'ne te sera prélevé.</p>'
+      + '<p class="aide">Pas encore raccordé : l\'écran qui ouvre l\'essai.</p>' + fermer;
+  }
+
+  return tete
+    + '<p>Dis ce que tu cherches et quand. Vos coordonnées ne s\'ouvrent que s\'il accepte.</p>'
+    + '<div class="champ"><label for="n-metier">Le métier que tu cherches '
+    +   '<span class="opt">facultatif</span></label>'
+    +   '<select id="n-metier"><option value="">Peu importe</option>'
+    +   Object.keys(libelles).map((c) =>
+          '<option value="' + echapper(c) + '"'
+          + (cibleFiche && cibleFiche.metier === libelles[c] ? " selected" : "")
+          + ">" + echapper(libelles[c]) + "</option>").join("")
+    +   "</select></div>"
+    + '<div class="champ"><label for="n-commune">La commune du chantier '
+    +   '<span class="opt">facultatif</span></label>'
+    +   '<input id="n-commune" maxlength="80" autocomplete="off" '
+    +   'placeholder="Chambéry" aria-describedby="sug-commune">'
+    +   '<div class="suggest" id="sug-commune" aria-live="polite"></div></div>'
+    + '<div class="deux">'
+    +   '<div class="champ"><label for="n-debut">Premier jour</label>'
+    +     '<input id="n-debut" type="date" aria-describedby="e-nouvelle"></div>'
+    +   '<div class="champ"><label for="n-fin">Dernier jour</label>'
+    +     '<input id="n-fin" type="date" aria-describedby="e-nouvelle"></div>'
+    + "</div>"
+    + '<div class="champ"><label for="n-message">Ce qu\'il y a à faire '
+    +   '<span class="opt">facultatif</span></label>'
+    +   '<textarea id="n-message" maxlength="2000" '
+    +   'placeholder="Charpente à reprendre sur une grange, deux jours à deux. '
+    +   'Je fournis l\'échafaudage."></textarea></div>'
+    + '<p class="err" id="e-nouvelle"></p>'
+    + '<div class="actions">'
+    +   '<button class="bouton plein petit" data-agir="envoyer" data-id="' + echapper(cible)
+    +   '">Envoyer ma demande</button>'
+    +   '<button class="bouton creux petit" data-agir="fermer-nouvelle" data-id="0">'
+    +   "Ne pas envoyer</button></div></div>";
+}
+
+/* Les communes proposees viennent de `chercher_commune()`, ouverte a tous.
+   Tant que la table des communes n'est pas chargee, elle ne rend rien : le
+   champ reste un texte libre, et la demande part quand meme. Le code INSEE
+   n'est ecrit que s'il vient de la base, jamais devine a partir du nom. */
+function brancherNouvelle() {
+  const champ = $("n-commune");
+  if (!champ) { const c = $("nouvelle"); if (c && !vise) c.focus({ preventScroll: true }); return; }
+  let minuteur = null;
+  champ.addEventListener("input", () => {
+    communeChoisie = null;
+    clearTimeout(minuteur);
+    minuteur = setTimeout(async () => {
+      const texte = champ.value.trim();
+      const zone = $("sug-commune");
+      if (!zone) return;
+      if (texte.length < 2) { zone.innerHTML = ""; return; }
+      const { data, error } = await sb.rpc("chercher_commune", { p_texte: texte, p_limite: 5 });
+      if (error || !data || !data.length) { zone.innerHTML = ""; return; }
+      zone.innerHTML = data.map((c) =>
+        '<button type="button" data-agir="commune" data-id="' + echapper(c.code_insee)
+        + '" data-nom="' + echapper(c.nom) + '">' + echapper(c.nom)
+        + " (" + echapper(c.departement) + ")</button>").join("");
+    }, 300);
+  });
+}
+
+async function envoyerDemande(b) {
+  const err = $("e-nouvelle");
+  const debut = $("n-debut"), fin = $("n-fin");
+  err.classList.remove("vu");
+  debut.removeAttribute("aria-invalid"); fin.removeAttribute("aria-invalid");
+
+  if (!debut.value || !fin.value) {
+    const quel = !debut.value ? debut : fin;
+    err.textContent = "Donne les deux dates du chantier.";
+    err.classList.add("vu");
+    quel.setAttribute("aria-invalid", "true"); quel.focus();
+    return;
+  }
+  if (fin.value < debut.value) {
+    err.textContent = "Le dernier jour ne peut pas être avant le premier.";
+    err.classList.add("vu");
+    fin.setAttribute("aria-invalid", "true"); fin.focus();
+    return;
+  }
+
+  const commune = $("n-commune").value.trim();
+  const ligne = {
+    demandeur_id: moi, destinataire_id: cible,
+    debut: debut.value, fin: fin.value,
+    metier: $("n-metier").value || null,
+    chantier_commune: commune || null,
+    /* Le code INSEE n'accompagne le nom que s'il vient de la base, et que le
+       nom n'a pas ete retouche depuis. Sinon on n'envoie que le texte. */
+    chantier_commune_insee: (communeChoisie && communeChoisie.nom === commune)
+      ? communeChoisie.code : null,
+    message: $("n-message").value.trim() || null
+  };
+
+  b.disabled = true; b.textContent = "Un instant…";
+  try {
+    const { data, error } = await sb.from("demandes").insert(ligne).select().single();
+    if (error) throw error;
+    oublierCible();
+    vise = data ? data.id : null;
+    await charger();
+    rendre();
+    dire("ok", "Ta demande est partie.",
+      "Ton confrère la voit dans son espace. Vos coordonnées ne s'ouvriront que s'il accepte.");
+  } catch (e) {
+    b.disabled = false; b.textContent = "Envoyer ma demande";
+    const c = String(e && e.code || "");
+    if (c === "23505") {
+      dire("ko", "Tu lui as déjà écrit pour ces dates.",
+        "Une demande en cours vers le même confrère sur la même période existe déjà. "
+        + "Elle est dans ta liste, juste en dessous.");
+    } else if (c === "42501") {
+      dire("ko", "La base a refusé l'envoi.",
+        "Deux conditions sont exigées : un essai ou un abonnement en cours de ton côté, "
+        + "et une fiche publiée du sien." + messageDe(e));
+    } else {
+      dire("ko", "Demande non envoyée.", messageDe(e));
+    }
+  }
+}
+
+/* On retire l'identifiant de l'adresse apres l'envoi : recharger la page ne
+   doit pas rouvrir un formulaire pour une demande deja partie. */
+function oublierCible() {
+  cible = null; cibleFiche = null; ciblePubliee = null; communeChoisie = null;
+  try { history.replaceState(null, "", location.pathname); } catch (e) {}
+}
+
+/* Ce qui attend une reponse passe devant. Le reste suit par date, du plus
+   recent au plus ancien. */
+function trier(liste) {
+  const rang = (d) => ATTENTE.indexOf(d.etat) >= 0 ? 0 : (d.etat === "acceptee" ? 1 : 2);
+  return liste.slice().sort((a, b) =>
+    rang(a) - rang(b) || String(b.cree_le).localeCompare(String(a.cree_le)));
+}
+
+/* ------------------------------------------------------- une demande, une carte
+   `mien` vaut vrai quand c'est MOI qui ai demande. Les actions possibles ne
+   sont pas les memes des deux cotes, et elles sont celles que le declencheur
+   de la base autorise a cet etat-la : rien de plus, rien de moins. */
+function carte(d, mien) {
+  const autre = mien ? d.destinataire_id : d.demandeur_id;
+  const p = profils[autre];
+  const e = ETATS[d.etat] || { mot: d.etat, teinte: "" };
+  const nom = p ? (p.denomination || p.prenom || "Un confrère") : "Un confrère";
+
+  const mot = (!mien && ATTENTE.indexOf(d.etat) >= 0) ? "à répondre" : e.mot;
+
+  let h = '<div class="carte" id="d-' + echapper(d.id) + '" tabindex="-1">'
+    + '<h3><span class="nom">' + echapper(nom) + "</span>"
+    + '<span class="quand ' + e.teinte + '">' + mot + "</span></h3>";
+
+  h += p
+    ? '<p class="meta">' + [p.metier, p.commune].filter(Boolean).map(echapper).join(" · ") + "</p>"
+    : '<p class="aide">Sa fiche n\'est pas publiée : tu ne peux pas la consulter.</p>';
+
+  h += '<p class="chantier">' + echapper(libelles[d.metier] || d.metier || "Chantier")
+     + (d.chantier_commune ? " à " + echapper(d.chantier_commune) : "") + "</p>"
+     + '<p class="meta">' + periode(d) + "</p>"
+     + "<p>" + phrase(d, mien) + "</p>";
+
+  if (d.message) h += '<p class="cite">' + echapper(d.message) + "</p>";
+  if (d.motif) h += '<p class="cite">Motif&nbsp;: ' + echapper(d.motif) + "</p>";
+
+  /* Le chantier a commence et la demande dort encore. On ne fait pas semblant
+     qu'elle a expire : la tache d'entretien qui expire n'est pas branchee. */
+  if (ATTENTE.indexOf(d.etat) >= 0 && passe(d.debut)) {
+    h += '<p class="aide">Le chantier a commencé et cette demande n\'a pas été traitée. '
+       + 'Elle reste ouverte : la tâche qui ferme les demandes dépassées n\'est pas '
+       + 'encore branchée.</p>';
+  }
+
+  h += blocCoordonnees(d);
+  h += blocNote(d, mien);
+
+  const actes = [];
+  if (!mien && ATTENTE.indexOf(d.etat) >= 0) {
+    actes.push(bouton("plein", "accepter", d.id, "Accepter"));
+    actes.push(bouton("creux", "refuser", d.id, "Refuser"));
+  }
+  if (mien && ATTENTE.indexOf(d.etat) >= 0) {
+    actes.push(bouton("creux", "annuler", d.id, "Annuler"));
+  }
+  if (actes.length) h += '<div class="actions">' + actes.join("") + "</div>";
+
+  /* La zone ou s'ouvrent la confirmation, le motif de refus et les
+     coordonnees. Vide par defaut : un ecran ne montre pas ce qu'on n'a pas
+     demande a voir. */
+  h += '<div id="z-' + echapper(d.id) + '"></div></div>';
+  return h;
+}
+
+function bouton(genre, agir, id, texte) {
+  return '<button class="bouton ' + genre + ' petit" data-agir="' + agir
+       + '" data-id="' + echapper(id) + '">' + texte + "</button>";
+}
+
+/* L'etat, dit dans la langue de celui qui lit : la meme ligne ne veut pas dire
+   la meme chose des deux cotes. */
+function phrase(d, mien) {
+  if (d.etat === "envoyee") {
+    return mien ? "Envoyée " + moment(d.cree_le) + ". Ton confrère ne l'a pas encore ouverte."
+                : "Ton confrère attend ta réponse.";
+  }
+  if (d.etat === "vue") {
+    return mien ? "Ouverte par ton confrère " + moment(d.vue_le) + ". Pas encore de réponse."
+                : "Tu l'as ouverte, tu n'as pas encore répondu.";
+  }
+  if (d.etat === "acceptee") {
+    return "Acceptée " + moment(d.repondu_le) + ". Vos coordonnées sont ouvertes des deux côtés.";
+  }
+  if (d.etat === "refusee") {
+    return mien ? "Refusée " + moment(d.repondu_le) + "."
+                : "Tu as refusé " + moment(d.repondu_le) + ".";
+  }
+  if (d.etat === "annulee") {
+    return mien ? "Tu as annulé cette demande." : "Ton confrère a annulé sa demande.";
+  }
+  if (d.etat === "expiree") return "Le chantier a commencé sans réponse.";
+  return "";
+}
+
+/* ------------------------------------------------- les coordonnees
+   LE MOMENT DU PRODUIT. Avant l'acceptation, on dit qu'elles sont fermees :
+   ce n'est pas une precaution de la page, c'est la base qui refuse de les
+   rendre. Apres, on dit qu'elles se sont ouvertes DES DEUX COTES, parce que
+   l'autre voit les siennes aussi et qu'il vaut mieux le savoir. */
+function blocCoordonnees(d) {
+  if (ATTENTE.indexOf(d.etat) >= 0) {
+    return '<p class="aide">Vos coordonnées restent fermées tant que la demande '
+         + 'n\'est pas acceptée.</p>';
+  }
+  if (d.etat !== "acceptee") return "";
+  return '<div class="bloc"><p><b>Vos coordonnées se sont ouvertes à l\'acceptation.</b> '
+       + 'Ton confrère voit les tiennes, tu vois les siennes. '
+       + 'Avant, personne ne les voyait.</p>'
+       + '<div class="actions">'
+       + bouton("creux", "coord", d.id, "Voir ses coordonnées") + "</div></div>";
+}
+
+async function ouvrirCoordonnees(id, b) {
+  b.disabled = true; b.textContent = "Un instant…";
+  try {
+    /* La SEULE porte vers le telephone et le nom de famille. Elle leve une
+       exception si la demande n'est pas acceptee, ou si on n'est pas l'une
+       des deux parties : la regle est dans la base, pas dans l'ecran. */
+    const { data, error } = await sb.rpc("coordonnees_confrere", { p_demande: id });
+    if (error) throw error;
+    const c = Array.isArray(data) ? data[0] : data;
+    if (!c) { dire("ko", "Rien à afficher.", "La base n'a rendu aucune coordonnée."); return; }
+    const nom = [c.prenom, c.nom].filter(Boolean).join(" ");
+    const tel = String(c.telephone || "").replace(/[^0-9+]/g, "");
+    $("z-" + id).innerHTML =
+      '<div class="bloc"><h3><span class="nom">' + echapper(nom || "Ton confrère") + "</span></h3>"
+      + (c.denomination ? '<p class="meta">' + echapper(c.denomination) + "</p>" : "")
+      + (c.commune ? '<p class="meta">' + echapper(c.commune) + "</p>" : "")
+      + (tel
+          ? '<p><a class="bouton creux petit" href="tel:' + echapper(tel) + '">'
+            + echapper(c.telephone) + "</a></p>"
+          : '<p class="aide">Ton confrère n\'a pas donné de numéro. Son entreprise '
+            + 'et sa commune sont ci-dessus.</p>')
+      + "</div>";
+  } catch (e) {
+    dire("ko", "Coordonnées indisponibles.", messageDe(e));
+  } finally { b.disabled = false; b.textContent = "Voir ses coordonnées"; }
+}
+
+/* ------------------------------------------------- la notation a double sens
+   Les deux axes ne sont pas les memes dans les deux sens : celui qui est venu
+   travailler est note sur la qualite, celui qui a fait venir sur ses delais de
+   paiement. C'est la contrainte `evaluation_axe_selon_role` de la base, et
+   c'est aussi la promesse ecrite dans la page d'aide. */
+const AXES = {
+  demandeur:    { champ: "qualite",         titre: "La qualité du travail et le sérieux" },
+  destinataire: { champ: "delais_paiement", titre: "Les délais de paiement et la clarté du chantier" }
+};
+
+function blocNote(d, mien) {
+  if (d.etat !== "acceptee") return "";
+  const role = mien ? "demandeur" : "destinataire";
+  const axe = AXES[role];
+  const mienne = notes.filter((n) => n.demande_id === d.id && n.auteur_id === moi)[0];
+  const recue  = notes.filter((n) => n.demande_id === d.id && n.cible_id === moi)[0];
+  const publiee = notes.some((n) => n.demande_id === d.id && n.publie_le);
+
+  let h = '<div class="bloc">';
+
+  if (recue) {
+    /* L'axe affiche est celui que l'AUTEUR de la note a rempli, pas celui que
+       je remplirais : il ne m'a pas note sur la meme chose. Et s'il est vide,
+       on ne le remplace pas par la note globale : un chiffre repete a deux
+       endroits est un chiffre invente a l'un des deux. */
+    const a = AXES[recue.role_auteur];
+    h += "<p><b>Ton confrère t'a noté " + echapper(recue.note) + " sur 5.</b>"
+       + (a && recue[a.champ]
+           ? " " + echapper(a.titre) + "&nbsp;: " + echapper(recue[a.champ]) + " sur 5." : "")
+       + "</p>"
+       + (recue.commentaire ? '<p class="cite">' + echapper(recue.commentaire) + "</p>" : "");
+  }
+
+  if (!passe(d.fin)) {
+    h += '<p class="aide">Vous pourrez vous noter l\'un l\'autre une fois le chantier '
+       + 'passé, à partir du ' + lendemain(d.fin) + '.</p>';
+    return h + "</div>";
+  }
+
+  if (mienne) {
+    h += mienne.publie_le
+      ? "<p><b>Ta note est publiée.</b> Elle compte dans la moyenne de ton confrère. "
+        + "Une note ne se modifie plus, une fois déposée.</p>"
+      : "<p><b>Ta note est déposée.</b> Elle reste invisible tant que ton confrère "
+        + "n'a pas déposé la sienne, ou que le délai n'est pas passé.</p>"
+        + '<p class="aide">La tâche qui publie les notes au bout du délai n\'est pas '
+        + 'encore branchée : aujourd\'hui, les deux notes sortent au moment où vous '
+        + 'avez noté tous les deux.</p>';
+    return h + "</div>";
+  }
+
+  if (publiee) {
+    /* La base refuse cet ajout, et elle a raison : qui repond apres avoir lu
+       ne note plus, il repond. Le dire vaut mieux qu'un bouton qui echoue. */
+    h += "<p><b>Le temps de noter est passé.</b> La note de ton confrère est déjà "
+       + "publiée : tu ne peux plus noter cette mise en relation.</p>";
+    return h + "</div>";
+  }
+
+  /* LA REGLE D'AFFICHAGE DIFFERE, EN UNE PHRASE. Sans elle, l'artisan croit
+     que sa note s'est perdue. */
+  h += '<h3><span class="nom">Note ton confrère</span></h3>'
+     + '<p class="aide">Ta note n\'apparaît que lorsque ton confrère a déposé la sienne, '
+     + 'ou au bout du délai&nbsp;: personne ne peut ajuster sa note à celle qu\'il vient '
+     + 'de recevoir.</p>'
+     + '<fieldset id="fg-' + echapper(d.id) + '" aria-describedby="e-n-' + echapper(d.id) + '">'
+     +   "<legend>Ta note globale, de 1 à 5</legend>"
+     +   '<div class="notes">' + radios("g-" + d.id) + "</div></fieldset>"
+     + '<fieldset id="fa-' + echapper(d.id) + '" aria-describedby="e-n-' + echapper(d.id) + '">'
+     +   "<legend>" + echapper(axe.titre) + ", de 1 à 5</legend>"
+     +   '<div class="notes">' + radios("a-" + d.id) + "</div></fieldset>"
+     + '<p class="aide">1, ça s\'est mal passé. 5, rien à redire.</p>'
+     + '<div class="champ"><label for="c-' + echapper(d.id) + '">Un mot pour ton confrère '
+     +   '<span class="opt">facultatif</span></label>'
+     +   '<textarea id="c-' + echapper(d.id) + '" maxlength="1000" '
+     +   'placeholder="Chantier propre, les dates ont été tenues."></textarea>'
+     +   '<p class="aide">Ton commentaire n\'est pas affiché publiquement&nbsp;: seule la '
+     +   'moyenne l\'est. Ton confrère le lit, et nous aussi en cas de signalement.</p></div>'
+     + '<p class="err" id="e-n-' + echapper(d.id) + '"></p>'
+     + '<div class="actions">' + bouton("plein", "noter", d.id, "Déposer ma note") + "</div>";
+  return h + "</div>";
+}
+
+function radios(nom) {
+  let h = "";
+  for (let i = 1; i <= 5; i++) {
+    h += '<input type="radio" name="n-' + nom + '" id="n-' + nom + "-" + i + '" value="' + i + '">'
+       + '<label for="n-' + nom + "-" + i + '">' + i + "</label>";
+  }
+  return h;
+}
+
+function choisie(nom) {
+  const c = document.querySelector('input[name="n-' + nom + '"]:checked');
+  return c ? +c.value : null;
+}
+
+async function deposerNote(id, b) {
+  const d = [...recues, ...envoyees].filter((x) => x.id === id)[0];
+  if (!d) return;
+  const mien = d.demandeur_id === moi;
+  const axe = AXES[mien ? "demandeur" : "destinataire"];
+  const err = $("e-n-" + id);
+  const fg = $("fg-" + id), fa = $("fa-" + id);
+  fg.removeAttribute("aria-invalid"); fa.removeAttribute("aria-invalid");
+  err.classList.remove("vu");
+
+  const globale = choisie("g-" + id), sur = choisie("a-" + id);
+  if (!globale || !sur) {
+    const quel = !globale ? fg : fa;
+    err.textContent = !globale
+      ? "Pose ta note globale, de 1 à 5."
+      : "Pose aussi la note sur " + axe.titre.toLowerCase() + ".";
+    err.classList.add("vu");
+    quel.setAttribute("aria-invalid", "true");
+    const premier = quel.querySelector("input");
+    if (premier) premier.focus();
+    return;
+  }
+
+  const ligne = { demande_id: id, note: globale };
+  ligne[axe.champ] = sur;
+  const txt = ($("c-" + id).value || "").trim();
+  if (txt) ligne.commentaire = txt;
+
+  b.disabled = true; b.textContent = "Un instant…";
+  try {
+    /* `auteur_id`, `cible_id` et `role_auteur` ne sont PAS envoyes : le
+       declencheur les deduit de la demande. Les envoyer serait les declarer,
+       et une note qu'on declare soi-meme ne vaut rien. */
+    const { error } = await sb.from("evaluations").insert(ligne);
+    if (error) throw error;
+    vise = id;
+    await charger();
+    rendre();
+    dire("ok", "Ta note est déposée.",
+      "Elle apparaîtra quand ton confrère aura déposé la sienne.");
+  } catch (e) {
+    b.disabled = false; b.textContent = "Déposer ma note";
+    dire("ko", "Note non enregistrée.", messageDe(e));
+  }
+}
+
+/* ------------------------------------------------------- repondre a une demande
+   Trois actions, trois confirmations. Accepter ouvre les coordonnees, refuser
+   et annuler ferment la demande pour de bon : aucune des trois ne se declenche
+   sur un seul clic distrait. */
+function confirmation(id, quoi) {
+  const z = $("z-" + id);
+  if (quoi === "accepter") {
+    z.innerHTML = '<div class="bloc"><p><b>En acceptant, tes coordonnées s\'ouvrent '
+      + 'pour ton confrère, et les siennes pour toi.</b> Vous vous appelez directement, '
+      + '« à dispo » ne touche jamais à l\'argent de vos chantiers.</p>'
+      + '<div class="actions">'
+      + bouton("plein", "faire-accepter", id, "Accepter et ouvrir mes coordonnées")
+      + bouton("creux", "rien", id, "Ne rien faire") + "</div></div>";
+  } else if (quoi === "refuser") {
+    z.innerHTML = '<div class="bloc">'
+      + '<div class="champ"><label for="m-' + echapper(id) + '">Pourquoi, en un mot '
+      +   '<span class="opt">facultatif</span></label>'
+      +   '<input id="m-' + echapper(id) + '" maxlength="500" '
+      +   'placeholder="Déjà pris sur ces dates."></div>'
+      + '<p class="aide">Ton confrère lira ce mot. Un refus ne se reprend pas.</p>'
+      + '<div class="actions">'
+      + bouton("plein", "faire-refuser", id, "Confirmer le refus")
+      + bouton("creux", "rien", id, "Ne rien faire") + "</div></div>";
+  } else {
+    z.innerHTML = '<div class="bloc"><p>Ton confrère sera prévenu que tu as annulé. '
+      + 'Une demande annulée ne se rouvre pas, il faudra en envoyer une autre.</p>'
+      + '<div class="actions">'
+      + bouton("plein", "faire-annuler", id, "Confirmer l'annulation")
+      + bouton("creux", "rien", id, "Ne rien faire") + "</div></div>";
+  }
+  const premier = z.querySelector("input, button");
+  if (premier) premier.focus();
+}
+
+async function repondre(id, etat, b) {
+  const champs = { etat: etat };
+  if (etat === "refusee") {
+    const m = $("m-" + id);
+    const t = m ? m.value.trim() : "";
+    if (t) champs.motif = t;
+  }
+  b.disabled = true;
+  const avant = b.textContent;
+  b.textContent = "Un instant…";
+  try {
+    /* La page n'ecrit QUE l'etat. Les dates, le metier, la commune et le
+       message sont geles par le declencheur : une demande dont on reecrit les
+       dates apres coup n'est plus une trace. */
+    const { error } = await sb.from("demandes").update(champs).eq("id", id);
+    if (error) throw error;
+    vise = id;
+    await charger();
+    rendre();
+    if (etat === "acceptee") {
+      dire("ok", "Demande acceptée.",
+        "Vos coordonnées sont ouvertes des deux côtés. Ton confrère est prévenu dans son espace.");
+    } else if (etat === "refusee") {
+      dire("ok", "Demande refusée.", "Ton confrère est prévenu dans son espace.");
+    } else {
+      dire("ok", "Demande annulée.", "Ton confrère est prévenu dans son espace.");
+    }
+  } catch (e) {
+    b.disabled = false; b.textContent = avant;
+    dire("ko", "La base a refusé.", messageDe(e));
+  }
+}
+
+/* Ouvrir la liste, c'est avoir vu les demandes qu'elle porte. On l'ecrit, et
+   le demandeur voit « ouverte » au lieu de « en attente » : c'est une
+   information qu'il attend, et elle ne coute rien a donner. */
+async function marquerVues() {
+  const neuves = recues.filter((d) => d.etat === "envoyee");
+  if (!neuves.length) return;
+  let change = false;
+  for (const d of neuves) {
+    const { error } = await sb.from("demandes").update({ etat: "vue" }).eq("id", d.id);
+    if (!error) { d.etat = "vue"; d.vue_le = new Date().toISOString(); change = true; }
+  }
+  if (change) rendre();
+}
+
+/* --------------------------------------------------------- les notifications */
+function voletNotifications(z) {
+  const nonLues = notifs.filter((n) => !n.lu_le).length;
+  let h = '<div class="carte eteinte"><h3><span class="nom">Le mail</span>'
+    + '<span class="quand">bientôt</span></h3>'
+    + '<p>Tes notifications s\'affichent ici, elles ne sortent pas du site.</p>'
+    + '<p>Pas encore raccordé : le service d\'envoi de mails n\'est pas choisi.</p></div>';
+
+  if (!notifs.length) {
+    z.innerHTML = h + '<p class="vide">Rien à lire pour le moment. '
+      + 'Une demande reçue, acceptée ou refusée apparaît ici.</p>';
+    return;
+  }
+
+  if (nonLues > 0) {
+    h += '<div class="actions">'
+       + '<button class="bouton creux petit" data-agir="toutlu" data-id="0">'
+       + "Tout marquer lu</button></div>";
+  }
+
+  h += notifs.map((n) => {
+    const connue = n.demande_id
+      && [...recues, ...envoyees].some((d) => d.id === n.demande_id);
+    return '<div class="notif' + (n.lu_le ? "" : " neuf") + '" id="n-' + echapper(n.id) + '">'
+      + '<h3><span class="nom">' + echapper(n.titre) + "</span>"
+      + (n.lu_le ? "" : '<span class="quand">non lue</span>') + "</h3>"
+      + (n.corps ? "<p>" + echapper(n.corps) + "</p>" : "")
+      + '<p class="meta">' + moment(n.cree_le) + "</p>"
+      + '<div class="actions">'
+      + (connue ? bouton("creux", "voir", n.demande_id, "Voir la demande") : "")
+      + (n.lu_le ? "" : bouton("creux", "lue", n.id, "Marquer comme lue"))
+      + "</div></div>";
+  }).join("");
+
+  z.innerHTML = h;
+}
+
+/* Le declencheur gele tout le reste : on ne peut poser que `lu_le`. Sans lui,
+   chacun pourrait reecrire le titre de sa propre notification, donc fabriquer
+   une trace. Ecrit une seule fois, appele par les trois chemins qui marquent
+   une notification lue. */
+async function poserLu(n) {
+  const maintenant = new Date().toISOString();
+  const { error } = await sb.from("notifications")
+    .update({ lu_le: maintenant }).eq("id", n.id);
+  if (error) throw error;
+  n.lu_le = maintenant;
+}
+
+async function marquerLue(id, b) {
+  const n = notifs.filter((x) => x.id === id)[0];
+  if (!n) return;
+  if (b) { b.disabled = true; b.textContent = "Un instant…"; }
+  try {
+    await poserLu(n);
+    rendre();
+  } catch (e) {
+    if (b) { b.disabled = false; b.textContent = "Marquer comme lue"; }
+    dire("ko", "Impossible de marquer comme lue.", messageDe(e));
+  }
+}
+
+async function marquerToutLu(b) {
+  const neuves = notifs.filter((n) => !n.lu_le);
+  if (!neuves.length) return;
+  b.disabled = true; b.textContent = "Un instant…";
+  try {
+    for (const n of neuves) await poserLu(n);
+    rendre();
+    dire("ok", "C'est lu.", neuves.length + " notification"
+      + (neuves.length > 1 ? "s marquées" : " marquée") + " comme lue"
+      + (neuves.length > 1 ? "s." : "."));
+  } catch (e) {
+    b.disabled = false; b.textContent = "Tout marquer lu";
+    dire("ko", "Impossible de tout marquer.", messageDe(e));
+  }
+}
+
+/* Depuis une notification, aller a la demande : on change d'onglet, on met la
+   carte sous les yeux, et on la marque lue au passage. On marque AVANT de
+   dessiner : marquer apres redessinait une seconde fois et la carte visee
+   perdait son cadre au bout d'un instant, sans que rien ne l'explique. */
+async function allerA(demandeId, notifId) {
+  onglet = recues.some((d) => d.id === demandeId) ? "recues" : "envoyees";
+  taire();
+  const n = notifs.filter((x) => x.id === notifId)[0];
+  /* Echec sans consequence : la notification reste non lue, et elle le dit. */
+  if (n && !n.lu_le) { try { await poserLu(n); } catch (e) {} }
+  vise = demandeId;
+  rendre();
+}
+
+/* ------------------------------------------------------------ l'aiguillage
+   Un seul ecouteur sur le volet plutot qu'un par bouton : les cartes sont
+   redessinees a chaque action, et des ecouteurs poses une fois de plus a
+   chaque rendu finissent par declencher deux fois la meme chose. */
+function surClic(ev) {
+  const b = ev.target.closest("button[data-agir]");
+  if (!b) return;
+  const id = b.dataset.id, agir = b.dataset.agir;
+  if (agir === "accepter" || agir === "refuser" || agir === "annuler") return confirmation(id, agir);
+  if (agir === "rien") { $("z-" + id).innerHTML = ""; return; }
+  if (agir === "faire-accepter") return repondre(id, "acceptee", b);
+  if (agir === "faire-refuser")  return repondre(id, "refusee", b);
+  if (agir === "faire-annuler")  return repondre(id, "annulee", b);
+  if (agir === "coord") return ouvrirCoordonnees(id, b);
+  if (agir === "noter") return deposerNote(id, b);
+  if (agir === "envoyer") return envoyerDemande(b);
+  if (agir === "fermer-nouvelle") { oublierCible(); taire(); return rendre(); }
+  if (agir === "commune") {
+    /* On retient le code ET le nom : si le nom est retouche ensuite, le code
+       ne suit plus la commune, et on ne l'envoie pas. */
+    communeChoisie = { code: id, nom: b.dataset.nom };
+    $("n-commune").value = b.dataset.nom;
+    $("sug-commune").innerHTML = "";
+    $("n-commune").focus();
+    return;
+  }
+  if (agir === "lue") return marquerLue(id, b);
+  if (agir === "toutlu") return marquerToutLu(b);
+  if (agir === "voir") {
+    const carteNotif = b.closest(".notif");
+    return allerA(id, carteNotif ? carteNotif.id.slice(2) : null);
+  }
+}
+
+/* Le message de la base, repete tel quel plutot que traduit : les
+   declencheurs disent deja pourquoi ils refusent, et une traduction maison
+   ferait chercher au mauvais endroit. */
+function messageDe(e) {
+  const m = e && (e.message || e.hint);
+  return m ? "<br><small>" + echapper(m) + "</small>" : "";
+}
+
+/* ---------------------------------------------------------------- demarrage */
+(async () => {
+  try {
+    const c = await client();
+    const { data: s } = await c.auth.getSession();
+    if (!s || !s.session) { location.replace("/connexion"); return; }
+    moi = s.session.user.id;
+
+    /* On arrive peut-etre de la fiche d'un confrere. Le format est verifie
+       avant tout appel : une adresse bricolee a la main ne part pas vers la
+       base. */
+    const vu = new URLSearchParams(location.search).get("artisan");
+    if (vu && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(vu)) {
+      cible = vu;
+      onglet = "envoyees";
+    }
+
+    await charger();
+    rendre();
+  } catch (e) {
+    ecran.innerHTML = "";
+    dire("ko", "Le fil ne s'est pas ouvert.",
+      "La base n'a pas répondu comme attendu." + messageDe(e)
+      + '<br><br><a href="/espace" style="color:var(--accent-texte)">Revenir à mon espace</a>');
+  }
+})();
+
+/* --------- La barre de l'espace ---------
+   Elle ne depend d'aucune autre piece de la page : elle lit la session
+   directement dans le stockage local, comme le fait deja le chargement
+   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
+   qu'aucun n'ait a lui preter ses fonctions. */
+(function () {
+  var nav = document.getElementById("nav-app");
+  if (!nav || !window.localStorage) return;
+
+  var cle = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
+  }
+  if (!cle) return;                       // pas de session : la barre n'existe pas
+  var sess;
+  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!sess || !sess.access_token || !sess.user) return;
+
+  var ici = nav.getAttribute("data-ici") || "";
+  var liens = nav.querySelectorAll("a");
+  for (var j = 0; j < liens.length; j++) {
+    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
+  }
+  nav.hidden = false;
+
+  /* LA BARRE DEFILE, ET L'ECRAN OU L'ON EST DOIT S'Y VOIR. Mesure a 390 px :
+     les cinq liens demandent 592 px pour 358 px visibles, et « Messages »
+     commence au-dela du bord. On amene donc le lien courant sous les yeux,
+     sans defilement anime : c'est une position de depart, pas un mouvement. */
+  var courant = nav.querySelector('a[aria-current="page"]');
+  if (courant && nav.scrollWidth > nav.clientWidth) {
+    nav.scrollLeft = Math.max(0, courant.offsetLeft - 12);
+  }
+
+  /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
+     rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
+  fetch(BASE + "/rest/v1/artisans?id=eq." + sess.user.id + "&select=etape",
+        { headers: { apikey: CLE, Authorization: "Bearer " + sess.access_token } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d[0] || d[0].etape === "fini") return;
+      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < bloques.length; k++) {
+        bloques[k].setAttribute("aria-disabled", "true");
+        bloques[k].setAttribute("tabindex", "-1");
+      }
+      var note = document.getElementById("nav-note");
+      if (note) {
+        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
+        note.hidden = false;
+      }
+    })
+    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+})();
+</script>

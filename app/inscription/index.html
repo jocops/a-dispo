@@ -1,0 +1,337 @@
+<title>Inscription à la liste d'attente - À dispo</title>
+<!--
+  LE FORMULAIRE DE LISTE D'ATTENTE.
+  Ligne du devis N°20260910-1 : « Inscription avant l'ouverture et email de
+  confirmation automatique », 1 j, OFFERT.
+
+  CE QU'IL SERT A DECIDER. Il ne collecte pas des adresses pour collecter des
+  adresses : il mesure l'interet METIER PAR METIER et DEPARTEMENT PAR
+  DEPARTEMENT. C'est sur ces deux comptages que se prendra la decision de
+  lancement, deux ou trois metiers sur une zone definie. Trois champs, et pas
+  un de plus : chaque champ ajoute fait perdre des inscrits.
+
+  POURQUOI SI PEU DE CHAMPS. Un artisan remplit ca sur un telephone, souvent
+  debout. Le nom de l'entreprise, le SIRET, la photo : tout ca se demandera a
+  l'ouverture, quand il aura une raison de le donner. Ici, il n'a encore rien
+  recu.
+
+  CE QUE LE NAVIGATEUR NE VOIT JAMAIS. Le jeton de confirmation. Il est cree
+  par la base et ne revient pas dans la reponse, parce qu'aucune politique de
+  lecture n'existe pour le public. S'il revenait, n'importe qui confirmerait sa
+  propre inscription et la double confirmation ne servirait plus a rien.
+
+  LES TROIS PROTECTIONS, ET CE QU'ELLES VALENT VRAIMENT.
+    · Un champ-piege, invisible, que seuls les robots remplissent. Arrete les
+      robots betes, c'est-a-dire la majorite.
+    · Un delai minimal de remplissage. Un formulaire soumis en moins de trois
+      secondes n'a pas ete lu par un humain.
+    · L'unicite de l'adresse, portee PAR LA BASE. C'est la seule des trois qui
+      ne se contourne pas : les deux premieres sont cote navigateur, donc
+      contournables par qui sait lire le code source. On les pose quand meme,
+      parce qu'elles coutent trois lignes.
+
+  L'ETAT DU BRANCHEMENT. La table n'existe pas encore : elle est decrite dans
+  `crm/supabase/migration-inscriptions.sql` et attend d'etre jouee. La page le
+  detecte et le dit clairement plutot que d'afficher une erreur incomprehensible.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE, MEMES NOMS, VALEURS CLAIRES ---
+     Valeurs relevees sur les douze ecrans deja passes en clair (source :
+     CHARTE-CLAIRE.md). Cette page etait restee sombre alors qu'on y arrive
+     depuis des pages claires : le saut se voyait. */
+
+  /* Verrouille les controles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Sans cette ligne, un navigateur en
+     theme sombre repeint les champs et toute mesure devient fausse. */
+  color-scheme:light;
+
+  --bg:#F6F3EC;--bg-2:#FFFFFF;--surface:#FBF8F2;--surface-2:#EFEADF;
+  --cream:#0C1421;--cream-mut:#3C4A62;--cream-dim:#546279;
+  --accent:#E8B93E;--accent-2:#D9A72E;--accent-soft:rgba(232,185,62,.22);
+  --vert:#196740;--vert-soft:rgba(79,208,138,.16);
+  --alerte:#A93C24;--alerte-soft:rgba(240,160,138,.16);
+  --line:rgba(12,20,33,.14);
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre */
+  --gut:clamp(1.1rem,4.5vw,3rem);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 460px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:clamp(30px,7vw,72px) var(--gut) 80px}
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(27px,5.5vw,38px);line-height:1.14}
+h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
+  background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
+  padding:0 .05em}
+.lead{color:var(--cream-mut);font-size:clamp(15.5px,2.2vw,17px);margin:13px 0 0}
+.pastille{display:inline-flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-texte);
+  background:var(--accent-soft);border:1px solid rgba(232,185,62,.3);
+  padding:5px 13px;border-radius:999px;margin-bottom:18px}
+.pastille i{width:7px;height:7px;border-radius:50%;background:var(--vert);display:block}
+
+form{margin:28px 0 0;display:grid;gap:15px}
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:14px;
+  margin-bottom:5px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:13px}
+input,select{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none;
+  -webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder{color:var(--cream-dim)}
+input[aria-invalid="true"]{border-color:var(--alerte)}
+.err{color:var(--alerte);font-size:13px;margin-top:5px;display:none}
+.err.vu{display:block}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media(max-width:430px){.deux{grid-template-columns:1fr}}
+
+/* Le champ-piege. Il doit etre invisible pour l'humain ET atteignable pour le
+   robot : `display:none` est repere par les robots un peu serieux. */
+.piege{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+button{font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:16px;
+  border:none;border-radius:999px;padding:15px 26px;background:var(--accent);
+  color:var(--cream);cursor:pointer;margin-top:5px}   /* l'encre sur l'ambre, 8,3 */
+button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+
+.sous{color:var(--cream-dim);font-size:12.7px;margin:4px 0 0;line-height:1.55}
+
+.etat{border-radius:14px;padding:18px 21px;margin:24px 0 0;display:none;font-size:15px}
+.etat.vu{display:block}
+.etat h2{font-family:"Signika",sans-serif;font-size:18px;margin:0 0 6px}
+.etat p{margin:.45rem 0;color:var(--cream-mut)}
+.etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35)}
+.etat.ok h2{color:var(--vert)}
+.etat.deja{background:var(--accent-soft);border:1px solid rgba(232,185,62,.35)}
+.etat.deja h2{color:var(--accent-texte)}
+.etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35)}
+.etat.ko h2{color:var(--alerte)}
+.etat code{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--cream-dim)}
+
+.pied{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--cream-dim);line-height:1.6}
+</style>
+
+<div class="wrap">
+  <span class="pastille"><i></i>Ouverture prochaine</span>
+  <h1>Sois prévenu <span class="em">avant tout le monde</span>.</h1>
+  <p class="lead">À dispo ouvre bientôt. Laisse ton métier et ton département : on te prévient
+  dès que ça démarre près de chez toi, et le premier mois est offert.</p>
+
+  <form id="f" novalidate>
+    <div>
+      <label for="metier">Ton métier</label>
+      <select id="metier" name="metier" required>
+        <option value="">Choisis…</option>
+      </select>
+      <p class="err" id="e-metier">Choisis ton métier dans la liste.</p>
+    </div>
+
+    <!-- Le formulaire « votre metier n'est pas dans la liste ? », ligne offerte
+         du devis. Il n'a PAS de page a lui : une page separee obligerait
+         l'artisan a recommencer sa saisie, et on perdrait la moitie des
+         demandes en route. Il apparait ici, au moment exact ou le manque se
+         constate. -->
+    <div id="bloc-libre" hidden>
+      <label for="metier_libre">Lequel&nbsp;?</label>
+      <input id="metier_libre" name="metier_libre" maxlength="60"
+             placeholder="Cordiste, poseur de cuisines, ferronnier…" autocomplete="off">
+      <p class="err" id="e-metier_libre">Écris ton métier, c'est justement ce qu'on cherche à savoir.</p>
+      <p class="sous">On l'ajoute à la liste dès que plusieurs personnes le demandent.
+      Tu seras prévenu en premier.</p>
+    </div>
+
+    <div class="deux">
+      <div>
+        <label for="departement">Ton département</label>
+        <input id="departement" name="departement" inputmode="numeric" maxlength="3"
+               placeholder="69" autocomplete="off" required>
+        <p class="err" id="e-departement">Deux chiffres, comme 69 ou 73.</p>
+      </div>
+      <div>
+        <label for="telephone">Téléphone <span class="opt">facultatif</span></label>
+        <input id="telephone" name="telephone" type="tel" inputmode="tel"
+               placeholder="06 12 34 56 78" autocomplete="tel">
+        <p class="err" id="e-telephone">Ce numéro ne semble pas valide.</p>
+      </div>
+    </div>
+
+    <div>
+      <label for="email">Ton email</label>
+      <input id="email" name="email" type="email" inputmode="email"
+             placeholder="jean@monentreprise.fr" autocomplete="email" required>
+      <p class="err" id="e-email">Vérifie ton adresse : il manque quelque chose.</p>
+    </div>
+
+    <!-- Champ-piege : un humain ne le voit pas, un robot le remplit. -->
+    <div class="piege" aria-hidden="true">
+      <label for="societe">Ne remplis pas ce champ</label>
+      <input id="societe" name="societe" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button type="submit" id="envoyer">Me prévenir à l'ouverture</button>
+    <p class="sous">On t'envoie un email pour confirmer, et c'est tout. Pas de publicité,
+    pas de revente de ton adresse. Tu peux te désinscrire en un clic.</p>
+  </form>
+
+  <div class="etat ok"   id="s-ok"></div>
+  <div class="etat deja" id="s-deja"></div>
+  <div class="etat ko"   id="s-ko"></div>
+
+  <div class="pied">
+    Les inscriptions servent à savoir dans quels métiers et quels départements ouvrir en
+    premier. Elles ne sont lisibles par personne d'autre que nous.
+  </div>
+</div>
+
+<script>
+/* La base du CRM, deja en place. La cle publique est publique par nature : la
+   protection vient des autorisations posees sur la table, pas du secret de la
+   cle. Verifie le 13/09/2026 : une lecture de `contacts` avec cette cle, sans
+   compte, rend une liste VIDE. */
+var BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+var CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+/* Les metiers de depart. « Un autre metier » renvoie vers le formulaire prevu
+   pour ca : c'est lui qui dira quels metiers ajouter, et dans quel ordre. */
+var METIERS = ["Plombier","Maçon","Électricien","Charpentier","Couvreur","Peintre",
+  "Carreleur","Menuisier","Serrurier","Chauffagiste","Plaquiste","Terrassier",
+  "Façadier","Étancheur","Paysagiste","Un autre métier"];
+
+var AUTRE = "Un autre métier";
+var sel = document.getElementById('metier');
+METIERS.forEach(function(m){
+  var o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o);
+});
+
+/* Le champ libre n'apparait que quand il sert. Affiche d'emblee, il alourdit
+   un formulaire de trois champs ; cache derriere une page, il fait recommencer
+   la saisie. Ici il surgit au moment exact ou le manque se constate. */
+var blocLibre = document.getElementById('bloc-libre');
+sel.addEventListener('change', function(){
+  var autre = sel.value === AUTRE;
+  blocLibre.hidden = !autre;
+  if (autre) document.getElementById('metier_libre').focus();
+  else { document.getElementById('metier_libre').value = ''; err('metier_libre', false); }
+});
+
+/* L'heure d'affichage. Un formulaire envoye en moins de trois secondes n'a pas
+   ete lu par un humain. */
+var AFFICHE = Date.now();
+
+/* D'ou vient l'inscrit : ?de=salon-batimat, ?de=qr-tshirt, ?de=journal. C'est
+   ce qui dira quel canal merite qu'on y remette de l'argent. */
+var PROVENANCE = new URLSearchParams(location.search).get('de') || null;
+
+function err(id, vu, texte){
+  var p = document.getElementById('e-' + id);
+  if (texte) p.textContent = texte;
+  p.classList.toggle('vu', vu);
+  document.getElementById(id).setAttribute('aria-invalid', vu ? 'true' : 'false');
+}
+function montrer(quel, titre, corps){
+  ['ok','deja','ko'].forEach(function(k){ document.getElementById('s-'+k).classList.remove('vu') });
+  var d = document.getElementById('s-' + quel);
+  d.innerHTML = '<h2>' + titre + '</h2>' + corps;
+  d.classList.add('vu');
+  d.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* Les memes regles que la base, ecrites une fois ici pour prevenir l'artisan
+   AVANT l'envoi. La base reste seule juge : ces controles-ci sont un confort,
+   pas une securite. */
+var R_EMAIL = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i;
+var R_DEPT  = /^(0[1-9]|[1-8][0-9]|9[0-5]|2[AB]|97[1-6])$/;
+var R_TEL   = /^[0-9 +().-]{6,20}$/;
+
+document.getElementById('f').addEventListener('submit', function(ev){
+  ev.preventDefault();
+
+  var metier = sel.value;
+  var libre  = document.getElementById('metier_libre').value.trim();
+  var dept   = document.getElementById('departement').value.trim().toUpperCase();
+  var tel    = document.getElementById('telephone').value.trim();
+  var email  = document.getElementById('email').value.trim();
+
+  var ok = true;
+  err('metier',      !metier);                      ok = ok && !!metier;
+  // Choisir « un autre metier » sans dire lequel ne sert a rien : c'est
+  // exactement le metier qu'on cherche a connaitre. La base refuse aussi.
+  var libreOk = metier !== AUTRE || (libre.length >= 2 && libre.length <= 60);
+  err('metier_libre', metier === AUTRE && !libreOk);  ok = ok && libreOk;
+  err('departement', !R_DEPT.test(dept));           ok = ok && R_DEPT.test(dept);
+  err('email',       !R_EMAIL.test(email));         ok = ok && R_EMAIL.test(email);
+  var telOk = !tel || R_TEL.test(tel);
+  err('telephone',   !telOk);                       ok = ok && telOk;
+  if (!ok) return;
+
+  /* Les deux pieges. On ne dit RIEN au robot : lui repondre « refuse » lui
+     apprend quoi contourner. On affiche le meme message qu'un succes. */
+  if (document.getElementById('societe').value || Date.now() - AFFICHE < 3000){
+    montrer('ok', 'C\'est noté.', '<p>On te prévient dès l\'ouverture.</p>');
+    return;
+  }
+
+  var b = document.getElementById('envoyer');
+  b.disabled = true; b.textContent = 'Un instant…';
+
+  fetch(BASE + '/rest/v1/inscriptions', {
+    method: 'POST',
+    headers: {
+      'apikey': CLE, 'Authorization': 'Bearer ' + CLE,
+      'Content-Type': 'application/json',
+      /* `return=minimal` : la base ne renvoie RIEN. C'est ce qui garantit que
+         le jeton de confirmation ne sort jamais vers le navigateur. */
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      email: email, metier: metier, metier_libre: libre || null,
+      departement: dept, telephone: tel || null, provenance: PROVENANCE
+    })
+  }).then(function(r){
+    if (r.ok) {
+      montrer('ok', 'C\'est noté, à bientôt.',
+        '<p>On vient de t\'envoyer un email. <b>Clique sur le lien qu\'il contient</b> pour ' +
+        'confirmer : sans ça, on ne pourra pas te prévenir.</p>' +
+        '<p>Rien reçu dans deux minutes ? Regarde dans les indésirables.</p>');
+      document.getElementById('f').style.display = 'none';
+      return;
+    }
+    return r.json().then(function(j){
+      /* 23505 : l'adresse est deja dans la liste. Ce n'est pas une erreur, et
+         le dire comme une erreur inquiete pour rien. */
+      if (j && j.code === '23505') {
+        montrer('deja', 'Tu es déjà dans la liste.',
+          '<p>Cette adresse est déjà inscrite. On te préviendra, pas besoin de recommencer.</p>');
+        document.getElementById('f').style.display = 'none';
+        return;
+      }
+      /* PGRST205 : la table n'existe pas encore. Ca ne peut arriver qu'avant
+         la mise en service, et un artisan ne doit jamais lire ce message. */
+      if (j && j.code === 'PGRST205') {
+        montrer('ko', 'Les inscriptions ne sont pas encore ouvertes.',
+          '<p>Reviens dans quelques jours.</p>' +
+          '<p><code>Côté technique : jouer crm/supabase/migration-inscriptions.sql.</code></p>');
+        return;
+      }
+      montrer('ko', 'Ça n\'a pas marché.',
+        '<p>Réessaie dans un instant. Si ça bloque encore, écris-nous.</p>' +
+        (j && j.message ? '<p><code>' + j.message + '</code></p>' : ''));
+    });
+  }).catch(function(){
+    montrer('ko', 'Pas de réseau.',
+      '<p>Ton inscription n\'est pas partie. Vérifie ta connexion et réessaie.</p>');
+  }).then(function(){
+    b.disabled = false; b.textContent = 'Me prévenir à l\'ouverture';
+  });
+});
+</script>

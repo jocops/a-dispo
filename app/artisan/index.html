@@ -1,0 +1,1049 @@
+<title>Fiche artisan - À dispo</title>
+<!--
+  LA FICHE PUBLIQUE D'UN ARTISAN, telle qu'un confrere la voit avant de le
+  contacter. Devis N°2, NON SIGNE, ligne « fiche publique ».
+
+  CE QUI GOUVERNE CETTE PAGE : ELLE NE LIT QUE LA VUE `fiches_publiques`.
+  Pas la table `artisans`, jamais. La vue, definie dans
+  crm/supabase/migration-espace-artisan.sql, choisit ses colonnes une par une :
+  id, prenom, denomination, metier, presentation, photo_url, commune,
+  departement (les deux premiers chiffres du code postal), rayon_km. Le nom de
+  famille, le telephone et le SIRET n'y figurent PAS. Ce n'est pas une
+  politesse de la page : ces colonnes ne sortent pas de la base, et le code
+  ci-dessous ne tente rien pour les obtenir. Les colonnes sont d'ailleurs
+  nommees une par une dans la requete plutot qu'un `select *` : le jour ou
+  quelqu'un ajoute une colonne a la vue, cette page ne se met pas a l'afficher
+  toute seule.
+
+  ELLE SE LIT SANS ETRE CONNECTE. La vue est ouverte a `anon` :
+  `grant select on public.fiches_publiques to anon, authenticated`. Un confrere
+  qui recoit le lien par SMS voit la fiche sans compte. C'est la condition pour
+  qu'un lien serve a quelque chose.
+
+  LE REFERENCEMENT, ET POURQUOI CETTE PAGE NE DOIT PAS ETRE INDEXEE.
+  Tant que la marque n'est pas deposee a l'INPI, le site ne se decrit pas :
+  outils/build.py retire volontairement toute balise meta description. Cette
+  page-ci va plus loin, et pour une seconde raison qui, elle, ne disparaitra
+  pas au depot de la marque : elle porte le prenom d'une personne physique et
+  le nom de son entreprise. Ces deux-la n'ont pas a se retrouver dans un moteur
+  de recherche, ni aujourd'hui ni apres.
+  Quatre protections, empilees, de la plus faible a la plus forte :
+    1. la balise ci-dessous, dans la page elle-meme ;
+    2. la meme balise dans le gabarit de outils/build.py, pour toutes les pages ;
+    3. l'en-tete `X-Robots-Tag: noindex, nofollow` sur /*, ecrit dans
+       dist/_headers par outils/cloudflare_adispo.py ;
+    4. `Disallow: /` dans dist/robots.txt, qui refuse la VISITE et pas
+       seulement l'indexation.
+  Aucune adresse canonique, aucun partage social, aucun titre descriptif : on
+  ne donne a un robot aucune raison de garder cette page.
+
+  CE QUI NE MARCHE PAS ENCORE, ET QUI EST DIT A L'ECRAN.
+    · Les atouts (competences, outillage, permis, materiel) existent dans
+      `artisan_atouts`, mais cette table n'a AUCUNE politique de lecture pour un
+      visiteur : sa seule politique est « ses atouts », reservee au proprietaire
+      de la ligne. Une lecture faite d'ici rendrait une liste vide MEME SI
+      l'artisan en a declare quinze. Afficher « aucun atout declare » a partir
+      de cette liste vide serait donc une fausse donnee. La page lit une vue
+      publique, `atouts_publics`, qui reste a creer, et dit franchement quand
+      elle n'existe pas. Le geste qui debloque, a jouer une fois dans Supabase :
+
+        create or replace view public.atouts_publics
+        with (security_invoker = off) as
+          select t.artisan_id, t.genre, t.libelle
+            from public.artisan_atouts t
+            join public.artisans a on a.id = t.artisan_id
+           where a.publie and a.etape = 'fini';
+        grant select on public.atouts_publics to anon, authenticated;
+
+    · Les notes viennent d'un AUTRE CHANTIER, et cette page ne cree rien.
+      Noms releves le 13/09/2026 dans son fichier
+      crm/supabase/migration-recherche-relations.sql, et pas devines :
+        - vue `notes_publiques`, colonnes `cible_id`, `moyenne`, `nombre`,
+          `moyenne_qualite`, `moyenne_delais`, ouverte a `anon` ;
+        - fonction `peut_demander()`, qui dit si un compte a le droit
+          d'envoyer une demande de mise en relation ;
+        - table `demandes`, qui porte la demande elle-meme.
+      MESURE DU 13/09/2026 : ce fichier existe sur le disque mais N'EST PAS
+      JOUE sur la base. Les trois repondent 404, code PGRST205 pour les deux
+      premieres et PGRST202 pour la fonction. La page traite ce cas comme les
+      autres : elle le dit, elle ne fait pas semblant.
+      Le commentaire de `peut_demander()` previent d'ailleurs que la fonction
+      rendra `false` POUR TOUT LE MONDE meme une fois jouee, parce qu'aucune
+      page n'ecrit encore `essai_jusqu_au` ni `abonne_jusqu_au`. La page dit
+      donc aussi ce cas-la, sans jamais ecrire de montant.
+    · Les disponibilites ne sont pas publiques : `occupations` est reservee a
+      son proprietaire, et ouvrir l'agenda d'un artisan a tout venant est une
+      decision de produit, pas une ligne de code. La page le dit.
+    · La mise en relation. Le bouton existe, il ne clique jamais dans le
+      vide : il mene a la connexion quand il manque un compte, et il est
+      eteint AVEC SA RAISON dans les trois autres cas (migration non jouee,
+      droit d'envoyer ferme, page /demandes pas encore en ligne).
+    · Le telephone n'est pas sur cette fiche, et ce n'est pas un oubli : le
+      chantier voisin le fait sortir par `coordonnees_confrere(p_demande)`,
+      APRES une mise en relation acceptee. La page l'explique plutot que de
+      laisser croire a un manque.
+
+  MOBILE D'ABORD. L'artisan lit ca debout sur un chantier, avec une main, au
+  soleil. Une seule colonne, rien qui deborde sur le cote (mesure a 375 px de
+  large : 0 px de debordement), boutons et liens d'action a 44 px de haut au
+  moins, seuls les liens poses au milieu d'une phrase y echappent parce qu'on
+  les vise dans le texte. L'action principale FERME la page au lieu de rester
+  collee en bas : voir la mesure a `.agir`, une barre collante recouvrait les
+  competences sur tout le defilement.
+-->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Les controles natifs, l'ascenseur et le remplissage automatique du
+     navigateur suivent ce mot : sans lui, ils restent peints en sombre. */
+  color-scheme:light;
+
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES --- */
+
+  /* Fonds. Blanc casse chaud, teinte 42 deg : la teinte du creme de marque
+     (41,5 deg). Le blanc pur a ete mesure et ecarte : 18,46 contre 16,66,
+     mais teinte nulle, donc aucune parente avec la marque. */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posee dessus, et le haut du degrade de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et elements enfonces */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, legendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de degrade */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'etiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalcules pour le clair : les valeurs sombres y sont
+     illisibles. #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* reussite et disponibilite.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet creme sombre pose sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : equilibre sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchange */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSEE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre. Meme teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintees au bleu nuit. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+/* RIEN NE DEBORDE SUR LE COTE, et pas par un `overflow-x:hidden` sur body :
+   pose la, il fait de body le conteneur de defilement et met `position:sticky`
+   en panne. Il masquerait en plus le defaut qu'on cherche a mesurer. On coupe
+   donc les mots trop longs a la source : une denomination sociale de quarante
+   caracteres sans espace, une adresse de photo, un message d'erreur de la base. */
+img,svg{max-width:100%}
+code{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cream-dim);
+  overflow-wrap:anywhere}
+.wrap{max-width:620px;margin:0 auto;padding:clamp(20px,5vw,44px) var(--gut) 40px}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;margin-bottom:22px}
+/* Le logo est un lien vers l'accueil : sur telephone, il doit se viser au
+   pouce. Mesure au navigateur : 24 px de haut sans ce `min-height`, soit la
+   moitie des 44 px attendus. Le `margin` negatif garde l'alignement optique
+   avec le bord gauche de la page. */
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:21px;line-height:1;color:var(--cream);text-decoration:none;
+  min-height:44px;padding:0 10px;margin-left:-10px;border-radius:12px}
+.marque:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px}
+/* Le mot-marque suppose un fond fonce : le « a » ambre vaut 9,31:1 sur le nuit
+   et 1,66:1 sur le papier clair. Il prend l'ambre de texte, 5,85:1 sur le sol. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+
+/* Le retour vers la recherche. C'est un lien, pas un bouton : il mene ailleurs,
+   il doit s'ouvrir dans un nouvel onglet si le confrere le demande. */
+.retour{display:inline-flex;align-items:center;gap:7px;min-height:44px;
+  background:none;border:1px solid var(--line);color:var(--cream-dim);
+  font:inherit;font-size:12.5px;border-radius:999px;padding:6px 14px;
+  cursor:pointer;text-decoration:none}
+.retour:hover{border-color:var(--accent-texte);color:var(--accent-texte);background:var(--bg-2)}
+.retour:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+
+/* ---------------------------------------------------------- l'en-tete fiche */
+.tete{display:flex;gap:16px;align-items:flex-start}
+.photo,.mono{width:84px;height:84px;flex:none;border-radius:20px;
+  border:1px solid var(--line);background:var(--surface)}
+.photo{object-fit:cover;display:block}
+/* L'AMBRE EN APLAT, L'ENCRE DESSUS : 10,06:1. En lettre ambre sur le puits,
+   l'initiale tombait a 1,53:1, c'est-a-dire nulle part. */
+.mono{display:grid;place-items:center;background:var(--accent);border-color:var(--accent-2);
+  font-family:"Signika",sans-serif;font-weight:700;font-size:30px;color:var(--encre)}
+.tete-txt{min-width:0}
+/* HIERARCHIE. Le nom de l'entreprise saute de 16 px de corps a 44 px : c'est
+   la seule chose a lire en arrivant. Sur telephone il tient 30 px. */
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(30px,6vw,44px);line-height:1.02;letter-spacing:-.022em;
+  overflow-wrap:anywhere}
+h1:focus{outline:none}
+h1:focus-visible{outline:3px solid var(--accent-texte);outline-offset:4px;border-radius:6px}
+/* L'ambre SOUS le mot, jamais DANS le mot : 1,84:1 en lettre contre 16,66:1
+   pour l'encre posee sur un surlignage ambre. */
+h1 .em{color:var(--cream);padding:0 .06em;
+  background:linear-gradient(180deg,transparent 62%,var(--accent) 62%)}
+.sous-titre{color:var(--cream-mut);font-size:15.5px;margin:8px 0 0;overflow-wrap:anywhere;
+  max-width:52ch}
+/* UN SEUL ACCENT DE COULEUR SUR LA FICHE, et il porte un mot : l'aplat ambre
+   avec l'encre dessus, 10,06:1. Le voile de la charte sombre donnait 1,20:1 de
+   bordure sur du blanc, c'est-a-dire aucune bordure. */
+.pastille{display:inline-flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--encre);
+  background:var(--accent);border:1px solid var(--accent-2);
+  padding:5px 13px;border-radius:999px;margin:0 0 12px}
+
+.faits{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+.fait{display:inline-flex;align-items:center;gap:8px;background:var(--bg-2);
+  border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13.5px;
+  color:var(--cream-mut);box-shadow:var(--ombre-1)}
+.fait b{font-family:"Signika",sans-serif;color:var(--cream);font-weight:600}
+
+/* ------------------------------------------------------------- les sections */
+.bloc{margin:30px 0 0}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:16px;margin:0 0 10px;
+  display:flex;align-items:center;gap:10px}
+h2 .compte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--cream-dim);
+  font-weight:400;letter-spacing:.04em}
+.texte{color:var(--cream-mut);font-size:15.2px;margin:0;white-space:pre-line;
+  overflow-wrap:anywhere}
+.vide{color:var(--cream-dim);font-size:13.5px;margin:0;line-height:1.55}
+
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
+.tag{display:inline-flex;align-items:center;background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13.5px;
+  overflow-wrap:anywhere}
+.genre{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--cream-dim);margin:0 0 6px}
+
+/* Une carte blanche sur le sol ne donne que 1,108:1 : le palier seul ne suffit
+   pas. Filet a 1,35 plus ombre douce, jamais un aplat plus fonce derriere. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:16px;
+  padding:16px 18px;margin:12px 0 0;box-shadow:var(--ombre-1)}
+/* PAS D'OPACITE SUR UNE CARTE QUI PORTE UNE EXPLICATION. Le `opacity:.62`
+   repris de l'espace artisan faisait tomber son texte a 3,81:1 sur le fond
+   (mesure au calcul WCAG), sous le seuil de 4,5:1 exige pour du texte courant.
+   Or ce qui est ecrit dans cette carte-la est precisement ce qu'il faut lire :
+   pourquoi quelque chose ne marche pas encore. On la distingue donc par un
+   trait discontinu et non en l'effacant. Texte remonte a 7,88:1. */
+.carte.eteinte{border-style:dashed;box-shadow:none}
+.carte h3{font-family:"Signika",sans-serif;font-size:15px;margin:0 0 3px;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.carte p{margin:.3rem 0;font-size:13.5px;color:var(--cream-mut)}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap}
+
+/* ------------------------------------------------------------- les boutons */
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  border-radius:999px;padding:14px 26px;cursor:pointer;border:1px solid transparent;
+  text-decoration:none;min-height:48px}
+/* L'aplat ambre porte l'encre : 10,06:1. Jamais de blanc dessus (1,84:1). */
+.bouton.plein{background:var(--accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.bouton.plein:hover{background:var(--accent-2)}
+.bouton.creux{background:transparent;color:var(--cream);border-color:var(--line)}
+/* Un bouton eteint reste LISIBLE, ET L'OPACITE NE SERT PLUS A RIEN ICI. Sur du
+   sombre, baisser l'opacite eteignait lentement. Sur du clair, l'ecart entre
+   l'encre et le papier est de 15 a 18 points de ratio : le texte s'efface
+   beaucoup plus vite, et une demi-opacite fait echouer jusqu'au noir (3,49:1).
+   On pose donc des couleurs mesurees : terne sur le puits, 5,15:1. */
+.bouton:disabled,.bouton[aria-disabled="true"]{background:var(--surface-2);
+  color:var(--cream-dim);border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.pied-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* L'ACTION RESTE DANS LE FIL, ET C'EST UNE CORRECTION, PAS UN CHOIX PAR
+   DEFAUT. Elle a d'abord ete posee en `position:sticky` pour rester sous le
+   pouce. Mesure au navigateur, ecran de 375 px : le bloc fait 280 px de haut,
+   bouton plus explication, et il recouvrait les competences pendant tout le
+   defilement. Un bouton qui cache ce qu'on est venu lire est pire qu'un bouton
+   qu'il faut aller chercher en bas. Il ferme donc la page, precede d'un trait. */
+.agir{margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--line)}
+
+.etat{border-radius:12px;padding:13px 16px;margin:16px 0 0;font-size:14.2px;display:none}
+.etat.vu{display:block}
+/* Les bordures d'etat sont RECONSTRUITES sur les couleurs sombres : le vert vif
+   a 35 % donnait 1,27:1 sur une carte blanche, le saumon 1,28:1. */
+.etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+
+.pied{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--cream-dim);line-height:1.6}
+.pied a{color:var(--cream-dim)}
+
+/* ---------------------------------------------------- l'ecran de chargement
+   Un squelette plutot qu'un « Un instant… » seul : il occupe la place exacte
+   que prendra la fiche, donc rien ne saute quand elle arrive. */
+/* Le squelette prend le SEUL aplat neutre de la charte : --surface a #FBF8F2
+   ne donne que 1,02:1 sur une carte blanche, soit un squelette invisible. */
+.sq{background:var(--agenda-fond);border-radius:10px;animation:respire 1.4s ease-in-out infinite}
+.sq.rond{width:84px;height:84px;border-radius:20px;flex:none}
+@keyframes respire{0%,100%{opacity:.55}50%{opacity:.85}}
+.chargement-txt{position:absolute;left:-9999px}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE. Le squelette cesse de respirer,
+   et le defilement automatique devient instantane. */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+
+@media(max-width:420px){
+  .tete{gap:13px}
+  .photo,.mono,.sq.rond{width:66px;height:66px;border-radius:16px}
+  .mono{font-size:24px}
+  .bouton{width:100%}
+  .pied-actions .bouton{flex:1 1 100%}
+}
+
+/* La barre de l'espace. Defilement horizontal plutot qu'un menu replie : sur un
+   chantier l'artisan a une main, et un menu demande deux gestes au lieu d'un. */
+.nav-app{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.nav-app::-webkit-scrollbar{display:none}
+/* Des pastilles, pas des liens de texte : le soulignement par defaut
+   traversait l'aplat ambre de l'ecran courant. Le survol et le focus gardent
+   chacun leur signe. */
+.nav-app a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 14px;
+  border-radius:999px;font-weight:600;font-size:.9375rem;color:var(--cream-mut);
+  text-decoration:none;white-space:nowrap;transition:background .2s,color .2s}
+.nav-app a:hover{background:var(--surface-2);color:var(--cream)}
+/* L'ecran ou l'on est : aplat ambre plein, encre dessus. 10,06:1. */
+.nav-app a[aria-current="page"]{background:var(--accent);color:var(--encre)}
+/* Jamais d'opacite sur du texte clair : a .45 l'encre tombe a 2,1:1.
+   Le gris terne, lui, est mesure a 5,15:1 sur la surface la plus foncee. */
+.nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none}
+.nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.nav-note{margin:-10px 0 16px;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
+
+/* ------------------------------------------------- LA MISE EN PAGE CHANGE
+   En dessous de 900 px : une colonne, et l'action ferme la page (mesure du
+   13/09 : une barre collante recouvrait les competences sur tout le
+   defilement). Au-dessus : la fiche se lit a gauche et l'action tient a
+   droite, sous les yeux, sans rien recouvrir. Ce n'est pas la meme page
+   compressee, c'est une autre mise en page. */
+.fiche{display:grid;gap:clamp(20px,3vw,34px)}
+@media(min-width:900px){
+  .wrap{max-width:1000px}
+  .fiche{grid-template-columns:minmax(0,1fr) 304px;align-items:start;
+    gap:clamp(30px,4vw,56px)}
+  .fiche-cote{position:sticky;top:24px}
+  .fiche-cote .agir{margin:0;padding:20px;border-top:none;border:1px solid var(--line);
+    background:var(--bg-2);border-radius:20px;box-shadow:var(--ombre-2)}
+  .fiche-cote .bouton{width:100%}
+}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <a class="marque" href="/" aria-label="à dispo, accueil">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </a>
+    <span id="zone-retour"></span>
+  </div>
+
+  <!-- LA BARRE DE L'ESPACE. Elle n'existe que pour qui a une session : un
+       visiteur de passage sur une fiche publique n'a rien a faire de cinq liens
+       qui le renverraient tous vers la connexion. Et tant que le parcours n'est
+       pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
+       au lieu de mener sur du vide. -->
+  <nav class="nav-app" id="nav-app" data-ici="" aria-label="Mon espace" hidden>
+    <a href="/espace" data-ecran="espace">Mon espace</a>
+    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
+    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
+    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
+    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
+  </nav>
+  <p class="nav-note" id="nav-note" hidden></p>
+
+  <main id="ecran" aria-busy="true">
+    <p class="chargement-txt" role="status">Chargement de la fiche.</p>
+    <div class="tete" aria-hidden="true">
+      <div class="sq rond"></div>
+      <div style="flex:1;min-width:0">
+        <div class="sq" style="height:14px;width:42%;margin-bottom:12px"></div>
+        <div class="sq" style="height:22px;width:78%;margin-bottom:9px"></div>
+        <div class="sq" style="height:14px;width:58%"></div>
+      </div>
+    </div>
+    <div class="faits" aria-hidden="true">
+      <div class="sq" style="height:36px;width:150px;border-radius:10px"></div>
+      <div class="sq" style="height:36px;width:120px;border-radius:10px"></div>
+    </div>
+  </main>
+
+  <div class="etat ok" id="s-ok" role="status" aria-live="polite"></div>
+  <div class="etat ko" id="s-ko" role="alert"></div>
+
+  <div class="pied">
+    À dispo met en relation <b>deux entreprises immatriculées</b>, en sous-traitance.
+    Ce qui se passe ensuite se règle entre vous, devis et facture, comme avec n'importe
+    quel sous-traitant. Chacun reste responsable de son travail et de ses assurances.
+    <br>
+    Ni téléphone ni SIRET sur cette fiche, et ce n'est pas un oubli : les coordonnées
+    ne se transmettent qu'après une mise en relation acceptée, des deux côtés.
+    <a href="/aide">Des questions&nbsp;?</a>
+    <span id="zone-legal"></span>
+  </div>
+</div>
+
+<script type="module">
+/* La base du projet. La cle publique est publique par nature : la protection
+   vient des autorisations posees sur les tables et sur la vue, pas du secret de
+   la cle. Ici, elle ne donne acces qu'a ce que `fiches_publiques` expose. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+/* Les colonnes sont nommees une par une, et jamais `*` : le jour ou quelqu'un
+   ajoute une colonne a la vue, cette page ne se met pas a l'afficher toute
+   seule. La liste ci-dessous est exactement celle de `fiches_publiques`. */
+const COLONNES = "id,prenom,denomination,metier,presentation,photo_url,commune,departement,rayon_km";
+
+/* Les deux sources que cette page LIT SANS LES CREER. `atouts_publics` reste
+   entierement a ecrire (le SQL est en tete de fichier). `notes_publiques`
+   existe deja dans crm/supabase/migration-recherche-relations.sql, ecrit par
+   le chantier voisin : ses noms de colonnes sont RELEVES dans ce fichier, pas
+   supposes. Si un nom change la-bas, il change ICI, a un seul endroit. */
+const VUE_ATOUTS = "atouts_publics";   /* attendu : artisan_id, genre, libelle */
+const VUE_NOTES  = "notes_publiques";  /* releve : cible_id, moyenne, nombre, moyenne_qualite, moyenne_delais */
+
+/* Les pages tenues par le chantier voisin. On ne suppose pas qu'elles
+   existent : on le verifie avant d'en faire un lien. */
+const PAGE_RECHERCHE = "/recherche";
+const PAGE_DEMANDES  = "/demandes";
+/* Cette page affiche le prenom, la photo et l'entreprise d'une personne : elle
+   doit pouvoir renvoyer vers les mentions et le traitement des donnees. La
+   page existe (legal/index.html, chantier voisin) mais n'est pas forcement
+   publiee : on verifie avant d'en faire un lien, comme pour les autres. */
+const PAGE_LEGAL = "/legal";
+
+const $ = (i) => document.getElementById(i);
+const ecran = $("ecran");
+
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  /* Animation reduite si le systeme le demande : la feuille de style ne suffit
+     pas, `behavior:"smooth"` passe outre. */
+  const doux = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  d.scrollIntoView({ behavior: doux ? "smooth" : "auto", block: "nearest" });
+}
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+
+/* L'identifiant se lit dans l'adresse : /artisan?id=<uuid>. Pas de segment de
+   chemin (/artisan/<uuid>) : l'hebergement sert des pages a plat, et
+   /artisan/<uuid> repondrait 404 avant meme d'arriver ici. */
+const ID = new URLSearchParams(location.search).get("id");
+const R_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/* --------------------------------------------------------------- la lecture
+   Un `fetch` direct plutot que la bibliotheque Supabase : la fiche est le
+   contenu de la page, elle doit s'afficher sans attendre qu'un module de
+   plusieurs dizaines de kilo-octets descende en 4G depuis un chantier. La
+   bibliotheque est chargee en parallele, et seulement pour savoir si le
+   visiteur a une session ouverte. */
+async function lire(chemin) {
+  const r = await fetch(BASE + "/rest/v1/" + chemin, {
+    headers: { apikey: CLE, Authorization: "Bearer " + CLE, Accept: "application/json" }
+  });
+  let corps = null;
+  try { corps = await r.json(); } catch (e) { corps = null; }
+  if (r.ok) return { ok: true, lignes: Array.isArray(corps) ? corps : [] };
+  return { ok: false, statut: r.status,
+           code: corps && corps.code ? corps.code : null,
+           message: corps && corps.message ? corps.message : "" };
+}
+
+/* Une page du site existe-t-elle deja ? « oui », « non », ou « inconnu » quand
+   la question elle-meme n'a pas pu etre posee (pas de reseau, fichier ouvert
+   en local). On ne repond jamais « non » a partir d'un doute : dire a un
+   confrere qu'une page n'existe pas alors qu'elle existe est une fausse donnee
+   au meme titre qu'un bouton mort. */
+const DEJA_VU = new Map();
+function existe(chemin) {
+  /* La reponse est gardee : la recherche est demandee a deux endroits de la
+     page, et une adresse ne change pas d'existence entre les deux. */
+  if (!DEJA_VU.has(chemin)) {
+    DEJA_VU.set(chemin, fetch(chemin, { method: "HEAD" })
+      .then((r) => (r.ok ? "oui" : "non"))
+      .catch(() => "inconnu"));
+  }
+  return DEJA_VU.get(chemin);
+}
+
+/* ------------------------------------------------------------- les ecrans */
+
+function ecranMessage(titre, corps, avecRetour) {
+  ecran.setAttribute("aria-busy", "false");
+  ecran.innerHTML =
+    '<span class="pastille">Fiche</span>'
+    + '<h1 tabindex="-1" id="t">' + titre + "</h1>"
+    + '<p class="sous-titre">' + corps + "</p>"
+    + (avecRetour === false ? "" : '<div class="agir"><div class="pied-actions" id="sortie"></div></div>');
+  $("t").focus();
+  if (avecRetour !== false) sortieVersRecherche($("sortie"));
+}
+
+/* Le retour vers la recherche, pose au meme endroit dans tous les cas
+   d'echec. Trois etats, parce que la page de recherche est ecrite par un autre
+   chantier et peut ne pas encore etre en ligne. */
+async function sortieVersRecherche(zone) {
+  if (!zone) return;
+  zone.innerHTML = '<span class="vide">On regarde si la recherche est en ligne…</span>';
+  const etat = await existe(PAGE_RECHERCHE);
+  if (etat === "oui") {
+    zone.innerHTML = '<a class="bouton plein" href="' + PAGE_RECHERCHE + '">Chercher un confrère</a>';
+  } else if (etat === "non") {
+    zone.innerHTML = '<p class="vide">La page de recherche n\'est pas encore en ligne : '
+      + 'elle est en cours de construction. Il n\'y a donc pas de lien ici, '
+      + 'plutôt qu\'un lien qui mènerait à une page introuvable.<br>'
+      + '<a href="/aide" style="color:var(--accent-texte)">Voir l\'aide</a></p>';
+  } else {
+    zone.innerHTML = '<a class="bouton creux" href="' + PAGE_RECHERCHE + '">Chercher un confrère</a>'
+      + '<span class="vide">On n\'a pas pu vérifier que cette page existe déjà : '
+      + 'si elle s\'ouvre sur une erreur, c\'est qu\'elle est encore en construction.</span>';
+  }
+}
+
+function monogramme(fiche) {
+  /* Le PRENOM d'abord. Mesure faite sur une fiche d'essai : « SARL TOITURE DES
+     ALPES » donnait un « S », qui est l'initiale d'une forme juridique et de
+     personne. L'initiale du prenom dit a qui on parle. */
+  const base = (fiche.prenom || fiche.denomination || "").trim();
+  const c = base.slice(0, 1).toUpperCase();
+  /* Une lettre ou un chiffre, rien d'autre : ce caractere part dans un attribut
+     HTML, et un guillemet en premiere position casserait l'attribut. */
+  return /^[\p{L}\p{N}]$/u.test(c) ? echapper(c) : "?";
+}
+
+/* La photo vient d'une autre fiche que la sienne : on ne lui fait pas
+   confiance. Seules `http` et `https` sont acceptees (une adresse `javascript:`
+   est inerte dans une image, mais autant ne pas la poser), et le navigateur
+   n'envoie pas d'ou vient le visiteur a l'hebergeur de l'image. */
+function photoSure(url) {
+  if (!url) return null;
+  try {
+    const u = new URL(url, location.origin);
+    return (u.protocol === "http:" || u.protocol === "https:") ? u.href : null;
+  } catch (e) { return null; }
+}
+
+function ecranFiche(fiche) {
+  const nom = fiche.denomination || fiche.prenom || "Cette entreprise";
+  const photo = photoSure(fiche.photo_url);
+  const lieu = [fiche.commune, fiche.departement ? "(" + fiche.departement + ")" : null]
+    .filter(Boolean).join(" ");
+
+  let h = "";
+
+  /* --- l'en-tete --- */
+  h += '<div class="tete">';
+  h += photo
+    ? '<img class="photo" src="' + echapper(photo) + '" alt="" referrerpolicy="no-referrer" '
+      + 'decoding="async" onerror="this.outerHTML=\'<span class=&quot;mono&quot; aria-hidden=&quot;true&quot;>'
+      + monogramme(fiche) + '</span>\'">'
+    : '<span class="mono" aria-hidden="true">' + monogramme(fiche) + "</span>";
+  h += '<div class="tete-txt">';
+  if (fiche.metier) h += '<span class="pastille">' + echapper(fiche.metier) + "</span>";
+  h += '<h1 tabindex="-1" id="t">' + echapper(nom) + "</h1>";
+  /* Le prenom n'est repete que s'il apporte quelque chose : sur une fiche au
+     nom d'une societe, il dit a qui on parle. La vue ne donne pas le nom de
+     famille, et cette page ne cherche pas a le reconstituer. */
+  if (fiche.prenom && fiche.denomination)
+    h += '<p class="sous-titre">Tu parleras à <b>' + echapper(fiche.prenom) + "</b>.</p>";
+  h += "</div></div>";
+
+  /* --- les faits, en une ligne de pastilles --- */
+  h += '<div class="faits">';
+  if (lieu) h += '<span class="fait">Basé à <b>' + echapper(lieu) + "</b></span>";
+  if (fiche.rayon_km)
+    h += '<span class="fait">Se déplace jusqu\'à <b>' + echapper(fiche.rayon_km) + " km</b></span>";
+  /* « Note » et « Avis », des noms : « Noté » s'accorderait avec quelqu'un
+     dont la vue ne dit pas le genre. */
+  h += '<span class="fait" id="f-note">Avis <b>…</b></span>';
+  h += "</div>";
+
+  /* --- le corps de la fiche, et la colonne d'action --- */
+  h += '<div class="fiche"><div class="fiche-corps">';
+
+  /* --- la presentation --- */
+  h += '<section class="bloc"><h2>Sa présentation</h2>';
+  h += fiche.presentation
+    ? '<p class="texte">' + echapper(fiche.presentation) + "</p>"
+    : '<p class="vide">Pas encore de présentation écrite sur cette fiche. '
+      + 'Le métier et la zone, ci-dessus, tiennent quand même : l\'entreprise a été '
+      + 'contrôlée au registre officiel à l\'inscription.</p>';
+  h += "</section>";
+
+  /* --- les atouts, remplis plus bas, quand la vue aura repondu --- */
+  h += '<section class="bloc" id="bloc-atouts"><h2>Compétences et matériel '
+     + '<span class="compte" id="compte-atouts"></span></h2>'
+     + '<p class="vide" id="atouts">Chargement…</p></section>';
+
+  /* --- les notes --- */
+  h += '<section class="bloc" id="bloc-notes"><h2>Les avis des confrères</h2>'
+     + '<p class="vide" id="notes">Chargement…</p></section>';
+
+  /* --- les disponibilites : elles ne sont pas publiques, et on le dit --- */
+  h += '<section class="bloc"><h2>Les disponibilités</h2>'
+     + '<div class="carte eteinte"><h3>Pas visibles depuis cette page'
+     +   '<span class="quand">à trancher</span></h3>'
+     +   '<p>Chaque artisan pose ses jours occupés dans son espace, et ils ne sortent pas '
+     +   'du compte : la table qui les porte n\'est lisible que par son propriétaire.</p>'
+     +   '<p>Publier l\'agenda d\'une entreprise à qui passe sur le lien est une décision '
+     +   'à prendre avec Claire-Marie, pas une ligne de code. En attendant, la question '
+     +   'se pose au moment de la mise en relation.</p></div></section>';
+
+  /* --- l'action, seule dans sa colonne : une chose importante par ecran --- */
+  h += '</div><aside class="fiche-cote">'
+     + '<div class="agir"><div id="action"></div></div></aside></div>';
+
+  ecran.setAttribute("aria-busy", "false");
+  ecran.innerHTML = h;
+  /* Le focus va sur le titre : au clavier comme au lecteur d'ecran, on arrive
+     sur le nom de la fiche et pas au-dessus du logo. */
+  $("t").focus();
+}
+
+/* --------------------------------------------------------------- les atouts */
+/* Des noms, et pas « ce qu'il sait faire » : la vue `fiches_publiques` ne dit
+   pas si l'artisan est un homme ou une femme, et le deviner a partir d'un
+   prenom serait une donnee inventee de plus. Les quatre genres sont ceux de
+   `artisan_atouts`, et pas un de plus. */
+const GENRES = [["competence", "Savoir-faire"], ["outillage", "Outillage"],
+                ["permis", "Permis et habilitations"], ["materiel", "Matériel prêtable"]];
+
+async function chargerAtouts(id) {
+  const zone = $("atouts"), compte = $("compte-atouts");
+  if (!zone) return;
+  let r;
+  try {
+    r = await lire(VUE_ATOUTS + "?artisan_id=eq." + encodeURIComponent(id)
+                   + "&select=genre,libelle&order=genre");
+  } catch (e) {
+    /* Sans ce filet, une coupure de reseau laissait « Chargement… » a l'ecran
+       pour toujours, ce qui est un ecran mort. */
+    zone.textContent = "Ses atouts n'ont pas pu être chargés : pas de réseau.";
+    return;
+  }
+  /* PGRST205 : la vue n'existe pas. C'est le cas aujourd'hui, et il faut le
+     DIRE : lire `artisan_atouts` a la place rendrait une liste vide meme si
+     l'artisan a declare quinze atouts, faute de politique de lecture pour un
+     visiteur. Afficher « aucun atout » a partir de ce vide-la serait une
+     fausse donnee. */
+  if (!r.ok) {
+    if (r.code === "PGRST205" || r.statut === 404) {
+      zone.innerHTML = "Ses compétences, son outillage, ses permis et son matériel sont "
+        + "bien enregistrés, mais ils ne sont pas encore publics : la vue qui les expose "
+        + "reste à créer dans la base. <br><b>Ce n'est pas que la fiche soit vide</b> : "
+        + "c'est qu'on ne peut pas encore le lire d'ici.<br>"
+        + '<code>Côté technique : créer la vue ' + VUE_ATOUTS + ", le SQL est en tête de ce fichier.</code>";
+      return;
+    }
+    zone.textContent = "Ses atouts n'ont pas pu être chargés. "
+      + (r.message || "La base n'a pas répondu comme attendu.");
+    return;
+  }
+  const lignes = r.lignes;
+  if (!lignes.length) {
+    zone.textContent = "Compétences, outillage et matériel ne sont pas encore renseignés "
+      + "sur cette fiche.";
+    return;
+  }
+  compte.textContent = lignes.length + (lignes.length > 1 ? " éléments" : " élément");
+  let h = "";
+  GENRES.forEach(([g, titre]) => {
+    const miens = lignes.filter((a) => a.genre === g);
+    if (!miens.length) return;
+    h += '<p class="genre">' + titre + "</p><div class=\"tags\">"
+       + miens.map((a) => '<span class="tag">' + echapper(a.libelle) + "</span>").join("")
+       + "</div>";
+  });
+  /* Un genre inconnu de la liste ci-dessus ne disparait pas en silence : il
+     s'affiche sans titre plutot que d'etre perdu. */
+  const restants = lignes.filter((a) => !GENRES.some(([g]) => g === a.genre));
+  if (restants.length)
+    h += '<div class="tags">' + restants.map((a) =>
+      '<span class="tag">' + echapper(a.libelle) + "</span>").join("") + "</div>";
+  zone.outerHTML = '<div id="atouts">' + h + "</div>";
+}
+
+/* ---------------------------------------------------------------- les notes */
+async function chargerNotes(id) {
+  const zone = $("notes"), fait = $("f-note");
+  if (!zone) return;
+  let r;
+  try {
+    /* `cible_id`, et non `artisan_id` : c'est le nom de la colonne dans la
+       vue du chantier voisin. Releve dans son fichier, pas devine. */
+    r = await lire(VUE_NOTES + "?cible_id=eq." + encodeURIComponent(id)
+                   + "&select=moyenne,nombre,moyenne_qualite,moyenne_delais");
+  } catch (e) {
+    if (fait) fait.remove();
+    zone.textContent = "Les notes n'ont pas pu être chargées : pas de réseau.";
+    return;
+  }
+  if (!r.ok) {
+    if (fait) fait.remove();
+    if (r.code === "PGRST205" || r.statut === 404) {
+      /* La table des notations est construite par un autre chantier. On ne la
+         cree pas, on ne devine pas de note, et on ne laisse pas un blanc. */
+      zone.innerHTML = "Les avis entre confrères ne sont pas encore ouverts : la "
+        + "migration qui porte les évaluations n'est pas encore jouée sur la base. "
+        + "Aucune note n'est affichée ici tant qu'il n'y en a pas de vraies.<br>"
+        + "<code>Côté technique : jouer crm/supabase/migration-recherche-relations.sql.</code>";
+      return;
+    }
+    zone.textContent = "Les notes n'ont pas pu être chargées. "
+      + (r.message || "La base n'a pas répondu comme attendu.");
+    return;
+  }
+  const n = r.lignes[0];
+  if (!n || !n.nombre) {
+    if (fait) fait.innerHTML = "Avis <b>aucun</b>";
+    zone.textContent = "Aucun avis pour l'instant. C'est normal au début : "
+      + "les avis arrivent après les premiers chantiers.";
+    return;
+  }
+  const chiffre = (v) => {
+    const x = Number(v);
+    return Number.isFinite(x) ? x.toFixed(1).replace(".", ",") : null;
+  };
+  const jolie = chiffre(n.moyenne) || "?";
+  if (fait) fait.innerHTML = "Note <b>" + echapper(jolie) + " sur 5</b>";
+  /* Les deux sous-notes sont celles de la vue : qualite du travail, et delais
+     de paiement. Elles ne sont affichees que si elles existent : une note
+     moyenne sans detail reste une note, un detail invente n'est pas une note. */
+  const q = chiffre(n.moyenne_qualite), d = chiffre(n.moyenne_delais);
+  let t = jolie + " sur 5, sur " + n.nombre
+        + (n.nombre > 1 ? " avis de confrères." : " avis de confrère.");
+  if (q) t += " Qualité du travail : " + q + " sur 5.";
+  if (d) t += " Délais de paiement : " + d + " sur 5.";
+  zone.textContent = t;
+}
+
+/* ------------------------------------------------------- la mise en relation
+   LE BOUTON EXISTE, ET IL NE CLIQUE JAMAIS DANS LE VIDE. Trois situations,
+   trois libelles, et dans chacune la page dit ce qui manque :
+     · pas de session : le bouton mene a la connexion, qui marche aujourd'hui ;
+     · session ouverte et page des demandes en ligne : le bouton y mene ;
+     · session ouverte et page des demandes absente : le bouton est ETEINT,
+       avec la raison ecrite a cote.
+   Aucun montant d'abonnement n'est ecrit nulle part : le tarif n'est pas
+   arrete, et rien n'est demande aujourd'hui. */
+async function actionRelation(fiche) {
+  const zone = $("action");
+  if (!zone) return;
+  zone.innerHTML = '<p class="vide">On regarde si tu es connecté…</p>';
+
+  let session = null, panneAuth = false, sb = null;
+  try {
+    const { createClient } = await import(
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+    sb = createClient(BASE, CLE, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+    });
+    const { data } = await sb.auth.getSession();
+    session = data && data.session ? data.session : null;
+  } catch (e) { panneAuth = true; }
+
+  const prenom = fiche.prenom ? echapper(fiche.prenom) : "cette entreprise";
+
+  if (panneAuth) {
+    zone.innerHTML = '<a class="bouton plein" href="/connexion" aria-label="Se connecter pour '
+      + 'contacter ' + prenom + '">Se connecter</a>'
+      + '<p class="vide" style="margin-top:10px">On n\'a pas pu vérifier si tu étais déjà '
+      + 'connecté : la connexion te le dira.</p>';
+    return;
+  }
+
+  if (!session) {
+    zone.innerHTML = '<a class="bouton plein" href="/connexion" aria-label="Se connecter pour '
+      + 'contacter ' + prenom + '">Se connecter</a>'
+      + '<p class="vide" style="margin-top:10px">Il faut un compte vérifié au SIRET pour '
+      + 'demander une mise en relation : c\'est ce qui garantit à chacun qu\'en face il y a '
+      + 'une entreprise, et pas quelqu\'un qui bricole le week-end.<br>'
+      + '<b>La connexion t\'emmène sur ton espace</b> : reviens ensuite sur cette fiche '
+      + 'par le lien que tu as reçu. Le retour automatique n\'est pas encore branché.<br>'
+      + 'Faudra-t-il un abonnement en cours pour envoyer une demande&nbsp;? '
+      + '<b>Ce n\'est pas tranché</b>, et rien ne t\'est demandé aujourd\'hui.</p>';
+    return;
+  }
+
+  /* SESSION OUVERTE. Deux questions, dans cet ordre, et posees A LA BASE
+     plutot que supposees :
+       1. ce compte a-t-il le droit d'envoyer une demande ? C'est
+          `peut_demander()` qui repond, et elle seule : la regle est une date
+          d'essai ou d'abonnement en cours, jamais un montant ;
+       2. la page qui porte la demande est-elle en ligne ?
+     Chaque « non » a sa propre phrase. Un bouton eteint sans raison, ou avec
+     la mauvaise raison, envoie l'artisan chercher au mauvais endroit. */
+  zone.innerHTML = '<p class="vide">On regarde si la mise en relation est ouverte…</p>';
+
+  let droit = null, manqueBase = false;
+  try {
+    const { data, error } = await sb.rpc("peut_demander");
+    /* PGRST202 : la fonction n'existe pas encore. Mesure du 13/09/2026 : c'est
+       le cas, la migration des relations est ecrite mais pas jouee. */
+    if (error) {
+      if (error.code === "PGRST202" || error.code === "42883") manqueBase = true;
+      else throw error;
+    } else droit = data === true;
+  } catch (e) { manqueBase = true; }
+
+  if (manqueBase) {
+    eteindre(zone,
+      "la base n'a pas encore reçu la migration qui porte les mises en relation",
+      "Le code existe, il n'est pas encore joué sur la base. Rien ne partirait.",
+      "Côté technique : jouer crm/supabase/migration-recherche-relations.sql.");
+    return;
+  }
+  if (droit === false) {
+    /* AUCUN MONTANT. La regle est une date, pas un prix, et le tarif n'est pas
+       arrete. On dit ce qui manque, pas ce que ca coutera. */
+    eteindre(zone,
+      "ton accès n'est pas encore ouvert",
+      "Envoyer une demande suppose un essai ou un abonnement en cours. L'essai gratuit "
+      + "existe dans la base, mais aucun écran ne permet encore de l'ouvrir. Le tarif "
+      + "est en cours d'arbitrage et rien ne t'est demandé aujourd'hui.",
+      "Côté technique : brancher ouvrir_mon_essai() sur l'écran d'abonnement "
+      + "(0 appel dans les pages au 13/09/2026).");
+    return;
+  }
+
+  const etat = await existe(PAGE_DEMANDES);
+  if (etat === "oui") {
+    zone.innerHTML = '<a class="bouton plein" href="' + PAGE_DEMANDES + "?artisan="
+      + encodeURIComponent(fiche.id) + '">Demander une mise en relation</a>'
+      + '<p class="vide" style="margin-top:10px">Tu décris ton chantier et tes dates. '
+      + 'Rien n\'est engagé tant que vous n\'êtes pas d\'accord tous les deux, et à dispo '
+      + 'ne touche jamais à l\'argent de vos chantiers.<br>'
+      + 'Faudra-t-il un abonnement en cours pour envoyer une demande&nbsp;? '
+      + '<b>Ce n\'est pas tranché</b> : si la page des demandes te le refuse, c\'est que '
+      + 'la règle a été posée depuis.</p>';
+    return;
+  }
+  eteindre(zone,
+    etat === "non"
+      ? "la page qui porte les demandes n'est pas encore en ligne"
+      : "on n'a pas pu vérifier que la page des demandes est en ligne",
+    "Tant qu'elle n'est pas publiée, rien ne partirait.",
+    "Côté technique : publier " + PAGE_DEMANDES + ".");
+}
+
+/* UN SEUL ENDROIT POUR ETEINDRE UN BOUTON. Les trois refus possibles se
+   ressemblent trop pour etre ecrits trois fois : ils divergeraient a la
+   premiere retouche, et l'un des trois finirait sans explication. */
+function eteindre(zone, raison, suite, technique) {
+  zone.innerHTML = '<button class="bouton plein" type="button" id="eteint" '
+    + 'aria-disabled="true" aria-describedby="pourquoi">Demander une mise en relation</button>'
+    + '<p class="vide" id="pourquoi" style="margin-top:10px">'
+    + '<b>Ce bouton est éteint, et voilà pourquoi :</b> ' + raison + '. ' + suite + ' '
+    + 'En attendant, tu peux copier le lien de cette fiche et l\'envoyer toi-même.<br>'
+    + '<code>' + echapper(technique) + '</code></p>'
+    + '<div class="pied-actions" style="margin-top:12px">'
+    + '<button class="bouton creux" type="button" id="copier">Copier le lien</button>'
+    + "</div>";
+  /* `aria-disabled` n'empeche pas le clic : c'est le code qui le refuse, et qui
+     redit pourquoi plutot que de ne rien faire. */
+  $("eteint").addEventListener("click", () => {
+    dire("ko", "La mise en relation n'est pas encore ouverte.",
+      "Ce n'est pas toi : " + raison + ".");
+  });
+  brancherCopie();
+}
+
+/* La seule action qui marche a coup sur aujourd'hui, sans personne et sans
+   base : copier le lien. Elle a donc droit a un vrai etat de succes. */
+function brancherCopie() {
+  const b = $("copier");
+  if (!b) return;
+  b.addEventListener("click", async () => {
+    const lien = location.href;
+    try {
+      await navigator.clipboard.writeText(lien);
+      dire("ok", "Lien copié.", "Tu peux le coller dans un SMS ou un mail.");
+    } catch (e) {
+      /* Le presse-papier est refuse hors connexion securisee, et sur certains
+         navigateurs de telephone. On montre le lien plutot que d'echouer. */
+      dire("ko", "Copie impossible sur ce navigateur.",
+        "Voici le lien, à sélectionner à la main : <br><code>" + echapper(lien) + "</code>");
+    }
+  });
+}
+
+/* ---------------------------------------------------------------- demarrage */
+(async () => {
+  /* Le retour vers la recherche, en haut, des le premier instant : meme si
+     tout le reste echoue, on sait d'ou on vient et ou repartir. */
+  /* Le renvoi vers les mentions, si et seulement si la page repond. */
+  existe(PAGE_LEGAL).then((etat) => {
+    if (etat !== "oui") return;
+    $("zone-legal").innerHTML =
+      ' <a href="' + PAGE_LEGAL + '">Mentions et données personnelles</a>';
+  });
+
+  const haut = $("zone-retour");
+  existe(PAGE_RECHERCHE).then((etat) => {
+    if (etat === "non") { haut.innerHTML = ""; return; }
+    haut.innerHTML = '<a class="retour" href="' + PAGE_RECHERCHE + '">'
+      + "&#8592;&nbsp;Toutes les fiches</a>";
+  });
+
+  if (!ID) {
+    ecranMessage("Il manque l'identifiant de la fiche.",
+      "L'adresse doit ressembler à <code>/artisan?id=…</code>. Le lien que tu as reçu "
+      + "est sans doute incomplet : recopie-le en entier, ou repars de la recherche.");
+    return;
+  }
+  if (!R_UUID.test(ID)) {
+    /* On refuse AVANT d'appeler la base : une adresse mal formee ne merite pas
+       un aller-retour reseau, et le message est plus juste ici. */
+    ecranMessage("Cette adresse n'est pas une fiche.",
+      "L'identifiant contenu dans le lien n'a pas la forme attendue. "
+      + "Il a peut-être été coupé en route, par un SMS ou une messagerie.");
+    return;
+  }
+
+  const r = await lire("fiches_publiques?id=eq." + encodeURIComponent(ID)
+                       + "&select=" + COLONNES + "&limit=1").catch(() => null);
+
+  if (r === null) {
+    ecran.setAttribute("aria-busy", "false");
+    ecran.innerHTML = '<span class="pastille">Fiche</span>'
+      + '<h1 tabindex="-1" id="t">Pas de réseau.</h1>'
+      + '<p class="sous-titre">La fiche n\'a pas pu être chargée. Vérifie ta connexion : '
+      + 'sur un chantier, ça arrive.</p>'
+      + '<div class="agir"><div class="pied-actions">'
+      + '<button class="bouton plein" type="button" id="reessayer">Réessayer</button>'
+      + "</div></div>";
+    $("t").focus();
+    $("reessayer").addEventListener("click", () => location.reload());
+    return;
+  }
+
+  if (!r.ok) {
+    /* La vue absente ne peut arriver qu'avant la mise en service. Un confrere
+       ne doit jamais lire ce message, et s'il le lit, il doit savoir que ce
+       n'est pas de sa faute. */
+    if (r.code === "PGRST205" || r.statut === 404) {
+      ecranMessage("Les fiches ne sont pas encore ouvertes.",
+        "Reviens dans quelques jours. <br><code>Côté technique : jouer "
+        + "crm/supabase/migration-espace-artisan.sql.</code>");
+      return;
+    }
+    ecranMessage("La fiche n'a pas pu être chargée.",
+      "Réessaie dans un instant. Si ça bloque encore, écris-nous."
+      + (r.message ? "<br><code>" + echapper(r.message) + "</code>" : ""));
+    return;
+  }
+
+  const fiche = r.lignes[0];
+  if (!fiche) {
+    /* Deux cas, indistinguables depuis ici, et c'est voulu : la fiche n'a
+       jamais existe, ou son proprietaire l'a retiree. Dire lequel des deux
+       reviendrait a renseigner sur quelqu'un qui a justement demande a ne plus
+       etre visible. */
+    ecranMessage("Cette fiche n'est plus en ligne.",
+      "Soit le lien est erroné, soit la fiche a été retirée par son propriétaire. "
+      + "Dans les deux cas, il n'y a rien à voir ici.");
+    return;
+  }
+
+  ecranFiche(fiche);
+  /* Les trois compléments partent ensemble : aucun ne bloque l'affichage de la
+     fiche, et chacun sait dire lui-meme qu'il n'a pas abouti. */
+  chargerAtouts(fiche.id);
+  chargerNotes(fiche.id);
+  actionRelation(fiche);
+})();
+
+/* --------- La barre de l'espace ---------
+   Elle ne depend d'aucune autre piece de la page : elle lit la session
+   directement dans le stockage local, comme le fait deja le chargement
+   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
+   qu'aucun n'ait a lui preter ses fonctions. */
+(function () {
+  var nav = document.getElementById("nav-app");
+  if (!nav || !window.localStorage) return;
+
+  var cle = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
+  }
+  if (!cle) return;                       // pas de session : la barre n'existe pas
+  var sess;
+  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!sess || !sess.access_token || !sess.user) return;
+
+  var ici = nav.getAttribute("data-ici") || "";
+  var liens = nav.querySelectorAll("a");
+  for (var j = 0; j < liens.length; j++) {
+    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
+  }
+  nav.hidden = false;
+
+  /* LA BARRE DEFILE, ET L'ECRAN OU L'ON EST DOIT S'Y VOIR. Mesure a 390 px :
+     les cinq liens demandent 592 px pour 358 px visibles, et « Messages »
+     commence au-dela du bord. On amene donc le lien courant sous les yeux,
+     sans defilement anime : c'est une position de depart, pas un mouvement. */
+  var courant = nav.querySelector('a[aria-current="page"]');
+  if (courant && nav.scrollWidth > nav.clientWidth) {
+    nav.scrollLeft = Math.max(0, courant.offsetLeft - 12);
+  }
+
+  /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
+     rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
+  fetch(BASE + "/rest/v1/artisans?id=eq." + sess.user.id + "&select=etape",
+        { headers: { apikey: CLE, Authorization: "Bearer " + sess.access_token } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d[0] || d[0].etape === "fini") return;
+      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < bloques.length; k++) {
+        bloques[k].setAttribute("aria-disabled", "true");
+        bloques[k].setAttribute("tabindex", "-1");
+      }
+      var note = document.getElementById("nav-note");
+      if (note) {
+        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
+        note.hidden = false;
+      }
+    })
+    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+})();
+</script>

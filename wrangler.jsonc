@@ -1,0 +1,12 @@
+{
+  // Un worker qui ne sert que des fichiers : pas de code, pas de rendu serveur.
+  // Le produit parle a Supabase depuis le navigateur, il n'a besoin de rien ici.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "a-dispo",
+  "compatibility_date": "2026-09-15",
+  "assets": {
+    "directory": "./dist",
+    // Une adresse inconnue rend la page d'accueil plutot qu'une erreur brute.
+    "not_found_handling": "single-page-application"
+  }
+}

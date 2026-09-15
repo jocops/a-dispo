@@ -1,0 +1,1897 @@
+<title>Mes données - À dispo</title>
+<!--
+  LA PAGE OU UN ARTISAN EXERCE SES DROITS.
+
+  CE QUI GOUVERNE CETTE PAGE : ELLE FAIT, ELLE NE PROMET PAS. Quatre droits du
+  RGPD y sont branches pour de vrai sur la base : voir ce que la plateforme
+  sait (article 15), emporter ses donnees dans un fichier reutilisable (article
+  20), gerer ses consentements finalite par finalite avec un retrait aussi
+  simple qu'un accord (article 7.3), et supprimer son compte (article 17). Ce
+  qui n'est pas branche est dit A L'ECRAN, avec le geste humain qui le
+  debloque, jamais masque derriere un bouton qui ne fait rien.
+
+  LES SEPT SOURCES, TOUTES RELEVEES DANS crm/supabase/migration-messagerie-rgpd.sql
+  LE 13/09/2026, ET AUCUNE SUPPOSEE :
+    · ma_fiche()                    cree la fiche au premier passage et la rend
+    · mes_donnees_personnelles()    l'export complet, sans parametre
+    · supprimer_mon_compte(texte)   exige le mot SUPPRIMER
+    · deposer_demande_rgpd(genre, detail)
+    · public.consentement_textes    lisible meme sans compte
+    · public.consentements          les siens, lecture, depot, retrait
+    · public.demandes_rgpd          les siennes, en lecture
+
+  POURQUOI L'EXPORT EST APPELE DES L'OUVERTURE DE L'ONGLET, ET POURQUOI ON LE
+  DIT. `mes_donnees_personnelles()` inscrit elle-meme une ligne au registre des
+  demandes, en genre 'portabilite' et en etat 'faite' : consulter ses donnees
+  EST l'exercice du droit d'acces, et la base le journalise. La fonction se
+  garde d'une ligne par jour et par personne : voir le garde-fou « UNE SEULE
+  LIGNE DE JOURNAL PAR JOUR ET PAR PERSONNE » dans la migration (relevé le
+  13/09/2026, lignes 1248 a 1256 ; on cite le commentaire et pas seulement le
+  numero, parce que le fichier est encore en cours d'ecriture et que les
+  numeros bougeront). Ouvrir l'onglet dix fois n'ecrit donc pas dix lignes. La
+  page l'annonce en clair plutot que de laisser decouvrir une ligne inattendue
+  dans le registre.
+
+  POURQUOI `ma_fiche()` EST APPELEE ICI ALORS QUE CETTE PAGE NE REMPLIT AUCUNE
+  FICHE. Un consentement pointe `artisans(id)` par cle etrangere. Quelqu'un qui
+  arrive ici avant d'etre passe par /espace n'a pas encore de ligne `artisans`,
+  et son premier accord serait refuse par une erreur de cle etrangere
+  incomprehensible. `ma_fiche()` pose la ligne si elle manque, sans rien y
+  ecrire d'autre que l'identifiant.
+
+  CE QUI N'EST PAS BRANCHE, ET QUI EST DIT A L'ECRAN :
+    · Les six textes de consentement portent tous un marqueur [A COMPLETER] et
+      `en_vigueur = false` : la base REFUSE d'enregistrer un accord sur un
+      texte qui n'existe pas, et c'est voulu. Les boutons d'accord sont donc
+      eteints, avec la raison et le geste (l'avocat ecrit les textes, on les
+      pose en base, on passe `en_vigueur` a vrai).
+    · La suppression n'efface pas le compte de connexion (`auth.users`), qui
+      demande la cle de service. La page le dit AVANT la suppression et redonne
+      la reference du journal APRES.
+    · L'export ne contient ni les factures ni les abonnements : ils vivent dans
+      crm/supabase/migration-abonnement-pieces.sql (autre chantier) et
+      `mes_donnees_personnelles()` ne les lit pas. Le droit d'acces les couvre.
+      Dit a l'ecran, avec le geste.
+    · RELEVE PERIME, CORRIGE LE 14/09/2026 : la page EST desormais enregistree
+      dans `outils/build.py` (entree "mes-donnees/index.html" vers
+      "dist/mes-donnees/index.html"), donc /mes-donnees part bien en ligne.
+      build.py ne se modifie toujours pas depuis ici.
+    · /assets/consentement.js n'est copie dans `dist/` par aucune etape du
+      build (mesure du 13/09/2026 : ni build.py ni cloudflare_adispo.py ne
+      touchent a `assets/`). L'onglet Traceurs le detecte et le dit au lieu
+      d'afficher un panneau vide.
+
+  LES TRACEURS, ET POURQUOI IL N'Y A PAS DE BANDEAU. Mesure du 13/09/2026 sur
+  tout le depot, `dist/` exclu : zero traceur. Ni mesure d'audience, ni
+  publicite, ni reseau social. Les seules ecritures locales sont la session de
+  connexion (strictement necessaire, exemptee par l'article 82 de la loi
+  n° 78-17) et trois preferences d'outils internes. Le composant
+  /assets/consentement.js est ecrit, il declare une liste VIDE, et il ne
+  dessine donc rien. Le jour ou un traceur arrive, on l'ajoute a sa liste et le
+  bandeau apparait de lui-meme sur toutes les pages qui chargent le fichier.
+
+  AUCUN MONTANT D'ABONNEMENT NULLE PART. Le prix n'est pas arrete. Cette page
+  parle de donnees, pas d'argent, et elle ne cite aucun tarif meme en exemple.
+
+  LE VOCABULAIRE. « A dispo » met en relation des ENTREPRISES INDEPENDANTES en
+  sous-traitance. Aucun mot d'emploi, de recrutement, de personnel ni
+  d'interim : l'article L8241-1 du code du travail interdit le pret de main
+  d'oeuvre a but lucratif, et le vocabulaire d'une page se cite au tribunal.
+
+  CE QUE CETTE PAGE NE FAIT PAS, ET N'A PAS A FAIRE. Elle ne modifie pas la
+  fiche : cela se passe dans /espace, et deux ecrans qui ecrivent la meme ligne
+  finissent par se contredire. Le bouton « Corriger une information » de
+  l'onglet Mes demandes renvoie donc vers /espace pour ce qui s'y corrige, et
+  ouvre une demande de rectification pour le reste.
+-->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
+     Bloc identique sur les sept écrans applicatifs. Source : CHARTE-CLAIRE.md,
+     relevé et mesuré le 14/09/2026. Tout ratio cité est calculé par la formule
+     WCAG 2.1, alpha composité sur son fond réel. */
+
+  /* Verrouille les contrôles natifs, l'ascenseur et le remplissage automatique
+     du navigateur dans le registre clair. Le gabarit de outils/build.py déclare
+     encore `meta color-scheme = dark` : la propriété CSS l'emporte sur la
+     balise, et c'est ici qu'elle se pose. */
+  color-scheme:light;
+
+  /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
+     (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
+     teinte nulle). */
+  --bg:#F6F3EC;              /* le sol : la page */
+  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+
+  /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
+  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+
+  /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
+     REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
+  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#D9A72E;        /* survol, bas de dégradé */
+  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+
+  /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
+     #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
+  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
+  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(240,160,138,.16);
+
+  /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
+  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+
+  --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
+
+  /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
+  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+
+  /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
+  --ombre-1:0 1px 2px rgba(12,20,33,.05);
+  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
+  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-repeat,var(--bg);
+  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* RIEN NE DEBORDE SUR LE COTE, et pas par un `overflow-x:hidden` sur body :
+   pose la, il ferait de body le conteneur de defilement. On coupe les mots
+   trop longs a la source. Cette page en affiche beaucoup : des identifiants de
+   36 caracteres, des adresses de photo, des messages d'erreur de la base. */
+img,svg{max-width:100%}
+code{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cream-dim);
+  overflow-wrap:anywhere}
+.wrap{max-width:620px;margin:0 auto;padding:clamp(20px,5vw,44px) var(--gut) 40px}
+/* LA COLONNE S'ELARGIT DE 60 PX AU DESSUS DE 760 PX, ET C'EST LA BARRE QUI LE
+   DEMANDE : les cinq pastilles mesurent 576 px, la colonne de 620 px n'en
+   laissait que 524 utiles, donc une pastille etait coupee sur un ecran ou la
+   place ne manquait pas. La longueur de ligne du texte, elle, ne suit pas la
+   colonne : elle est bornee separement, et la borne est mesuree sur la page
+   rendue et non estimee. */
+@media(min-width:760px){ .wrap{max-width:680px} }
+.lead,.vide,.aide,.carte p,.nav-note,.pied{max-width:52ch}
+
+.haut{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;margin-bottom:22px}
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+  font-weight:700;font-size:21px;line-height:1;color:var(--cream);text-decoration:none;
+  min-height:44px;padding:0 10px;margin-left:-10px;border-radius:12px}
+.marque:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px}
+/* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE : le `à` ambre donne 9,31:1 sur le
+   nuit et 1,66:1 sur le papier. Il passe donc a l'ambre-lettre, 5,85:1. */
+.marque .a{color:var(--accent-texte)}
+.marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
+.retour{display:inline-flex;align-items:center;gap:7px;min-height:44px;
+  background:var(--bg-2);border:1px solid var(--line);color:var(--cream-mut);
+  font:inherit;font-size:12.5px;border-radius:999px;padding:6px 14px;
+  box-shadow:var(--ombre-1);cursor:pointer;text-decoration:none}
+.retour:hover{border-color:var(--accent-texte);color:var(--accent-texte)}
+.retour:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+
+h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+  font-size:clamp(23px,4.8vw,30px);line-height:1.16;overflow-wrap:anywhere}
+h1:focus{outline:none}
+h1:focus-visible{outline:3px solid var(--accent-texte);outline-offset:4px;border-radius:6px}
+/* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
+   Le mot reste en encre (18,46:1) et l'ambre passe dessous en surlignage ;
+   la ou la barre couvre la lettre, l'encre sur l'ambre vaut 10,06:1. Ecrit en
+   ambre, le meme mot vaudrait 1,84:1. */
+h1 .em{color:var(--cream);
+  background:linear-gradient(var(--accent),var(--accent)) 0 86%/100% .24em no-repeat}
+.lead{color:var(--cream-mut);font-size:15.2px;margin:11px 0 0}
+.pastille{display:inline-flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-texte);
+  background:var(--accent-soft);border:1px solid rgba(118,90,14,.35);
+  padding:5px 13px;border-radius:999px;margin:0 0 12px}
+
+/* ------------------------------------------------------------- les onglets
+   Vrais onglets ARIA : role tablist / tab / tabpanel, fleches gauche-droite,
+   haut-bas, Debut et Fin. La barre defile horizontalement SUR ELLE-MEME quand
+   elle est plus large que l'ecran : c'est elle qui defile, jamais la page. */
+.onglets{display:flex;gap:6px;margin:0 0 22px;border-bottom:1px solid var(--line);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.onglets::-webkit-scrollbar{display:none}
+.onglet{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-mut);
+  font:inherit;font-family:"Signika",sans-serif;font-weight:600;font-size:14px;
+  padding:11px 13px;cursor:pointer;white-space:nowrap;margin-bottom:-1px;min-height:46px}
+.onglet:hover{color:var(--cream)}
+/* L'ONGLET OUVERT NE PEUT PLUS ETRE SOULIGNE D'AMBRE : un filet `--accent` sur
+   du papier vaut 1,84:1, il disparait. L'ambre-lettre vaut 6,48:1, et le trait
+   est double par la graisse du libelle : l'information n'est jamais portee par
+   la seule couleur. */
+.onglet[aria-selected="true"]{color:var(--accent-texte);font-weight:700;
+  border-bottom-color:var(--accent-texte)}
+.onglet:focus-visible{outline:2px solid var(--cream);outline-offset:-3px;border-radius:6px}
+[role="tabpanel"]:focus{outline:none}
+
+/* -------------------------------------------------------------- les blocs */
+.bloc{margin:28px 0 0}
+h2{font-family:"Signika",sans-serif;font-weight:700;font-size:16px;margin:0 0 10px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h2 .compte{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--cream-dim);
+  font-weight:400;letter-spacing:.04em}
+h3{font-family:"Signika",sans-serif;font-size:15px;margin:0 0 3px}
+.vide{color:var(--cream-dim);font-size:13.5px;margin:0;line-height:1.55}
+.aide{font-size:12.8px;color:var(--cream-dim);margin:6px 0 0;line-height:1.5}
+
+/* LA CARTE SE DISTINGUE PAR SON FILET ET UNE OMBRE DOUCE, JAMAIS PAR UN APLAT
+   PLUS FONCE. Mesure : carte blanche sur le sol #F6F3EC = 1,108:1, un palier
+   reel mais faible ; le filet a 1,35:1 trace le bord et l'ombre la decolle.
+   Un gris pose derriere salirait le papier chaud. */
+.carte{border:1px solid var(--line);background:var(--bg-2);border-radius:14px;
+  padding:15px 17px;margin:11px 0 0;box-shadow:var(--ombre-1)}
+/* PAS D'OPACITE SUR UNE CARTE QUI PORTE UNE EXPLICATION, et sur fond clair la
+   raison est plus forte encore : `opacity:.5` posee sur l'encre la plus noire
+   tombe a 3,49:1 sur carte blanche, et sur un libelle terne a 2,17:1. Or ce
+   qui est ecrit dans ces cartes est precisement ce qu'il faut lire : pourquoi
+   quelque chose ne marche pas encore. On la distingue par un trait
+   discontinu, pas en l'effacant. */
+.carte.eteinte{border-style:dashed;box-shadow:none;background:var(--surface)}
+.carte.grave{border-color:rgba(169,60,36,.45);background:var(--alerte-soft)}
+.carte h3{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.carte p{margin:.35rem 0;font-size:13.8px;color:var(--cream-mut)}
+.carte .quand{font-family:"JetBrains Mono",monospace;font-size:10.5px;
+  color:var(--accent-texte);background:var(--accent-soft);padding:2px 8px;border-radius:4px;
+  margin-left:auto;white-space:nowrap}
+.carte .quand.ok{color:var(--vert);background:var(--vert-soft)}
+.carte .quand.non{color:var(--cream-dim);background:var(--surface-2)}
+/* Le puits : l'element enfonce prend `--surface-2`, la seule surface claire
+   qui se voit sur une carte blanche (1,20:1). `--surface` n'y donne que
+   1,03:1, c'est-a-dire rien. */
+.geste{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--cream-mut);
+  background:var(--surface-2);border-radius:8px;padding:9px 11px;margin:9px 0 0;
+  overflow-wrap:anywhere;line-height:1.5}
+
+/* --------------------------------------------- les lignes cle et valeur */
+.paire{display:grid;grid-template-columns:minmax(0,11.5rem) minmax(0,1fr);gap:4px 14px;
+  padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.paire:first-of-type{border-top:none}
+.paire dt{color:var(--cream-dim);font-size:13px;overflow-wrap:anywhere}
+.paire dd{margin:0;overflow-wrap:anywhere}
+.paire dd.rien{color:var(--cream-dim);font-style:italic}
+@media(max-width:460px){.paire{grid-template-columns:1fr;gap:1px}}
+dl{margin:0}
+
+details{margin:10px 0 0}
+summary{cursor:pointer;font-size:13.2px;color:var(--cream-mut);
+  min-height:44px;display:flex;align-items:center;gap:8px}
+summary:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px;border-radius:6px}
+summary:hover{color:var(--accent-texte)}
+/* LE DETAIL BRUT DEFILE DANS SA PROPRE BOITE, jamais en poussant la page. */
+pre{margin:8px 0 0;padding:12px 13px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:10px;overflow-x:auto;font-family:"JetBrains Mono",monospace;
+  font-size:11.5px;color:var(--cream-mut);line-height:1.5;max-height:340px}
+
+/* ------------------------------------------------------------ les champs */
+label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;margin:0 0 5px}
+label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:12.5px}
+/* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND : `--surface` sur une
+   carte blanche ne donne que 1,03:1. Filet `--cream-dim`, 6,18:1 sur blanc. */
+input,select,textarea{width:100%;font:inherit;color:var(--cream);background:var(--surface);
+  border:1px solid var(--cream-dim);border-radius:12px;padding:13px 15px;outline:none;
+  min-height:48px;-webkit-appearance:none;appearance:none}
+textarea{min-height:96px;resize:vertical}
+/* LE CHEVRON EST UNE IMAGE, PAS UNE VARIABLE : sa couleur est ecrite dans
+   l'adresse. Le bleu-gris de la charte sombre #A9B6C6 tombe a 1,94:1 sur le
+   champ clair et la fleche s'efface avec le seul signe qu'il s'agit d'une
+   liste. #546279 y vaut 5,83:1. */
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23546279' stroke-width='1.8' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:12px;padding-right:40px}
+/* LE FOCUS N'EST PLUS AMBRE : une bordure `--accent` sur du blanc vaut 1,84:1
+   contre les 3,0 exiges, et aucun voile d'ambre ne rattrape (1,14:1 a .22,
+   1,23 a .35). L'ambre-lettre vaut 6,48:1, le halo ne reste que par confort. */
+input:focus,select:focus,textarea:focus{border-color:var(--accent-texte);
+  box-shadow:0 0 0 3px var(--accent-soft)}
+input::placeholder,textarea::placeholder{color:var(--cream-dim);opacity:1}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--alerte);
+  box-shadow:0 0 0 3px var(--alerte-soft)}
+.champ{margin:14px 0 0}
+/* L'ERREUR EST RATTACHEE AU CHAMP PAR `aria-describedby`, ET PAS SEULEMENT
+   POSEE EN DESSOUS. Mesure relevee dans la migration : inscription/index.html
+   pose bien `aria-invalid` mais zero `aria-describedby`, donc un lecteur
+   d'ecran annonce « champ invalide » sans jamais dire pourquoi. Corrige ici
+   sur tous les champs. */
+.err{color:var(--alerte);font-size:13px;margin-top:6px;display:none}
+.err.vu{display:block}
+
+/* ----------------------------------------------------------- les boutons */
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  border-radius:999px;padding:14px 26px;cursor:pointer;border:1px solid transparent;
+  text-decoration:none;min-height:48px}
+.bouton.plein{background:var(--accent);color:var(--encre);border-color:var(--accent-2);
+  box-shadow:var(--ombre-1)}
+.bouton.plein:hover:enabled{background:var(--accent-2);box-shadow:var(--ombre-2)}
+.bouton.creux{background:var(--bg-2);color:var(--cream);border-color:var(--line);
+  box-shadow:var(--ombre-1)}
+.bouton.creux:hover:enabled{border-color:var(--cream-dim)}
+/* L'INVERSION LA MOINS INTUITIVE DE LA BASCULE. Sur la charte sombre,
+   `--alerte` etait un saumon clair et #2A1410 un brun tres fonce : le couple
+   marchait. Recalcule pour le clair, `--alerte` #A93C24 devient un aplat
+   SOMBRE, et l'encre brune n'y donne plus que 2,79:1 (l'encre nuit 2,95:1).
+   Le bouton destructif prend donc du BLANC : 6,25:1. C'est la seule regle qui
+   va a contre-courant du « encre sombre sur aplat de couleur ». */
+.bouton.danger{background:var(--alerte);color:var(--bg-2);border-color:var(--alerte);
+  box-shadow:var(--ombre-1)}
+/* UN BOUTON ETEINT RESTE LISIBLE, ET ON NE L'OBTIENT PAS PAR L'OPACITE : sur
+   fond clair, l'ecart de luminance entre encre et papier est tel qu'une
+   demi-opacite fait echouer jusqu'au noir (3,49:1). Couleurs mesurees a la
+   place : #546279 sur #EFEADF = 5,15:1. */
+.bouton:disabled,.bouton[aria-disabled="true"]{background:var(--surface-2);
+  color:var(--cream-dim);border-color:var(--line);box-shadow:none;cursor:not-allowed}
+.bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
+.pied-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 0}
+.lien-rouge{background:none;border:none;color:var(--alerte);font:inherit;
+  font-size:13.5px;padding:10px 0;cursor:pointer;text-decoration:underline;min-height:44px}
+.lien-rouge:focus-visible{outline:2px solid var(--alerte);outline-offset:2px;border-radius:6px}
+.lien-rouge:disabled{color:var(--cream-dim);cursor:not-allowed}
+
+/* Les listes d'une carte : « ce qui disparait », « ce qui reste ». Le retrait
+   est en `rem` et non en pixels, pour suivre la taille de texte choisie par
+   l'artisan dans son telephone. */
+ul{margin:.5rem 0 .2rem;padding-left:1.15rem}
+li{margin:.3rem 0;font-size:13.8px;color:var(--cream-mut);overflow-wrap:anywhere}
+li::marker{color:var(--accent-texte)}
+
+/* ------------------------------------------------------------- les etats */
+.etat{border-radius:12px;padding:13px 16px;margin:16px 0 0;font-size:14.2px;display:none;
+  border:1px solid var(--line);background:var(--bg-2);box-shadow:var(--ombre-1)}
+.etat.vu{display:block}
+.etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
+.etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35);color:var(--cream-mut)}
+.etat b{font-family:"Signika",sans-serif}
+.etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
+
+.pied{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--cream-dim);line-height:1.6}
+.pied a{color:var(--cream-dim);text-decoration:underline}
+
+/* ---------------------------------------------------- l'ecran de chargement
+   Un squelette plutot qu'un « Un instant… » seul : il occupe la place que
+   prendra le contenu, donc rien ne saute quand il arrive. Sur fond clair il
+   prend le puits `--surface-2` : `--surface` sur une carte blanche vaut
+   1,03:1, c'est-a-dire un squelette invisible. */
+.sq{background:var(--surface-2);border-radius:10px;animation:respire 1.4s ease-in-out infinite}
+@keyframes respire{0%,100%{opacity:1}50%{opacity:.5}}
+.chargement-txt{position:absolute;left:-9999px}
+
+/* ANIMATION REDUITE SI LE SYSTEME LE DEMANDE : le squelette cesse de respirer
+   et le defilement automatique devient instantane. */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important}
+}
+
+@media(max-width:430px){
+  .bouton{width:100%}
+  .pied-actions .bouton{flex:1 1 100%}
+}
+
+/* La barre de l'espace. Defilement horizontal plutot qu'un menu replie : sur un
+   chantier l'artisan a une main, et un menu demande deux gestes au lieu d'un. */
+.nav-app{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 18px;
+  padding:4px 0;border-bottom:1px solid var(--line)}
+.nav-app::-webkit-scrollbar{display:none}
+.nav-app a{flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:0 14px;
+  border-radius:999px;font-weight:600;font-size:.9375rem;color:var(--cream-mut);
+  white-space:nowrap;text-decoration:none;transition:background .2s,color .2s}
+.nav-app a:hover{background:var(--surface-2);color:var(--cream)}
+.nav-app a[aria-current="page"]{background:var(--accent-soft);color:var(--accent-texte)}
+/* L'ECRAN FERME NE S'OBTIENT PAS PAR L'OPACITE : `opacity:.45` sur du clair
+   efface le libelle bien plus vite que sur du sombre. Couleur mesuree. */
+.nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none}
+.nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+/* LA BARRE CHANGE DE PLAN AVEC LA LARGEUR, ET LA MESURE COMMANDE LA VALEUR.
+   Les cinq pastilles mesurent 595 px avec leurs espaces ; la colonne de 620 px
+   n'en laissait que 524 utiles, donc sur un grand ecran une pastille etait
+   coupee alors que la place ne manquait pas. Au dessus de 760 px la colonne
+   passe a 680 px (584 utiles) et les pastilles se resserrent a 575 px : la
+   barre tient entiere, sur une ligne, sans defilement cache. */
+@media(min-width:760px){
+  .nav-app{overflow-x:visible;flex-wrap:wrap;row-gap:4px}
+  .nav-app a{padding:0 12px}
+}
+.nav-note{margin:-10px 0 16px;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
+</style>
+
+<div class="wrap">
+  <div class="haut">
+    <a class="marque" href="/" aria-label="à dispo, accueil">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="19" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+        <path d="M32 20.6V32l8.6 5.3" fill="none" stroke="currentColor" stroke-width="5.5"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><span class="a">à</span> dispo</span>
+    </a>
+    <span id="zone-haut"></span>
+  </div>
+
+  <!-- LA BARRE DE L'ESPACE. Elle n'existe que pour qui a une session : un
+       visiteur de passage sur une fiche publique n'a rien a faire de cinq liens
+       qui le renverraient tous vers la connexion. Et tant que le parcours n'est
+       pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
+       au lieu de mener sur du vide. -->
+  <nav class="nav-app" id="nav-app" data-ici="mes-donnees" aria-label="Mon espace" hidden>
+    <a href="/espace" data-ecran="espace">Mon espace</a>
+    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
+    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
+    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
+    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
+  </nav>
+  <p class="nav-note" id="nav-note" hidden></p>
+
+  <main id="ecran" aria-busy="true">
+    <p class="chargement-txt" role="status">Ouverture de tes données personnelles.</p>
+    <div aria-hidden="true">
+      <div class="sq" style="height:14px;width:38%;margin-bottom:14px"></div>
+      <div class="sq" style="height:26px;width:76%;margin-bottom:10px"></div>
+      <div class="sq" style="height:14px;width:90%;margin-bottom:8px"></div>
+      <div class="sq" style="height:14px;width:64%;margin-bottom:26px"></div>
+      <div class="sq" style="height:80px;width:100%;border-radius:14px"></div>
+    </div>
+  </main>
+
+  <div class="etat ok" id="s-ok" role="status" aria-live="polite"></div>
+  <div class="etat ko" id="s-ko" role="alert"></div>
+
+  <div class="pied">
+    <b>À dispo</b> met en relation <b>deux entreprises immatriculées</b>, en sous-traitance.
+    Cette page ne parle que de tes données : ce que la plateforme en sait, ce que tu peux
+    en emporter, et comment tout faire disparaître.
+    <br>
+    Une question sur un point précis&nbsp;? <a href="/aide">L'aide</a> répond en français,
+    sans jargon.<span id="zone-legal"></span>
+  </div>
+</div>
+
+<!-- LE COMPOSANT DE CONSENTEMENT AUX TRACEURS.
+     Charge sur toutes les pages du site de la meme facon : une ligne, en
+     `defer`. Il ne dessine rien tant qu'aucun traceur n'est declare, ce qui
+     est le cas au 13/09/2026. L'onglet Traceurs detecte son absence et le dit
+     plutot que d'afficher un panneau vide. -->
+<script src="/assets/consentement.js" defer></script>
+
+<script type="module">
+/* La base du projet. La cle publique est publique par nature : la protection
+   vient des autorisations posees sur les tables (securite par ligne), pas du
+   secret de la cle. Ici, elle ne donne acces qu'a ce que les politiques du
+   volet RGPD laissent passer, c'est-a-dire ses propres lignes. */
+const BASE = "https://ucnyvsocoxenxbuakluo.supabase.co";
+const CLE  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbnl2c29jb3hlbnhidWFrbHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0MjIyMDAsImV4cCI6MjEwMzk5ODIwMH0.IHTUOXDj69OdIbLOmxXk7dTBiUIZJHoshPaVGd6O3JY";
+
+/* Le fichier a jouer quand la base n'a pas encore recu le volet RGPD. Ecrit
+   une seule fois : le jour ou il change de nom, il change ici et nulle part
+   ailleurs. */
+const MIGRATION = "crm/supabase/migration-messagerie-rgpd.sql";
+
+const $ = (i) => document.getElementById(i);
+const ecran = $("ecran");
+
+/* ANIMATION REDUITE SUR DEMANDE DU SYSTEME. `scrollIntoView({behavior:"smooth"})`
+   ne regarde PAS la regle CSS `scroll-behavior` posee plus haut : la preference
+   doit etre lue ici, sans quoi la page continue de faire glisser l'ecran de
+   quelqu'un qui a demande qu'on arrete. Lu une fois, au chargement. */
+const DOUX = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ? "auto" : "smooth";
+
+let sb = null;      /* le client Supabase, cree une seule fois */
+let moi = null;     /* l'identifiant du compte connecte */
+let fiche = null;   /* la ligne `artisans`, posee par ma_fiche() */
+let EXPORT = null;  /* le resultat de mes_donnees_personnelles(), garde en memoire */
+let eteint = false; /* vrai apres une suppression : la page ne relit plus rien */
+
+/* LE VOLET RGPD EST-IL EN BASE ? Trois reponses, et la troisieme compte autant
+   que les deux autres : vrai, faux, ou `null` pour « on n'a pas pu le
+   demander ». On n'eteint JAMAIS un bouton a partir d'un doute : eteindre la
+   suppression de compte parce que le reseau a hoquete serait refuser un droit
+   pour une mauvaise raison. Doute donc = bouton actif, et l'erreur se dira au
+   moment de l'action, avec son geste. */
+let enService = null;
+
+/* Les codes qui disent « ce n'est pas la », par opposition a « ca n'a pas
+   marche ». Les premiers appellent un geste technique, les seconds un
+   « reessaie ». Confondre les deux envoie l'artisan appuyer dix fois sur un
+   bouton qui ne peut pas marcher. */
+const HORS_SERVICE = ["PGRST202", "PGRST205", "42883", "42P01"];
+const horsService = (e) => !!e && HORS_SERVICE.includes(e.code);
+
+const echapper = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function dire(quel, titre, corps) {
+  for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu");
+  const d = $("s-" + quel);
+  d.innerHTML = "<b>" + titre + "</b> " + (corps || "");
+  d.classList.add("vu");
+  d.scrollIntoView({ behavior: DOUX, block: "nearest" });
+}
+function taire() { for (const k of ["ok", "ko"]) $("s-" + k).classList.remove("vu"); }
+
+async function client() {
+  if (sb) return sb;
+  const { createClient } = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(BASE, CLE, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  return sb;
+}
+
+/* Une page du site existe-t-elle deja ? « oui », « non », ou « inconnu » quand
+   la question elle-meme n'a pas pu etre posee. On ne repond jamais « non » a
+   partir d'un doute : annoncer qu'une page n'existe pas alors qu'elle existe
+   est une fausse donnee au meme titre qu'un bouton mort. */
+const DEJA_VU = new Map();
+function existe(chemin) {
+  if (!DEJA_VU.has(chemin)) {
+    DEJA_VU.set(chemin, fetch(chemin, { method: "HEAD" })
+      .then((r) => (r.ok ? "oui" : "non")).catch(() => "inconnu"));
+  }
+  return DEJA_VU.get(chemin);
+}
+
+/* ------------------------------------------------------------------------
+   TRADUIRE UN REFUS DE LA BASE EN DEUX PHRASES : CE QUI S'EST PASSE, ET LE
+   GESTE QUI DEBLOQUE.
+
+   Le volet RGPD pose chacun de ses refus avec un `message` ET un `hint`
+   (« using hint = … » dans la migration). Supabase rend les deux dans l'objet
+   d'erreur. Une page qui n'affiche que `message` perd le geste humain, et un
+   ecran sans geste humain est un ecran mort : on affiche donc les deux,
+   toujours. Les codes ci-dessous sont ceux qui arrivent AVANT que la migration
+   soit jouee, et ils n'ont pas de message lisible : on les traduit. */
+function pourquoi(e) {
+  const code = (e && e.code) || "";
+  if (code === "PGRST202" || code === "42883") {
+    return { titre: "Cette partie n'est pas encore en service.",
+      corps: "Le code existe, il n'a pas encore été joué sur la base. Rien n'est perdu, "
+           + "et rien de ce que tu fais ici n'a échoué : la fonction n'est pas là.",
+      geste: "Côté technique : jouer " + MIGRATION + "." };
+  }
+  if (code === "PGRST205" || code === "42P01") {
+    return { titre: "Cette partie n'est pas encore en service.",
+      corps: "La table qui porte ces informations n'existe pas encore dans la base.",
+      geste: "Côté technique : jouer " + MIGRATION + "." };
+  }
+  if (code === "42501") {
+    return { titre: "Tu n'as pas le droit de lire ça.",
+      corps: "C'est le comportement attendu si la session a expiré pendant que la page "
+           + "était ouverte.",
+      geste: "Reconnecte-toi, puis reviens sur cette page." };
+  }
+  if (code === "23503") {
+    return { titre: "Ta fiche n'existe pas encore.",
+      corps: "Un consentement s'attache à une fiche, et la tienne n'a pas encore été créée.",
+      geste: "Passe une fois par ton espace, puis reviens : /espace." };
+  }
+  return {
+    titre: (e && e.message) ? e.message : "Ça n'a pas marché.",
+    corps: (e && e.details) ? echapper(e.details) : "",
+    geste: (e && e.hint) ? e.hint : "Réessaie dans un instant. Si ça bloque encore, écris-nous."
+  };
+}
+
+function panneau(e, quoi) {
+  const p = pourquoi(e);
+  return '<div class="carte eteinte"><h3>' + echapper(quoi)
+    + '<span class="quand non">indisponible</span></h3>'
+    + "<p>" + echapper(p.titre) + "</p>"
+    + (p.corps ? "<p>" + p.corps + "</p>" : "")
+    + '<p class="geste">' + echapper(p.geste) + "</p></div>";
+}
+
+/* ------------------------------------------------------------------------
+   AFFICHER UNE VALEUR DE LA BASE SANS LA TRAHIR.
+
+   Une date vide s'ecrit « vide », jamais « 01/01/1970 ». Un booleen s'ecrit
+   « oui » ou « non », jamais « true ». Une valeur inconnue s'affiche TELLE
+   QUELLE : cacher une colonne qu'on ne sait pas nommer reviendrait a cacher
+   une donnee personnelle dans la page qui sert justement a les montrer. */
+const R_HORODATE = /^\d{4}-\d{2}-\d{2}T/;
+const R_JOUR = /^\d{4}-\d{2}-\d{2}$/;
+
+function quand(v) {
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  if (R_JOUR.test(v)) return d.toLocaleDateString("fr-FR",
+    { day: "2-digit", month: "long", year: "numeric" });
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
+       + " à " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function valeur(v) {
+  if (v === null || v === undefined || v === "") return null;
+  if (typeof v === "boolean") return v ? "oui" : "non";
+  if (typeof v === "number") return String(v);
+  if (typeof v === "string" && (R_HORODATE.test(v) || R_JOUR.test(v))) return quand(v);
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
+/* Le nom lisible d'une colonne. La liste couvre ce que la base contient au
+   13/09/2026 ; toute colonne ajoutee plus tard tombe dans le repli, qui
+   remplace les tirets bas par des espaces. Elle s'affiche donc quand meme,
+   avec un nom moins joli, plutot que de disparaitre. */
+const LIBELLES = {
+  id: "Identifiant", identifiant: "Identifiant", adresse_mail: "Adresse e-mail",
+  cree_le: "Créé le", maj_le: "Modifié le", supprime_le: "Suppression demandée le",
+  etape: "Étape de l'inscription", prenom: "Prénom", nom: "Nom",
+  telephone: "Téléphone", photo_url: "Photo", siret: "SIRET",
+  siret_etat: "État du SIRET", denomination: "Dénomination de l'entreprise",
+  activite: "Activité déclarée", commune: "Commune", code_postal: "Code postal",
+  siret_verifie_le: "SIRET vérifié le", metier: "Métier",
+  metier_libre: "Métier écrit à la main", presentation: "Présentation",
+  rayon_km: "Rayon d'intervention (km)", formule: "Formule",
+  essai_jusqu_au: "Essai jusqu'au", abonne_jusqu_au: "Abonnement jusqu'au",
+  publie: "Fiche publiée", genre: "Type", libelle: "Libellé",
+  fournisseur: "Source", branche_le: "Branché le", synchro_le: "Synchronisé le",
+  actif: "Actif", debut: "Début", fin: "Fin",
+  saisi_a_la_main: "Saisi à la main", ouverte_le: "Ouverte le",
+  fermee_le: "Fermée le", interlocuteur: "Interlocuteur", messages: "Messages",
+  de_moi: "Écrit par toi", envoye_le: "Envoyé le", lu_le: "Lu le", corps: "Texte",
+  motif: "Motif", detail: "Détail", traite_le: "Traité le",
+  finalite: "Finalité", version_du_texte: "Version du texte", texte: "Texte accepté",
+  accorde_le: "Accordé le", retire_le: "Retiré le", origine: "Donné depuis",
+  reference: "Référence", demande_le: "Demandée le", etat: "État",
+  inscrit_le: "Inscrit le", departement: "Département",
+  confirme_le: "Confirmée le", provenance: "Provenance",
+  base: "Informations d'origine", suivi: "Suivi commercial", modifie_le: "Modifié le",
+  exporte_le: "Exporté le"
+};
+const libelle = (k) => LIBELLES[k] || (k.charAt(0).toUpperCase() + k.slice(1)).replace(/_/g, " ");
+
+/* UNE CONVERSATION CONTIENT SES MESSAGES, ET UN MESSAGE EST UN OBJET DANS UN
+   TABLEAU DANS UN OBJET. Ecrire `JSON.stringify` a cet endroit rend une ligne
+   illisible, c'est-a-dire une donnee montree sans etre lisible, ce qui ne vaut
+   pas mieux que cachee.
+
+   POURQUOI QUATRE ET PAS DEUX. La limite etait a deux, et la mesure au
+   navigateur sur une conversation reelle a montre ce que ca donnait :
+   l'interlocuteur s'affichait en `{"prenom":"Sonia",...}` et les messages
+   etaient remplaces par « 2 éléments, lisibles dans le fichier complet ».
+   C'est-a-dire que la rubrique la plus personnelle de l'export etait la seule
+   qu'on ne pouvait pas lire. Le compte exact : le tableau des conversations
+   prend un niveau, la conversation un deuxieme, le tableau des messages un
+   troisieme, le message un quatrieme. Quatre est donc le minimum pour que le
+   texte d'un message s'affiche, et c'est la valeur posee.
+
+   AU-DELA, on renvoie au fichier brut plutot que d'empiler des replis : trois
+   replis emboites sur un telephone ne se manipulent plus d'une main. */
+const PROFONDEUR_MAX = 4;
+
+function contenu(v, profondeur) {
+  if (v === null || v === undefined || v === "") return '<span class="rien">vide</span>';
+  if (Array.isArray(v)) {
+    if (!v.length) return '<span class="rien">aucun</span>';
+    if (profondeur >= PROFONDEUR_MAX) {
+      return echapper(v.length + (v.length > 1 ? " éléments" : " élément")
+        + ", lisibles dans le fichier complet");
+    }
+    return "<details><summary>Voir les " + v.length + " élément"
+      + (v.length > 1 ? "s" : "") + "</summary>"
+      + v.map((el) => '<div class="carte" style="margin-top:9px">'
+          + contenu(el, profondeur + 1) + "</div>").join("") + "</details>";
+  }
+  if (typeof v === "object") {
+    if (profondeur >= PROFONDEUR_MAX) return "<code>" + echapper(JSON.stringify(v)) + "</code>";
+    return paires(v, profondeur + 1);
+  }
+  const t = valeur(v);
+  return echapper(t === null ? "vide" : t);
+}
+
+function paires(objet, profondeur) {
+  const p = profondeur || 0;
+  const cles = Object.keys(objet).filter((k) => k.charAt(0) !== "_");
+  if (!cles.length) return '<p class="vide">Rien dans cette rubrique.</p>';
+  return "<dl>" + cles.map((k) => {
+    const brut = objet[k];
+    const rien = brut === null || brut === undefined || brut === ""
+      || (Array.isArray(brut) && !brut.length);
+    return '<div class="paire"><dt>' + echapper(libelle(k)) + "</dt>"
+      + '<dd' + (rien ? ' class="rien"' : "") + ">" + contenu(brut, p) + "</dd></div>";
+  }).join("") + "</dl>";
+}
+
+/* ========================================================================
+   L'AIGUILLAGE : LES CINQ ONGLETS.
+   L'onglet ouvert vit dans l'adresse (#consentements, #supprimer…) : un lien
+   envoye par mail peut donc pointer l'onglet exact, et le bouton retour du
+   navigateur fait ce qu'on attend de lui. */
+const VOLETS = [
+  { cle: "donnees",      nom: "Ce qu'on sait de toi" },
+  { cle: "consentements", nom: "Mes consentements" },
+  { cle: "traceurs",     nom: "Traceurs" },
+  { cle: "demandes",     nom: "Mes demandes" },
+  { cle: "supprimer",    nom: "Supprimer mon compte" }
+];
+let volet = "donnees";
+
+/* LES CINQ PANNEAUX EXISTENT TOUS DANS LA PAGE, ET QUATRE SONT CACHES.
+   Un `aria-controls` qui pointe un identifiant absent ne dit rien a un lecteur
+   d'ecran : c'est une reference cassee, pas une aide. On les pose donc tous, et
+   on cache par l'attribut `hidden`, celui que les technologies d'assistance
+   respectent vraiment. Le contenu n'est peint que lorsqu'on ouvre l'onglet :
+   la page ne lance pas cinq lectures de base pour en montrer une. */
+function cadre() {
+  ecran.setAttribute("aria-busy", "false");
+  ecran.innerHTML =
+    '<h1 tabindex="-1" id="t">Tes <span class="em">données</span>, et ce que tu peux en faire.</h1>'
+    + '<p class="lead">Tout ce que « à dispo » sait de toi est ici. Tu peux le lire, '
+    + "l'emporter dans un fichier, revenir sur chacun de tes accords, et tout supprimer.</p>"
+    + '<div class="onglets" role="tablist" aria-label="Mes droits">'
+    + VOLETS.map((v) =>
+        '<button class="onglet" role="tab" type="button" id="o-' + v.cle + '"'
+        + ' aria-controls="p-' + v.cle + '" aria-selected="' + (volet === v.cle) + '"'
+        + ' tabindex="' + (volet === v.cle ? "0" : "-1") + '" data-v="' + v.cle + '">'
+        + echapper(v.nom) + "</button>").join("")
+    + "</div>"
+    + VOLETS.map((v) =>
+        '<div id="p-' + v.cle + '" role="tabpanel" tabindex="0" aria-labelledby="o-' + v.cle
+        + '"' + (volet === v.cle ? "" : " hidden") + "></div>").join("");
+
+  const boutons = [...ecran.querySelectorAll(".onglet")];
+  boutons.forEach((b) => {
+    b.addEventListener("click", () => aller(b.dataset.v, false));
+    /* Fleches gauche et droite, haut et bas, Debut et Fin : la navigation
+       attendue d'une barre d'onglets au clavier. Sans elle, Tab traverse les
+       cinq boutons avant d'atteindre le contenu. Les fleches verticales sont
+       acceptees en plus, parce qu'une main qui vient d'une liste les essaie
+       d'abord et qu'un raccourci qui ne repond pas se lit comme une panne. */
+    b.addEventListener("keydown", (ev) => {
+      const i = boutons.indexOf(b);
+      let j = null;
+      if (ev.key === "ArrowRight" || ev.key === "ArrowDown") j = (i + 1) % boutons.length;
+      else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") j = (i - 1 + boutons.length) % boutons.length;
+      else if (ev.key === "Home") j = 0;
+      else if (ev.key === "End") j = boutons.length - 1;
+      if (j === null) return;
+      ev.preventDefault();
+      aller(boutons[j].dataset.v, true);
+    });
+  });
+
+  peindre();
+}
+
+/* CHANGER D'ONGLET NE RECONSTRUIT PAS LA BARRE : on deplace la selection et on
+   peint le panneau. Reconstruire detruisait le bouton qui avait le focus, et le
+   focus retombait sur le corps de page a chaque fleche, ce qui rend la
+   navigation au clavier inutilisable. */
+function aller(v, avecFocus) {
+  if (volet === v) return;
+  volet = v;
+  taire();
+  try { history.replaceState(null, "", "#" + v); } catch (e) {}
+  ecran.querySelectorAll(".onglet").forEach((b) => {
+    const ici = b.dataset.v === v;
+    b.setAttribute("aria-selected", ici ? "true" : "false");
+    b.tabIndex = ici ? 0 : -1;
+  });
+  ecran.querySelectorAll('[role="tabpanel"]').forEach((p) => { p.hidden = p.id !== "p-" + v; });
+  if (avecFocus) { const b = $("o-" + v); if (b) b.focus(); }
+  peindre();
+}
+
+function peindre() {
+  const z = $("p-" + volet);
+  if (volet === "donnees") return voletDonnees(z);
+  if (volet === "consentements") return voletConsentements(z);
+  if (volet === "traceurs") return voletTraceurs(z);
+  if (volet === "demandes") return voletDemandes(z);
+  return voletSupprimer(z);
+}
+
+const CHARGEMENT = (quoi) =>
+  '<p class="chargement-txt" role="status">' + echapper(quoi) + "</p>"
+  + '<div aria-hidden="true" style="margin-top:22px">'
+  + '<div class="sq" style="height:14px;width:52%;margin-bottom:12px"></div>'
+  + '<div class="sq" style="height:74px;width:100%;border-radius:14px;margin-bottom:10px"></div>'
+  + '<div class="sq" style="height:74px;width:100%;border-radius:14px"></div></div>';
+
+/* ========================================================================
+   ONGLET 1 : CE QU'ON SAIT DE TOI, ET LE FICHIER A EMPORTER.
+   Articles 15 (acces) et 20 (portabilite) du RGPD. */
+
+/* L'ordre des rubriques suit ce que la personne cherche : elle-meme d'abord,
+   ses echanges ensuite, l'administratif en dernier. Le libelle est ecrit ici
+   et non devine depuis la cle : « fiche_de_prospection » ne se traduit pas
+   tout seul en une phrase qu'un artisan comprend. */
+const RUBRIQUES = [
+  { cle: "compte", nom: "Ton compte", quoi: "Ce qui permet de te reconnaître quand tu te connectes." },
+  { cle: "fiche", nom: "Ta fiche", quoi: "Ce que tu as rempli dans ton espace." },
+  { cle: "competences_et_materiel", nom: "Tes compétences et ton matériel",
+    quoi: "Ce que tu as coché ou ajouté à la main." },
+  { cle: "creneaux_occupes", nom: "Tes créneaux occupés",
+    quoi: "Les demi-journées marquées occupées, à la main ou depuis un agenda branché." },
+  { cle: "agendas_branches", nom: "Tes agendas branchés",
+    quoi: "Le branchement lui-même. Jamais les titres de tes rendez-vous, jamais les lieux." },
+  { cle: "mises_en_relation", nom: "Tes mises en relation",
+    quoi: "Les demandes envoyées et reçues." },
+  { cle: "conversations", nom: "Tes conversations",
+    quoi: "Les fils ouverts et les messages échangés." },
+  { cle: "professionnels_bloques", nom: "Les professionnels que tu as bloqués",
+    quoi: "Un blocage ne prévient jamais la personne bloquée." },
+  { cle: "signalements_deposes", nom: "Les signalements que tu as déposés",
+    quoi: "Ce que tu as signalé à la modération." },
+  { cle: "consentements", nom: "Tes consentements",
+    quoi: "Chaque accord donné, la version exacte du texte, et la date d'un éventuel retrait." },
+  { cle: "demandes_rgpd", nom: "Tes demandes",
+    quoi: "Le registre de ce que tu as demandé, et de ce qui a été fait." },
+  { cle: "liste_d_attente", nom: "Ton inscription à la liste d'attente",
+    quoi: "Ce que tu avais laissé avant l'ouverture, rapproché de ton adresse e-mail." },
+  { cle: "fiche_de_prospection", nom: "Ta fiche de prospection",
+    quoi: "Si on t'a contacté avant que tu t'inscrives, les notes prises à ce moment-là "
+        + "sont des données qui te concernent : elles sont donc ici." }
+];
+
+async function voletDonnees(z) {
+  if (EXPORT) return rendreDonnees(z);
+  z.innerHTML = CHARGEMENT("Lecture de tes données.");
+  try {
+    const { data, error } = await sb.rpc("mes_donnees_personnelles");
+    if (error) throw error;
+    EXPORT = data;
+    rendreDonnees(z);
+  } catch (e) {
+    z.innerHTML = panneau(e, "Voir tes données")
+      + '<p class="aide">Tant que cette partie n\'est pas en service, rien n\'est affiché '
+      + "plutôt qu'un écran à moitié rempli qui laisserait croire que la base ne contient "
+      + "que ça.</p>";
+  }
+}
+
+function rendreDonnees(z) {
+  const j = EXPORT || {};
+  const jour = new Date().toISOString().slice(0, 10);
+
+  /* Le compte des elements d'une rubrique. Une liste rend sa longueur, un
+     objet rend le nombre de champs REMPLIS : dire « 24 informations » quand 22
+     sont vides serait une fausse donnee. */
+  const compter = (v) => {
+    if (v === null || v === undefined) return 0;
+    if (Array.isArray(v)) return v.length;
+    if (typeof v === "object") {
+      return Object.keys(v).filter((k) => k.charAt(0) !== "_"
+        && v[k] !== null && v[k] !== undefined && v[k] !== "").length;
+    }
+    return 1;
+  };
+
+  let h = '<div class="bloc">'
+    + "<h2>Le fichier de tes données"
+    + '<span class="compte">' + echapper(quand(j.exporte_le || new Date().toISOString())) + "</span></h2>"
+    + '<p class="vide">Le fichier ci-dessous contient exactement ce qui est affiché plus bas, '
+    + "dans un format lisible par un autre service : c'est ce que le règlement appelle la "
+    + "portabilité. Tu n'as à demander l'autorisation de personne pour l'emporter.</p>"
+    + '<div class="pied-actions">'
+    +   '<a class="bouton plein" id="telecharger" download="a-dispo-mes-donnees-' + jour + '.json" href="#">'
+    +   "Télécharger mes données</a>"
+    +   '<button class="bouton creux" type="button" id="copier">Copier dans le presse-papier</button>'
+    + "</div>"
+    + '<p class="aide" id="dit-copie" role="status" aria-live="polite"></p>'
+    + '<p class="aide">Consulter cette page inscrit une ligne au registre de tes demandes, '
+    + "en type « portabilité » et déjà marquée faite : regarder ses données, c'est exercer "
+    + "son droit d'accès, et la base le note. Une seule ligne par jour, même si tu reviens "
+    + "dix fois.</p></div>";
+
+  /* Les rubriques. Une rubrique vide s'affiche quand meme, avec « rien » : son
+     absence laisserait croire qu'on cache quelque chose, alors que la verite
+     est qu'il n'y a rien dedans. */
+  h += '<div class="bloc"><h2>Ce que la base contient<span class="compte">'
+     + RUBRIQUES.length + " rubriques</span></h2>";
+
+  for (const r of RUBRIQUES) {
+    const v = j[r.cle];
+    const nonBranche = v && !Array.isArray(v) && typeof v === "object" && v._non_branche;
+    const n = compter(v);
+
+    h += '<div class="carte' + (nonBranche ? " eteinte" : "") + '"><h3>' + echapper(r.nom)
+      + '<span class="quand ' + (nonBranche ? "non" : n ? "" : "non") + '">'
+      + (nonBranche ? "pas encore en base" : n ? (Array.isArray(v) ? n + (n > 1 ? " éléments" : " élément")
+          : n + (n > 1 ? " informations" : " information")) : "rien")
+      + "</span></h3>"
+      + "<p>" + echapper(r.quoi) + "</p>";
+
+    if (nonBranche) {
+      h += '<p class="geste">' + echapper(v._non_branche) + "</p>";
+    } else if (!n) {
+      h += '<p class="vide">Rien n\'est enregistré dans cette rubrique.</p>';
+    } else if (Array.isArray(v)) {
+      h += contenu(v, 0);
+    } else if (typeof v === "object") {
+      h += "<details><summary>Voir le détail</summary>" + paires(v, 1) + "</details>";
+    } else {
+      h += "<p>" + echapper(valeur(v)) + "</p>";
+    }
+    h += "</div>";
+  }
+  h += "</div>";
+
+  /* CE QUI N'EST PAS DANS L'EXPORT. Dit ici, et non laisse a deviner : une
+     rubrique absente sans explication est indistinguable d'une rubrique
+     cachee. Les deux premiers points sont voulus, le troisieme est un manque
+     mesure et il porte son geste. */
+  h += '<div class="bloc"><h2>Ce que le fichier ne contient pas</h2>'
+    + '<div class="carte"><h3>Les clés d\'accès à tes agendas'
+    +   '<span class="quand ok">volontaire</span></h3>'
+    +   "<p>Un agenda branché s'accompagne d'une clé qui ouvre cet agenda. Ce n'est pas une "
+    +   "donnée sur toi, c'est un passe-partout. Un fichier exporté part par e-mail, se pose "
+    +   "dans un dossier de téléchargements, se transfère : y mettre cette clé fabriquerait "
+    +   "exactement la fuite qu'on cherche à éviter. Le fichier dit qu'un agenda est branché, "
+    +   "jamais comment y entrer.</p></div>"
+    + '<div class="carte"><h3>Le nom et le téléphone de tes interlocuteurs'
+    +   '<span class="quand ok">volontaire</span></h3>'
+    +   "<p>Les messages reçus sont bien dans le fichier, avec leur texte. L'auteur, lui, "
+    +   "est réduit à ce que sa fiche publique montre déjà : prénom, entreprise, commune. "
+    +   "Son nom de famille et son téléphone sont ses données à lui, pas les tiennes.</p></div>"
+    + '<div class="carte eteinte"><h3>Tes factures et ton abonnement'
+    +   '<span class="quand non">manque</span></h3>'
+    +   "<p>Les factures et les abonnements existent dans une autre partie de la base "
+    +   "(<code>public.factures</code>, <code>public.abonnements</code>, "
+    +   "<code>public.paiements</code>), et le droit d'accès les couvre. La fonction "
+    +   "d'export ne les lit pas encore : ce n'est donc pas que tu n'en as pas, c'est "
+    +   "qu'elles ne sont pas allées les chercher. En attendant, tu peux les demander "
+    +   "dans l'onglet « Mes demandes », et la demande est tracée.</p>"
+    +   '<p class="geste">Côté technique : étendre mes_donnees_personnelles() aux tables '
+    +   "factures, abonnements, paiements et parrainages de "
+    +   "crm/supabase/migration-abonnement-pieces.sql.</p></div></div>";
+
+  /* Le detail brut. Il est offert, jamais impose : c'est ce qu'on transmet a
+     un avocat ou a la CNIL quand la liste lisible ne suffit plus. */
+  h += '<div class="bloc"><details id="brut"><summary>Voir le fichier tel qu\'il est, sans mise en forme</summary>'
+    + "<pre>" + echapper(JSON.stringify(j, null, 2)) + "</pre></details></div>";
+
+  z.innerHTML = h;
+
+  /* Le lien de telechargement porte une vraie adresse de fichier, posee ici et
+     non fabriquee au clic : un clic qui declenche un `click()` sur un element
+     detache est bloque par certains navigateurs, et le bouton semblerait mort. */
+  const texte = JSON.stringify(j, null, 2);
+  const lien = $("telecharger");
+  try {
+    const url = URL.createObjectURL(new Blob([texte], { type: "application/json" }));
+    lien.href = url;
+  } catch (e) {
+    lien.removeAttribute("href");
+    lien.setAttribute("aria-disabled", "true");
+    lien.textContent = "Téléchargement indisponible ici";
+    lien.insertAdjacentHTML("afterend",
+      '<p class="aide">Ce navigateur refuse de préparer le fichier. Le bouton '
+      + "« Copier » juste à côté fonctionne, lui : colle le contenu dans un fichier texte.</p>");
+  }
+
+  $("copier").addEventListener("click", async () => {
+    const dit = $("dit-copie");
+    try {
+      await navigator.clipboard.writeText(texte);
+      dit.textContent = "Copié. Colle-le où tu veux, c'est à toi.";
+    } catch (e) {
+      /* Le presse-papier est refuse hors connexion securisee et sur certains
+         navigateurs. On ne dit pas « copié » sans l'avoir fait : on pose le
+         texte a selectionner. */
+      dit.textContent = "Ce navigateur ne laisse pas copier tout seul. Le texte est ouvert "
+        + "en bas de page : sélectionne-le et copie-le à la main.";
+      const d = z.querySelector("#brut");
+      if (d) { d.open = true; d.scrollIntoView({ behavior: DOUX, block: "start" }); }
+    }
+  });
+}
+
+/* ========================================================================
+   ONGLET 2 : LES CONSENTEMENTS, FINALITE PAR FINALITE.
+   Article 7 du RGPD : un consentement se donne librement, pour une finalite
+   precise, et se retire AUSSI FACILEMENT qu'il se donne. D'ou un seul bouton
+   par ligne, au meme endroit, de la meme taille, dans les deux sens. */
+
+/* Le titre lisible de chaque finalite. Le texte qui ENGAGE, lui, vient
+   toujours de la base : ces libelles-ci nomment la ligne, ils ne la
+   remplacent pas. Une finalite ajoutee en base sans libelle ici s'affiche
+   quand meme, avec sa cle technique. */
+const FINALITES = {
+  cgu: "Les conditions générales d'utilisation",
+  fiche_publique: "Publier ma fiche et mes disponibilités",
+  partage_coordonnees: "Transmettre mon téléphone après une mise en relation acceptée",
+  messagerie: "Être joignable par la messagerie interne",
+  prospection: "Recevoir les nouveautés par e-mail",
+  mesure_audience: "La mesure d'audience du site"
+};
+const BASES_LEGALES = {
+  consentement: "ton accord", contrat: "l'exécution du contrat",
+  obligation_legale: "une obligation légale", interet_legitime: "l'intérêt légitime"
+};
+
+let TEXTES = null, ACCORDS = null;
+
+async function voletConsentements(z) {
+  z.innerHTML = CHARGEMENT("Lecture de tes consentements.");
+  try {
+    const [t, a] = await Promise.all([
+      sb.from("consentement_textes")
+        .select("finalite,version,texte,base_legale,publie_le,en_vigueur")
+        .order("finalite").order("version"),
+      sb.from("consentements").select("*").eq("artisan_id", moi)
+        .order("accorde_le", { ascending: false })
+    ]);
+    if (t.error) throw t.error;
+    if (a.error) throw a.error;
+    TEXTES = t.data || [];
+    ACCORDS = a.data || [];
+    rendreConsentements(z);
+  } catch (e) {
+    z.innerHTML = panneau(e, "Gérer tes consentements");
+  }
+}
+
+function rendreConsentements(z) {
+  /* ZERO LIGNE N'EST PAS UNE ERREUR, mais ici c'est un etat qui ne devrait pas
+     durer : la migration pose les six finalites elle-meme. Zero ligne signifie
+     donc qu'elle n'a pas ete jouee, et on le dit. */
+  if (!TEXTES.length) {
+    z.innerHTML = '<div class="carte eteinte"><h3>Aucune finalité déclarée'
+      + '<span class="quand non">pas encore en base</span></h3>'
+      + "<p>La table des textes de consentement est vide. Tant qu'elle l'est, il n'y a "
+      + "rien à accepter ni à refuser, et aucun accord n'est enregistré nulle part.</p>"
+      + '<p class="geste">Côté technique : jouer ' + MIGRATION + ".</p></div>";
+    return;
+  }
+
+  /* Une finalite peut avoir plusieurs versions de texte. Celle qui compte est
+     celle en vigueur ; s'il n'y en a aucune, on montre la plus recente pour
+     que la personne voie de quoi il s'agit, et on dit qu'elle n'est pas
+     publiee. */
+  const parFinalite = new Map();
+  for (const t of TEXTES) {
+    const cour = parFinalite.get(t.finalite);
+    if (!cour) { parFinalite.set(t.finalite, t); continue; }
+    if (cour.en_vigueur) continue;                       /* rien ne detrone la version en vigueur */
+    if (t.en_vigueur || t.version > cour.version) parFinalite.set(t.finalite, t);
+  }
+
+  const enVigueur = [...parFinalite.values()].filter((t) => t.en_vigueur).length;
+
+  let h = '<div class="bloc"><h2>Tes accords, un par un'
+    + '<span class="compte">' + parFinalite.size + " finalité"
+    + (parFinalite.size > 1 ? "s" : "") + "</span></h2>"
+    + '<p class="vide">Un accord se donne pour une chose précise, et se retire quand tu veux, '
+    + "d'un seul bouton, au même endroit. Retirer un accord n'efface pas la trace qu'il avait "
+    + "été donné : c'est ce qui prouve que ce qui a été fait avant était permis.</p>";
+
+  if (!enVigueur) {
+    h += '<div class="carte eteinte"><h3>Aucun texte n\'est encore publié'
+      + '<span class="quand non">en attente</span></h3>'
+      + "<p>Les " + parFinalite.size + " finalités ci-dessous existent, mais leur texte n'est "
+      + "pas écrit : à la place, un marqueur. La base <b>refuse</b> d'enregistrer un accord "
+      + "sur un texte vide, et c'est voulu : un accord donné sur un texte qu'on ne peut pas "
+      + "montrer ne vaut rien, et ça se découvre le jour d'un contrôle. Les boutons sont donc "
+      + "éteints, et rien n'est enregistré à ton insu.</p>"
+      + '<p class="geste">Geste humain : l\'avocat rédige les textes, on les pose en base, '
+      + "on passe en_vigueur à vrai. Les six textes sont hors du périmètre du devis.</p></div>";
+  }
+
+  for (const [f, t] of parFinalite) {
+    const actif = ACCORDS.find((c) => c.finalite === f && !c.retire_le);
+    const histo = ACCORDS.filter((c) => c.finalite === f);
+    const marqueur = /^\s*\[A COMPLETER/i.test(t.texte || "");
+    const perime = actif && actif.version !== t.version;
+
+    let badge = '<span class="quand non">jamais donné</span>';
+    if (actif && !perime) badge = '<span class="quand ok">accordé</span>';
+    else if (perime) badge = '<span class="quand">le texte a changé</span>';
+
+    h += '<div class="carte' + (t.en_vigueur ? "" : " eteinte") + '">'
+      + "<h3>" + echapper(FINALITES[f] || f) + badge + "</h3>";
+
+    /* LE TEXTE VIENT DE LA BASE, TOUJOURS. Quand c'est un marqueur, on ne le
+       maquille pas en phrase : on montre le marqueur et on dit ce qu'il veut
+       dire. Inventer une phrase a la place serait inventer un engagement. */
+    if (marqueur) {
+      h += '<p class="vide">Texte pas encore rédigé. La base contient pour l\'instant&nbsp;: '
+        + "<code>" + echapper(t.texte) + "</code></p>";
+    } else {
+      h += "<p>" + echapper(t.texte) + "</p>";
+    }
+
+    h += '<p class="aide">Version ' + t.version
+      + (t.publie_le ? " · publiée le " + echapper(quand(t.publie_le)) : " · pas encore publiée")
+      + (t.base_legale ? " · repose sur " + echapper(BASES_LEGALES[t.base_legale] || t.base_legale)
+                       : " · base légale à confirmer")
+      + "</p>";
+
+    if (actif && !perime) {
+      h += '<p class="aide">Accordé le ' + echapper(quand(actif.accorde_le))
+        + (actif.origine ? " depuis « " + echapper(actif.origine) + " »" : "") + ".</p>";
+    } else if (perime) {
+      h += '<p class="aide">Ton accord porte sur la version ' + actif.version
+        + ", et le texte est passé en version " + t.version
+        + ". Il faut le relire et redonner ton accord, ou le laisser retiré.</p>";
+    }
+
+    /* LES BOUTONS. Aucun n'est decoratif : celui qui ne peut pas marcher
+       aujourd'hui est eteint ET porte la raison, a cote, en clair. */
+    h += '<div class="pied-actions">';
+    if (actif) {
+      h += '<button class="bouton creux" type="button" data-retirer="' + actif.id + '">'
+        + "Retirer mon accord</button>";
+    }
+    if (!actif || perime) {
+      h += '<button class="bouton plein" type="button" data-accorder="' + echapper(f)
+        + '" data-version="' + t.version + '"'
+        + (t.en_vigueur ? "" : ' disabled aria-describedby="pq-' + echapper(f) + '"') + ">"
+        + (perime ? "Redonner mon accord" : "Donner mon accord") + "</button>";
+    }
+    h += "</div>";
+    if (!t.en_vigueur) {
+      h += '<p class="aide" id="pq-' + echapper(f) + '">Éteint : le texte de cette finalité '
+        + "n'est pas publié, la base refuserait l'enregistrement.</p>";
+    }
+
+    if (histo.length) {
+      h += "<details><summary>L'historique de cette finalité ("
+        + histo.length + (histo.length > 1 ? " lignes" : " ligne") + ")</summary>"
+        + histo.map((c) => '<div class="carte" style="margin-top:9px">'
+            + "<p>Version " + c.version + " · accordé le " + echapper(quand(c.accorde_le))
+            + (c.retire_le ? " · retiré le " + echapper(quand(c.retire_le)) : " · toujours actif")
+            + (c.origine ? " · depuis « " + echapper(c.origine) + " »" : "")
+            + "</p></div>").join("") + "</details>";
+    }
+    h += "</div>";
+  }
+  h += "</div>";
+
+  h += '<div class="bloc"><h2>Ce qu\'un retrait change, et ce qu\'il ne change pas</h2>'
+    + '<div class="carte"><p>Un retrait vaut <b>pour l\'avenir</b>. Il ne rend pas illégal ce '
+    + "qui a été fait pendant que l'accord était donné, et il n'efface pas la ligne qui prouve "
+    + "que tu l'avais donné : cette ligne est justement ce qui te protège autant qu'elle nous "
+    + "engage.</p>"
+    + "<p>Pour faire disparaître les données elles-mêmes, c'est l'onglet "
+    + "« Supprimer mon compte », ou une demande d'effacement dans « Mes demandes ».</p></div></div>";
+
+  z.innerHTML = h;
+
+  z.querySelectorAll("button[data-accorder]").forEach((b) =>
+    b.addEventListener("click", () => accorder(b, b.dataset.accorder, +b.dataset.version)));
+  z.querySelectorAll("button[data-retirer]").forEach((b) =>
+    b.addEventListener("click", () => retirer(b, +b.dataset.retirer)));
+}
+
+async function accorder(bouton, finalite, version) {
+  bouton.disabled = true;
+  const avant = bouton.textContent;
+  bouton.textContent = "Un instant…";
+  try {
+    /* Si un accord actif porte une version perimee, il faut le retirer avant :
+       la base n'admet qu'UN SEUL accord actif par finalite. Les deux gestes
+       sont faits dans l'ordre, et si le premier echoue on s'arrete la plutot
+       que de laisser deux lignes actives impossibles. */
+    const actif = (ACCORDS || []).find((c) => c.finalite === finalite && !c.retire_le);
+    if (actif) {
+      const { error } = await sb.from("consentements")
+        .update({ retire_le: new Date().toISOString() }).eq("id", actif.id);
+      if (error) throw error;
+    }
+    const { error } = await sb.from("consentements")
+      .insert({ artisan_id: moi, finalite, version, origine: "mes-donnees" });
+    if (error) throw error;
+    dire("ok", "C'est noté.", "Ton accord est enregistré, avec la version exacte du texte "
+      + "que tu viens de lire. Tu peux le retirer quand tu veux.");
+    await voletConsentements($("p-consentements"));
+  } catch (e) {
+    bouton.disabled = false; bouton.textContent = avant;
+    const p = pourquoi(e);
+    dire("ko", echapper(p.titre), (p.corps ? p.corps + "<br>" : "")
+      + "<code>" + echapper(p.geste) + "</code>");
+  }
+}
+
+async function retirer(bouton, id) {
+  bouton.disabled = true;
+  const avant = bouton.textContent;
+  bouton.textContent = "Un instant…";
+  try {
+    const { error } = await sb.from("consentements")
+      .update({ retire_le: new Date().toISOString() }).eq("id", id);
+    if (error) throw error;
+    dire("ok", "Accord retiré.", "Il ne vaut plus pour la suite. La ligne reste, "
+      + "sans quoi plus rien ne prouverait ce qui était permis avant.");
+    await voletConsentements($("p-consentements"));
+  } catch (e) {
+    bouton.disabled = false; bouton.textContent = avant;
+    const p = pourquoi(e);
+    dire("ko", echapper(p.titre), (p.corps ? p.corps + "<br>" : "")
+      + "<code>" + echapper(p.geste) + "</code>");
+  }
+}
+
+/* ========================================================================
+   ONGLET 3 : LES TRACEURS.
+   Article 82 de la loi n° 78-17 du 6 janvier 1978, et non le RGPD : ce n'est
+   pas le meme texte ni le meme regime, d'ou un onglet a part. Ce qui est
+   affiche ici est MESURE dans le navigateur au moment de l'affichage, jamais
+   recopie d'une politique de cookies type. */
+
+/* Ce que cette page charge vraiment, releve dans son propre code source le
+   13/09/2026. Trois lignes, et pas une de plus : si une quatrieme apparait un
+   jour, elle s'ajoute ici en meme temps qu'elle s'ajoute en haut du fichier. */
+const CHARGEMENTS = [
+  { quoi: "Les polices de caractères", ou: "fonts.googleapis.com, fonts.gstatic.com",
+    depose: "Rien sur ton appareil",
+    note: "Ton adresse IP est transmise au fournisseur des polices pour qu'il te les envoie. "
+        + "Ce n'est pas un traceur, mais ce n'est pas rien non plus : point à confirmer "
+        + "avec l'avocat." },
+  { quoi: "La bibliothèque qui fait marcher la connexion", ou: "cdn.jsdelivr.net",
+    depose: "Rien sur ton appareil", note: "Même remarque sur l'adresse IP." },
+  { quoi: "Ta session de connexion", ou: "ce navigateur, rien ne part",
+    depose: "Une clé locale, effacée quand tu te déconnectes",
+    note: "Strictement nécessaire au service que tu demandes : sans elle, il faudrait "
+        + "retaper ton mot de passe à chaque écran. Ce type de dépôt est exempté de "
+        + "consentement (article 82 et recommandation « cookies » de la CNIL)." }
+];
+
+/* Les cles locales que le site pose et qu'on sait nommer. Tout ce qui n'est
+   pas dans cette liste s'affiche quand meme, en « origine inconnue » : cacher
+   une cle qu'on ne reconnait pas serait exactement le contraire du but. */
+const CLES_CONNUES = [
+  { motif: /^sb-.*-auth-token$/, nom: "Ta session de connexion", genre: "nécessaire" },
+  { motif: /^dispo-traceurs$/, nom: "Ton choix sur les traceurs", genre: "nécessaire" },
+  { motif: /^dispo-devis$/, nom: "Un brouillon de devis, outil interne", genre: "confort" },
+  { motif: /^dispo-simu$/, nom: "Les curseurs du simulateur, outil interne", genre: "confort" },
+  { motif: /^dispo-plan/, nom: "Les cases cochées du plan d'action, outil interne", genre: "confort" }
+];
+
+function voletTraceurs(z) {
+  const C = window.Consentement;
+
+  let h = '<div class="bloc"><h2>Ce que ce site dépose sur ton téléphone</h2>';
+
+  if (!C) {
+    /* LE COMPOSANT N'EST PAS LA. On le dit, avec le geste : un panneau vide
+       laisserait croire qu'il n'y a rien a regler, ce qui est une conclusion,
+       pas un constat. */
+    h += '<div class="carte eteinte"><h3>Le réglage n\'est pas chargé'
+      + '<span class="quand non">indisponible</span></h3>'
+      + "<p>Le composant qui gère les traceurs (<code>/assets/consentement.js</code>) n'a pas "
+      + "été chargé par cette page. Ce n'est pas une panne de ton téléphone : le fichier "
+      + "existe dans le dépôt, mais aucune étape de construction ne le recopie dans le site "
+      + "publié.</p>"
+      + '<p class="geste">Côté technique, mesuré le 13/09/2026 : ni outils/build.py ni '
+      + "outils/cloudflare_adispo.py ne copient assets/ vers dist/. Ajouter cette copie "
+      + "(build.py appartient au chef d'orchestre), puis reconstruire.</p></div>";
+  } else if (!C.actif()) {
+    h += '<div class="carte"><h3>Aucun traceur<span class="quand ok">mesuré</span></h3>'
+      + "<p>Ce site ne mesure pas ton audience, ne t'affiche aucune publicité, et ne charge "
+      + "aucun bouton de réseau social. Il n'y a donc <b>rien à accepter ni à refuser</b>, et "
+      + "c'est pour ça qu'aucun bandeau ne s'affiche.</p>"
+      + "<p>Un bandeau qui ne gouverne rien n'est pas une précaution : il habitue à cliquer "
+      + "sans lire, et le jour où il y aurait vraiment quelque chose à décider, plus personne "
+      + "ne le lirait. Le réglage ci-dessous s'allumera tout seul le jour où un traceur sera "
+      + "posé, et il sera demandé <b>avant</b> tout dépôt.</p></div>"
+      + '<div id="reglage-traceurs"></div>';
+  } else {
+    h += '<div class="carte"><h3>Ton choix<span class="quand">modifiable</span></h3>'
+      + '<div id="reglage-traceurs"></div></div>'
+      + '<div class="pied-actions">'
+      + '<button class="bouton creux" type="button" id="rouvrir">Revoir le bandeau</button></div>';
+  }
+  h += "</div>";
+
+  /* Ce que la page charge, releve dans son propre code. */
+  h += '<div class="bloc"><h2>Ce que cette page charge<span class="compte">relevé dans le code</span></h2>';
+  for (const c of CHARGEMENTS) {
+    h += '<div class="carte"><h3>' + echapper(c.quoi) + "</h3>"
+      + "<p><code>" + echapper(c.ou) + "</code></p>"
+      + "<p>Déposé sur ton appareil : " + echapper(c.depose) + ".</p>"
+      + '<p class="vide">' + echapper(c.note) + "</p></div>";
+  }
+  h += "</div>";
+
+  /* Ce qui est REELLEMENT pose dans ce navigateur, maintenant. C'est une
+     mesure, pas une description : elle change d'un appareil a l'autre, et
+     c'est precisement ce qui la rend utile. */
+  h += '<div class="bloc"><h2>Ce qui est posé dans ce navigateur, maintenant'
+     + '<span class="compte" id="n-cles"></span></h2><div id="cles"></div></div>';
+
+  z.innerHTML = h;
+
+  if (C) {
+    const hote = $("reglage-traceurs");
+    if (hote) C.reglages(hote);
+    const r = $("rouvrir");
+    if (r) r.addEventListener("click", () => C.ouvrir(true));
+  }
+
+  /* La lecture du stockage local peut echouer (navigation privee, reglage
+     d'entreprise). On le dit plutot que d'afficher une liste vide, qui se
+     lirait « rien n'est posé » alors qu'on n'a pas pu regarder. */
+  const zc = $("cles");
+  let cles = null;
+  try {
+    cles = [];
+    for (let i = 0; i < localStorage.length; i++) cles.push(localStorage.key(i));
+  } catch (e) { cles = null; }
+
+  if (cles === null) {
+    $("n-cles").textContent = "lecture refusée";
+    zc.innerHTML = '<p class="vide">Ce navigateur ne laisse pas lire ce qui est stocké. '
+      + "Ce n'est pas une erreur du site : certains réglages de confidentialité le "
+      + "refusent, et c'est leur droit.</p>";
+    return;
+  }
+  $("n-cles").textContent = cles.length + (cles.length > 1 ? " clés" : " clé");
+  zc.innerHTML = cles.length
+    ? cles.map((k) => {
+        const connue = CLES_CONNUES.find((c) => c.motif.test(k));
+        return '<div class="carte"><h3>' + echapper(connue ? connue.nom : "Origine inconnue")
+          + '<span class="quand ' + (connue ? "ok" : "non") + '">'
+          + echapper(connue ? connue.genre : "à vérifier") + "</span></h3>"
+          + "<p><code>" + echapper(k) + "</code></p>"
+          + (connue ? "" : '<p class="vide">Cette clé n\'est pas posée par les pages '
+              + "connues du site. Elle peut venir d'une extension de ton navigateur.</p>")
+          + "</div>";
+      }).join("")
+    : '<p class="vide">Rien n\'est stocké par ce site dans ce navigateur.</p>';
+}
+
+/* ========================================================================
+   ONGLET 4 : MES DEMANDES.
+   Les droits qui demandent une intervention humaine : rectification,
+   limitation, opposition, et l'acces a ce que l'export ne couvre pas encore.
+   Chaque depot rend une reference et une echeance : l'article 12.3 donne un
+   mois pour repondre, et une echeance affichee est une echeance opposable. */
+const GENRES = [
+  { cle: "acces", nom: "Accéder à des données que l'export ne montre pas",
+    aide: "Par exemple tes factures, qui ne sont pas encore dans le fichier." },
+  { cle: "portabilite", nom: "Recevoir mes données dans un format réutilisable",
+    aide: "L'onglet « Ce qu'on sait de toi » le fait déjà tout seul, immédiatement." },
+  { cle: "rectification", nom: "Corriger une information fausse",
+    aide: "Ce qui se corrige depuis ton espace s'y corrige plus vite : prénom, "
+        + "téléphone, entreprise, métier, présentation." },
+  { cle: "effacement", nom: "Faire effacer mes données",
+    aide: "L'onglet « Supprimer mon compte » le fait immédiatement, sans attendre." },
+  { cle: "limitation", nom: "Geler l'utilisation de mes données",
+    aide: "Les données restent, plus personne ne s'en sert, le temps qu'un point soit tranché." },
+  { cle: "opposition", nom: "M'opposer à un traitement",
+    aide: "Dis lequel, et pourquoi : une opposition se motive." }
+];
+const ETATS = { recue: "Reçue", en_cours: "En cours", faite: "Faite", refusee: "Refusée" };
+
+async function voletDemandes(z) {
+  z.innerHTML = CHARGEMENT("Lecture de tes demandes.");
+  let lignes = [], souci = null;
+  try {
+    const { data, error } = await sb.from("demandes_rgpd").select("*")
+      .order("demande_le", { ascending: false });
+    if (error) throw error;
+    lignes = data || [];
+  } catch (e) { souci = e; }
+
+  /* UN FORMULAIRE QUI NE PEUT PAS ABOUTIR NE SE LAISSE PAS REMPLIR. Sans ce
+     verrou, la personne choisissait son motif, tapait un paragraphe, cliquait,
+     et recevait alors seulement « cette partie n'est pas en service ». Le
+     formulaire reste VISIBLE, pour qu'on voie ce qui sera possible, mais il est
+     eteint et il dit pourquoi avant qu'on commence a ecrire. */
+  const bloque = enService === false || (souci && horsService(souci));
+  const off = bloque ? " disabled" : "";
+
+  let h = '<div class="bloc"><h2>Demander autre chose</h2>'
+    + '<p class="vide">Ce qui ne se fait pas tout seul depuis cette page se demande ici. '
+    + "Chaque demande reçoit une référence et une date limite de réponse : un mois, "
+    + "c'est le délai que fixe le règlement.</p>"
+    + (bloque ? '<div class="carte eteinte" id="pq-depot"><h3>Le dépôt n\'est pas encore en service'
+        + '<span class="quand non">éteint</span></h3>'
+        + "<p>Les champs ci-dessous sont éteints : la base n'a pas encore reçu la partie qui "
+        + "enregistre les demandes. Rien ne serait perdu, mais rien ne partirait non plus, et "
+        + "un formulaire qui avale une demande sans la garder est pire que pas de formulaire "
+        + "du tout.</p>"
+        + "<p>En attendant, écris-nous : une demande envoyée par écrit vaut exactement autant, "
+        + "et le délai d'un mois court de la même façon.</p>"
+        + '<p class="geste">Côté technique : jouer ' + MIGRATION + ".</p></div>" : "")
+    + '<div class="champ"><label for="genre">Ce que tu demandes</label>'
+    +   '<select id="genre" aria-describedby="aide-genre' + (bloque ? " pq-depot" : "") + '"' + off + ">"
+    +   GENRES.map((g) => '<option value="' + g.cle + '">' + echapper(g.nom) + "</option>").join("")
+    +   "</select>"
+    +   '<p class="aide" id="aide-genre" role="status" aria-live="polite"></p></div>'
+    + '<div class="champ"><label for="detail">Précise ta demande '
+    +   '<span class="opt">recommandé</span></label>'
+    +   '<textarea id="detail" maxlength="2000" aria-describedby="aide-detail e-detail'
+    +   (bloque ? " pq-depot" : "") + '"' + off
+    +   ' placeholder="Dis en une phrase ce que tu veux, et sur quoi. Plus c\'est précis, plus c\'est rapide."></textarea>'
+    +   '<p class="aide" id="aide-detail">2 000 caractères au maximum. Ce que tu écris ici '
+    +   "est lu par une personne, pas par une machine.</p>"
+    +   '<p class="err" id="e-detail" role="alert"></p></div>'
+    + '<div class="pied-actions">'
+    +   '<button class="bouton plein" type="button" id="deposer"' + off
+    +   (bloque ? ' aria-describedby="pq-depot"' : "") + ">Déposer ma demande</button></div>"
+    + "</div>";
+
+  h += '<div class="bloc"><h2>Le registre de tes demandes'
+    + '<span class="compte">' + (souci ? "indisponible" : lignes.length
+        + (lignes.length > 1 ? " lignes" : " ligne")) + "</span></h2>";
+
+  if (souci) {
+    h += panneau(souci, "Le registre de tes demandes");
+  } else if (!lignes.length) {
+    /* L'ETAT VIDE, ET IL EST NORMAL : un compte neuf n'a rien demande. On le
+       dit avec une phrase et un geste, jamais par un vide. */
+    h += '<div class="carte"><h3>Aucune demande<span class="quand non">rien à afficher</span></h3>'
+      + "<p>Tu n'as encore rien demandé, et il n'y a aucune raison que ce soit un problème. "
+      + "Ce registre se remplira tout seul : télécharger tes données y écrit une ligne, "
+      + "supprimer ton compte aussi.</p></div>";
+  } else {
+    for (const l of lignes) {
+      const g = GENRES.find((x) => x.cle === l.genre);
+      const fini = l.etat === "faite" || l.etat === "refusee";
+      h += '<div class="carte"><h3>' + echapper(g ? g.nom : l.genre)
+        + '<span class="quand ' + (l.etat === "faite" ? "ok" : fini ? "non" : "") + '">'
+        + echapper(ETATS[l.etat] || l.etat) + "</span></h3>"
+        + "<p>Demandée le " + echapper(quand(l.demande_le))
+        + (fini && l.traite_le ? " · traitée le " + echapper(quand(l.traite_le))
+                               : " · réponse attendue avant le " + echapper(quand(l.echeance_le)))
+        + "</p>"
+        + (l.detail ? "<p>" + echapper(l.detail) + "</p>" : "")
+        + '<p class="aide">Référence : <code>' + echapper(l.id) + "</code></p></div>";
+    }
+  }
+  h += "</div>";
+  z.innerHTML = h;
+
+  const sel = $("genre"), aide = $("aide-genre");
+  const majAide = () => {
+    const g = GENRES.find((x) => x.cle === sel.value);
+    aide.textContent = g ? g.aide : "";
+  };
+  sel.addEventListener("change", majAide);
+  majAide();
+
+  $("deposer").addEventListener("click", () => deposer());
+}
+
+async function deposer() {
+  const b = $("deposer"), genre = $("genre").value;
+  const detail = $("detail").value.trim();
+  const err = $("e-detail"), champ = $("detail");
+
+  /* Une demande sans un mot d'explication se traite mal et revient en
+     aller-retour. On l'exige pour les trois genres qui ne veulent rien dire
+     sans precision, et on ne l'exige pas pour les autres : une regle qui
+     bloque sans raison se contourne en tapant un point. */
+  const exige = ["rectification", "limitation", "opposition"].includes(genre);
+  if (exige && detail.length < 10) {
+    err.textContent = "Dis en une phrase sur quoi porte ta demande : sans ça, "
+      + "personne ne saura quoi corriger.";
+    err.classList.add("vu");
+    champ.setAttribute("aria-invalid", "true");
+    champ.focus();
+    return;
+  }
+  err.classList.remove("vu");
+  champ.setAttribute("aria-invalid", "false");
+
+  b.disabled = true;
+  const avant = b.textContent;
+  b.textContent = "Un instant…";
+  try {
+    const { data, error } = await sb.rpc("deposer_demande_rgpd",
+      { p_genre: genre, p_detail: detail || null });
+    if (error) throw error;
+    const ligne = Array.isArray(data) ? data[0] : data;
+    dire("ok", "Demande déposée.",
+      "Référence <code>" + echapper(ligne && ligne.id ? ligne.id : "") + "</code>. "
+      + "Réponse attendue avant le "
+      + echapper(ligne && ligne.echeance_le ? quand(ligne.echeance_le) : "un mois")
+      + ". Garde cette référence : elle suffit à retrouver ta demande, sans redonner "
+      + "ton adresse.");
+    $("detail").value = "";
+    await voletDemandes($("p-demandes"));
+  } catch (e) {
+    b.disabled = false; b.textContent = avant;
+    const p = pourquoi(e);
+    dire("ko", echapper(p.titre), (p.corps ? p.corps + "<br>" : "")
+      + "<code>" + echapper(p.geste) + "</code>");
+  }
+}
+
+/* ========================================================================
+   ONGLET 5 : SUPPRIMER MON COMPTE.
+   Article 17 du RGPD. Trois principes tenus dans le code :
+     · on annonce AVANT ce qui disparait, ce qui reste, et pourquoi ;
+     · rien ne part sur un clic : il faut taper un mot, et le bouton final
+       reste eteint tant que le mot n'est pas exact ;
+     · a la fin, la session est fermee, et la reference du journal reste
+       affichee apres la deconnexion.
+
+   CE QUI EST ECRIT ICI EST RELEVE DANS supprimer_mon_compte(), pas suppose :
+   la liste des tables effacees, celle des tables anonymisees, et le fait que
+   le compte de connexion survit a l'operation viennent toutes de la fonction
+   elle-meme. */
+const EFFACE = [
+  "ta fiche : prénom, nom, téléphone, photo, SIRET, entreprise, commune, métier, présentation",
+  "tes compétences, ton outillage, tes permis et ton matériel",
+  "tous tes créneaux occupés",
+  "tes agendas branchés, et les clés qui donnaient accès à ces agendas",
+  "les blocages que tu as posés, et ceux qui te visaient",
+  "tes consentements",
+  "ton inscription à la liste d'attente, si tu en avais une"
+];
+const GARDE = [
+  { quoi: "Les messages que tu as écrits à un confrère",
+    pourquoi: "Ils appartiennent aussi à celui qui les a reçus : les effacer trouerait sa "
+            + "conversation, il lui resterait ses propres phrases répondant à des questions "
+            + "disparues. Ton nom en est retiré, le texte reste." },
+  { quoi: "Les signalements te concernant",
+    pourquoi: "La modération doit garder le fait. Partir après avoir été signalé n'efface "
+            + "pas les signalements. Ton identité en est retirée." },
+  { quoi: "Tes factures",
+    pourquoi: "Une pièce comptable se conserve, c'est une obligation et pas un choix "
+            + "(article L123-22 du code de commerce). L'identité qui y figure a été recopiée "
+            + "sur le document le jour de son émission : elle y reste, sans quoi ce ne serait "
+            + "plus une facture." },
+  { quoi: "La ligne qui prouve que tu as demandé la suppression",
+    pourquoi: "C'est elle qui prouve qu'on a fait ce que tu as demandé. Elle perd ton "
+            + "identité à l'instant où ton compte de connexion disparaît." }
+];
+
+function voletSupprimer(z) {
+  if (eteint) return;
+
+  z.innerHTML = '<div class="bloc">'
+    + "<h2>Supprimer ton compte</h2>"
+    + '<p class="vide">C\'est définitif, et ça ne se rattrape pas. Lis ce qui suit avant de '
+    + "le faire : la moitié de ce qui te concerne disparaît, l'autre moitié perd ton nom "
+    + "sans disparaître, et il y a une bonne raison pour chaque cas.</p>"
+
+    + '<div class="carte"><h3>Ce qui disparaît<span class="quand">effacé</span></h3>'
+    + "<ul>" + EFFACE.map((e) => "<li>" + echapper(e) + "</li>").join("") + "</ul>"
+    + "<p>Effacé veut dire effacé : la ligne n'existe plus, personne ne peut la retrouver.</p></div>"
+
+    + '<div class="carte"><h3>Ce qui reste, sans ton nom<span class="quand non">anonymisé</span></h3>'
+    + GARDE.map((g) => "<p><b>" + echapper(g.quoi) + ".</b> " + echapper(g.pourquoi) + "</p>").join("")
+    + "</div>"
+
+    + '<div class="carte eteinte"><h3>Ce qui demande encore une intervention'
+    +   '<span class="quand non">pas automatique</span></h3>'
+    +   "<p>Ton <b>compte de connexion</b> (ton adresse e-mail et ton mot de passe) ne peut pas "
+    +   "être effacé depuis cette page : ça demande une clé que nous ne mettons jamais dans un "
+    +   "navigateur, parce qu'elle ouvrirait tout à tout le monde. Tant que ce geste n'est pas "
+    +   "fait, tu peux encore te reconnecter et tomber sur un espace vide.</p>"
+    +   "<p>La demande est inscrite au registre à la seconde où tu supprimes, avec une "
+    +   "référence, et c'est cette ligne qui sert de liste de travail. Tu recevras la "
+    +   "référence juste après.</p>"
+    +   '<p class="geste">Côté technique : traiter les lignes de demandes_rgpd en genre '
+    +   "effacement et en état en_cours, supprimer le compte dans Authentication puis passer "
+    +   "la ligne en faite.</p></div>"
+
+    /* MEME REGLE QUE LE DEPOT D'UNE DEMANDE, ET ELLE COMPTE DAVANTAGE ICI :
+       faire taper le mot SUPPRIMER a quelqu'un pour lui repondre ensuite que
+       la fonction n'existe pas serait la pire minute de la page. */
+    + (enService === false
+        ? '<div class="carte eteinte" id="pq-suppr"><h3>La suppression n\'est pas encore en service'
+          + '<span class="quand non">éteint</span></h3>'
+          + "<p>La base n'a pas encore reçu la fonction qui efface et anonymise. Le bouton est "
+          + "éteint plutôt que de te faire confirmer une suppression qui ne se ferait pas.</p>"
+          + "<p>Ton droit, lui, ne dépend pas de ce bouton : écris-nous, et la suppression est "
+          + "faite à la main dans le délai d'un mois.</p>"
+          + '<p class="geste">Côté technique : jouer ' + MIGRATION + ".</p></div>"
+        : "")
+    + '<div class="pied-actions">'
+    +   '<button class="bouton creux" type="button" id="ouvrir-suppr"'
+    +   (enService === false ? ' disabled aria-describedby="pq-suppr"' : "") + ">"
+    +   "Je veux supprimer mon compte</button></div>"
+    + '<div id="zone-suppr"></div></div>';
+
+  $("ouvrir-suppr").addEventListener("click", () => confirmation());
+}
+
+function confirmation() {
+  const z = $("zone-suppr");
+  $("ouvrir-suppr").disabled = true;
+  z.innerHTML = '<div class="carte grave"><h3>Confirme en écrivant un mot</h3>'
+    + "<p>Un bouton se touche par accident sur un téléphone tenu d'une main. Un mot tapé, non. "
+    + "Écris <b>SUPPRIMER</b> en toutes lettres ci-dessous.</p>"
+    + '<div class="champ"><label for="mot">Écris SUPPRIMER</label>'
+    +   '<input id="mot" autocomplete="off" autocapitalize="characters" spellcheck="false" '
+    +   'aria-describedby="aide-mot e-mot" placeholder="SUPPRIMER">'
+    +   '<p class="aide" id="aide-mot">Le bouton s\'allume quand le mot est exact. '
+    +   "Les minuscules et les espaces autour ne gênent pas.</p>"
+    +   '<p class="err" id="e-mot" role="alert"></p></div>'
+    + '<div class="pied-actions">'
+    +   '<button class="bouton danger" type="button" id="suppr-ok" disabled '
+    +   'aria-describedby="aide-mot">Supprimer définitivement</button>'
+    +   '<button class="lien-rouge" type="button" id="suppr-non">Finalement non, annuler</button>'
+    + "</div></div>";
+
+  const champ = $("mot"), bouton = $("suppr-ok");
+  const bon = () => champ.value.trim().toUpperCase() === "SUPPRIMER";
+  champ.addEventListener("input", () => {
+    bouton.disabled = !bon();
+    if (bon()) { $("e-mot").classList.remove("vu"); champ.setAttribute("aria-invalid", "false"); }
+  });
+  champ.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" && bon()) { ev.preventDefault(); supprimer(); }
+  });
+  champ.focus();
+
+  bouton.addEventListener("click", () => supprimer());
+  $("suppr-non").addEventListener("click", () => {
+    z.innerHTML = "";
+    $("ouvrir-suppr").disabled = false;
+    $("ouvrir-suppr").focus();
+    dire("ok", "Rien n'a été supprimé.", "Ton compte est intact.");
+  });
+}
+
+async function supprimer() {
+  const champ = $("mot"), bouton = $("suppr-ok");
+  const mot = champ.value.trim();
+  if (mot.toUpperCase() !== "SUPPRIMER") {
+    $("e-mot").textContent = "Le mot n'est pas exact. Écris SUPPRIMER, rien d'autre.";
+    $("e-mot").classList.add("vu");
+    champ.setAttribute("aria-invalid", "true");
+    champ.focus();
+    return;
+  }
+  bouton.disabled = true;
+  bouton.textContent = "Suppression en cours…";
+  $("suppr-non").disabled = true;
+  try {
+    const { data, error } = await sb.rpc("supprimer_mon_compte", { p_confirmation: mot });
+    if (error) throw error;
+    eteint = true;
+    await ecranSupprime(data);
+    /* LA DECONNEXION VIENT APRES L'AFFICHAGE, jamais avant : la reference du
+       journal doit rester lisible a l'ecran. `signOut` vide la session locale,
+       il ne rafraichit pas la page. */
+    try { await sb.auth.signOut(); } catch (e) {}
+  } catch (e) {
+    bouton.disabled = false; bouton.textContent = "Supprimer définitivement";
+    $("suppr-non").disabled = false;
+    const p = pourquoi(e);
+    dire("ko", echapper(p.titre), (p.corps ? p.corps + "<br>" : "")
+      + "<code>" + echapper(p.geste) + "</code>");
+  }
+}
+
+async function ecranSupprime(r) {
+  taire();
+  $("zone-haut").innerHTML = "";
+  const ref = r && r.reference ? r.reference : "";
+  const anon = (r && r.anonymise) || {};
+  ecran.setAttribute("aria-busy", "false");
+  ecran.innerHTML =
+    '<span class="pastille">Compte supprimé</span>'
+    + '<h1 tabindex="-1" id="t">C\'est <span class="em">fait</span>.</h1>'
+    + '<p class="lead">Tes données ont été effacées, et ce qui ne pouvait pas l\'être a perdu '
+    + "ton nom. Tu viens d'être déconnecté.</p>"
+
+    + (ref ? '<div class="carte"><h3>Ta référence<span class="quand ok">à garder</span></h3>'
+      + "<p>Note-la, ou prends une photo de cet écran. Elle suffit à retrouver ta demande "
+      + "sans redonner ton adresse.</p>"
+      + '<p><code id="ref">' + echapper(ref) + "</code></p>"
+      + '<div class="pied-actions">'
+      + '<button class="bouton creux" type="button" id="copier-ref">Copier la référence</button></div>'
+      + '<p class="aide" id="dit-ref" role="status" aria-live="polite"></p></div>' : "")
+
+    + '<div class="carte"><h3>Ce qui a été effacé</h3>'
+    + "<ul>" + ((r && r.efface) || EFFACE).map((e) => "<li>" + echapper(e) + "</li>").join("")
+    + "</ul></div>"
+
+    + '<div class="carte"><h3>Ce qui reste, sans ton nom</h3>'
+    + "<p>" + (anon.messages ? echapper(anon.messages) + " message"
+        + (anon.messages > 1 ? "s" : "") + " écrit" + (anon.messages > 1 ? "s" : "")
+        + " par toi" : "Aucun message") + " : le texte reste chez ton interlocuteur, "
+    + "ton nom en a été retiré.</p>"
+    + "<p>" + (anon.conversations ? echapper(anon.conversations) + " conversation"
+        + (anon.conversations > 1 ? "s" : "") + " fermée"
+        + (anon.conversations > 1 ? "s" : "") : "Aucune conversation") + ".</p>"
+    + (anon.signalements ? "<p>Signalements : " + echapper(anon.signalements) + ".</p>" : "")
+    + "</div>"
+
+    + '<div class="carte eteinte"><h3>Ce qui reste à faire de notre côté'
+    +   '<span class="quand non">sous un mois</span></h3>'
+    +   "<p>" + echapper((r && r.reste_a_faire)
+        || "La suppression du compte de connexion demande une intervention de notre côté.")
+    +   "</p></div>"
+
+    + '<div class="pied-actions"><a class="bouton plein" href="/">Revenir à l\'accueil</a></div>';
+
+  $("t").focus();
+  const cop = $("copier-ref");
+  if (cop) {
+    cop.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(ref); $("dit-ref").textContent = "Copiée."; }
+      catch (e) {
+        $("dit-ref").textContent = "Ce navigateur ne laisse pas copier tout seul : "
+          + "sélectionne la référence ci-dessus, ou prends une photo de l'écran.";
+      }
+    });
+  }
+}
+
+/* ========================================================================
+   LES ECRANS QUI NE SONT PAS DES ONGLETS. */
+
+function ecranMessage(titre, corps, actions) {
+  ecran.setAttribute("aria-busy", "false");
+  ecran.innerHTML = '<h1 tabindex="-1" id="t">' + titre + "</h1>"
+    + '<p class="lead">' + corps + "</p>"
+    + (actions ? '<div class="pied-actions">' + actions + "</div>" : "");
+  $("t").focus();
+}
+
+/* ========================================================================
+   LE DEMARRAGE. */
+(async () => {
+  /* L'onglet demande dans l'adresse, s'il est connu. Un ancrage inconnu ne
+     fait pas d'erreur : on retombe sur le premier onglet. */
+  const ancre = (location.hash || "").replace("#", "");
+  if (VOLETS.some((v) => v.cle === ancre)) volet = ancre;
+
+  let c;
+  try {
+    c = await client();
+  } catch (e) {
+    ecranMessage("La page n'a pas pu se charger entièrement.",
+      "La bibliothèque qui fait marcher la connexion n'est pas arrivée. C'est presque "
+      + "toujours le réseau.",
+      '<button class="bouton plein" type="button" id="reessayer">Réessayer</button>');
+    $("reessayer").addEventListener("click", () => location.reload());
+    return;
+  }
+
+  const { data: s } = await c.auth.getSession();
+  if (!s || !s.session) {
+    /* PAS DE RENVOI AUTOMATIQUE VERS LA CONNEXION. Cette page se reçoit par
+       e-mail ou se garde en favori : un renvoi immédiat ferait croire à un
+       lien cassé, et le bouton retour du navigateur reviendrait ici, donc
+       reboucle. On dit ce qui se passe, et on laisse la personne cliquer. */
+    ecranMessage("Il faut être connecté pour voir tes données.",
+      "C'est la condition qui empêche n'importe qui de demander les tiennes. "
+      + "Connecte-toi, tu reviendras ici.",
+      '<a class="bouton plein" href="/connexion">Me connecter</a>'
+      + '<a class="bouton creux" href="/">Revenir à l\'accueil</a>');
+    return;
+  }
+  moi = s.session.user.id;
+
+  $("zone-haut").innerHTML = '<a class="retour" href="/espace">Mon espace</a>';
+
+  try {
+    /* `ma_fiche()` cree la ligne au premier passage ET la rend, en un appel.
+       Elle est appelee ici pour que le premier consentement ne bute pas sur
+       une cle etrangere vers une fiche qui n'existe pas encore. */
+    const { data: f, error } = await c.rpc("ma_fiche");
+    if (error) throw error;
+    fiche = Array.isArray(f) ? f[0] : f;
+  } catch (e) {
+    /* La fiche n'est pas indispensable a tout : l'export et le registre
+       marchent sans elle. On continue, et le refus se dira au moment ou il
+       compte vraiment, c'est-a-dire sur un consentement. */
+    fiche = null;
+  }
+
+  /* UNE SUPPRESSION DEJA DEMANDEE. La fiche existe encore, vidée et marquée :
+     afficher les onglets ordinaires laisserait croire que rien ne s'est passé.
+     On montre l'état réel, et le geste qui reste. */
+  if (fiche && fiche.supprime_le) {
+    ecran.setAttribute("aria-busy", "false");
+    ecran.innerHTML = '<span class="pastille">Suppression demandée</span>'
+      + '<h1 tabindex="-1" id="t">Ton compte est déjà <span class="em">supprimé</span>.</h1>'
+      + '<p class="lead">Tu l\'as demandé le ' + echapper(quand(fiche.supprime_le))
+      + ". Tes données ont été effacées, et ce qui ne pouvait pas l'être a perdu ton nom.</p>"
+      + '<div class="carte eteinte"><h3>Pourquoi tu peux encore te connecter'
+      +   '<span class="quand non">en cours</span></h3>'
+      +   "<p>Ton compte de connexion (adresse e-mail et mot de passe) n'a pas encore été "
+      +   "effacé : ce geste-là demande une intervention de notre côté, et il est inscrit "
+      +   "au registre. En attendant, tu tombes sur un espace vide, ce qui est normal.</p></div>"
+      + '<div class="carte"><h3>Si c\'était une erreur</h3>'
+      +   "<p>Ce qui est effacé ne revient pas. Tu peux en revanche créer un nouveau compte, "
+      +   "et tout remplir à neuf.</p></div>"
+      + '<div class="pied-actions">'
+      +   '<button class="bouton creux" type="button" id="sortir">Me déconnecter</button>'
+      +   '<a class="bouton creux" href="/">Revenir à l\'accueil</a></div>';
+    $("t").focus();
+    $("sortir").addEventListener("click", async () => {
+      try { await c.auth.signOut(); } catch (e) {}
+      location.replace("/connexion");
+    });
+    return;
+  }
+
+  /* LA SONDE, UNE SEULE FOIS ET SANS EFFET DE BORD. `consentement_textes` est
+     la table du volet RGPD la moins chere a interroger : lisible meme sans
+     compte, une seule colonne, une seule ligne, et surtout aucune ecriture au
+     registre (contrairement a l'export, qui se journalise lui-meme). Elle
+     repond a une seule question : les ecrans qui ECRIVENT peuvent-ils
+     travailler ? Un echec reseau laisse `enService` a null, et les boutons
+     restent actifs. */
+  try {
+    const { error } = await c.from("consentement_textes").select("finalite").limit(1);
+    if (!error) enService = true;
+    else if (horsService(error)) enService = false;
+  } catch (e) { enService = null; }
+
+  cadre();
+
+  /* UN LIEN VERS UN ONGLET PRECIS DOIT MARCHER MEME QUAND LA PAGE EST DEJA
+     OUVERTE. Mesure au navigateur : arriver sur /mes-donnees#supprimer depuis
+     une page deja affichee ne recharge rien (c'est une navigation dans le meme
+     document), et sans cette ecoute l'onglet ne bougeait pas. Le changement
+     d'onglet, lui, passe par `replaceState`, qui ne declenche pas l'evenement :
+     pas de boucle. */
+  window.addEventListener("hashchange", () => {
+    if (eteint) return;
+    const a = (location.hash || "").replace("#", "");
+    if (VOLETS.some((v) => v.cle === a) && $("o-" + a)) aller(a, false);
+  });
+
+  /* Le lien vers les mentions et le traitement des donnees. La page existe
+     dans le depot (legal/index.html) mais n'est pas forcement publiee : on
+     verifie avant d'en faire un lien, plutot que d'envoyer sur un 404. */
+  existe("/legal").then((etat) => {
+    if (etat !== "oui") return;
+    $("zone-legal").innerHTML =
+      ' <a href="/legal#donnees">Le détail juridique est là</a>.';
+  });
+})();
+
+/* --------- La barre de l'espace ---------
+   Elle ne depend d'aucune autre piece de la page : elle lit la session
+   directement dans le stockage local, comme le fait deja le chargement
+   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
+   qu'aucun n'ait a lui preter ses fonctions. */
+(function () {
+  var nav = document.getElementById("nav-app");
+  if (!nav || !window.localStorage) return;
+
+  var cle = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
+  }
+  if (!cle) return;                       // pas de session : la barre n'existe pas
+  var sess;
+  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!sess || !sess.access_token || !sess.user) return;
+
+  var ici = nav.getAttribute("data-ici") || "";
+  var liens = nav.querySelectorAll("a");
+  for (var j = 0; j < liens.length; j++) {
+    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
+  }
+  nav.hidden = false;
+
+  /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
+     rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
+  fetch(BASE + "/rest/v1/artisans?id=eq." + sess.user.id + "&select=etape",
+        { headers: { apikey: CLE, Authorization: "Bearer " + sess.access_token } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d[0] || d[0].etape === "fini") return;
+      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < bloques.length; k++) {
+        bloques[k].setAttribute("aria-disabled", "true");
+        bloques[k].setAttribute("tabindex", "-1");
+      }
+      var note = document.getElementById("nav-note");
+      if (note) {
+        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
+        note.hidden = false;
+      }
+    })
+    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+})();
+</script>

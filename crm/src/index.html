@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F2F1EE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- Titre neutre : tant que la marque n'est pas deposee a l'INPI, un onglet
+     ne nomme pas le projet. Le nom reste dans le contenu visible de la page. -->
+<title>CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- L'interface est en police systeme (SF Pro via -apple-system) : deja installee
+     sur Mac et iPhone, rendu natif exact, aucun telechargement, fonctionne hors
+     ligne. Seule la marque « a dispo » garde sa police dessinee : une requete au
+     lieu de trois, et un repli propre si le reseau manque. -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/*__STYLES__*/
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="btn ghost sm" id="menuBtn" aria-label="Filtres">Filtres</button>
+  <a class="brand" href="#" id="brandLink">
+    <span class="logo"><em>à</em>dispo</span>
+    <span class="sub">CRM artisans</span>
+  </a>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="dash">Tableau de bord</button>
+    <button class="tab" data-view="contacts">Contacts <span class="n" id="nContacts"></span></button>
+    <button class="tab" data-view="inscrits">Inscrits <span class="n" id="nInscrits"></span></button>
+    <button class="tab" data-view="pipeline">Pipeline</button>
+    <button class="tab" data-view="relances">Relances <span class="n" id="nRelances"></span></button>
+    <button class="tab" data-view="reglages">Réglages</button>
+  </nav>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#F7F0E4" stroke-width="1.8"><circle cx="7" cy="7" r="4.6"/><path d="M10.5 10.5 14 14"/></svg>
+    <input id="q" type="search" placeholder="Nom, société, e-mail, téléphone, ville, département…" autocomplete="off">
+    <span class="kbd">/</span>
+  </div>
+  <div class="top-actions">
+    <button class="btn primary sm" id="addBtn">+ Contact</button>
+    <div class="presents" id="presents" title="Personnes connectées"></div><button class="user" id="userBtn" title="Changer d'utilisateur"><span class="av" id="userAv">?</span><span id="userName">…</span><span class="sync local" id="sync" title="Mode local"></span></button>
+  </div>
+</header>
+
+<!-- ====================================================== TABLEAU DE BORD -->
+<section class="view active" id="view-dash">
+  <div class="page">
+    <div class="page-head">
+      <div>
+        <span class="sec-label">Recrutement des premiers artisans</span>
+        <h1 style="margin-top:12px">Des bras à trouver, <em>des fiches à appeler.</em></h1>
+        <p id="dashIntro"></p>
+      </div>
+      <div style="display:flex;gap:8px"><button class="btn" id="dashGoRelances">Voir les relances</button><button class="btn primary" id="dashGoNext">Prochaine fiche à appeler</button></div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="card"><h3>Pipeline <span class="muted" id="funnelSub"></span></h3><div class="funnel" id="funnel"></div></div>
+      <div class="card"><h3>À rappeler <span class="muted">en retard et aujourd'hui</span></h3><div class="mini" id="dashRelances"></div></div>
+    </div>
+    <div class="grid3">
+      <div class="card"><h3>Par département <span class="muted">contactés / total</span></h3><div class="bars" id="barsDept"></div></div>
+      <div class="card"><h3>Par métier <span class="muted">déduit ou confirmé</span></h3><div class="bars" id="barsMetier"></div></div>
+      <div class="card"><h3>Par personne <span class="muted">fiches suivies</span></h3><div class="bars" id="barsResp"></div><h3 style="margin-top:18px">Mode souhaité</h3><div class="bars" id="barsMode"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Activité récente</h3><div class="mini" id="dashActivite"></div></div>
+      <div class="card"><h3>Qualité de la base <span class="muted">extraction Pipedrive</span></h3><div class="bars" id="barsQualite"></div><p class="dim" style="font-size:12px;margin-top:12px">Les fiches « à contrôler » ont un champ coupé ou douteux sur la photo d'origine. Vérifiez-les au téléphone, puis cliquez « Coordonnées vérifiées » dans la fiche.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== CONTACTS -->
+<section class="view" id="view-contacts">
+  <div class="wrap" id="wrap">
+    <nav class="rail" id="rail">
+      <div class="rail-actions"><button class="btn sm ghost" id="clearFilters">Effacer les filtres</button></div>
+      <h2>Statut</h2><div class="chip-row" id="fStatut"></div>
+      <h2>Relance</h2><div class="chip-row" id="fRelance"></div>
+      <h2>Suivi par</h2><div class="chip-row" id="fResp"></div>
+      <h2>Fiabilité de la fiche</h2><div class="chip-row" id="fFiab"></div>
+      <h2>Métier</h2><select id="fMetier"><option value="">Tous les métiers</option></select>
+      <h2>Département</h2><select id="fDept"><option value="">Tous les départements</option></select>
+      <h2>Autres</h2><div class="chip-row" id="fAutres"></div>
+    </nav>
+    <main class="list" id="list">
+      <div class="list-head">
+        <div class="count" id="count"></div>
+        <div class="active-filters" id="chips"></div>
+        <div class="list-tools">
+          <div class="bulk hidden" id="bulk"><span id="bulkN"></span>
+            <select id="bulkStatut"><option value="">Statut…</option></select>
+            <select id="bulkResp"><option value="">Suivi par…</option></select>
+            <button class="btn sm ghost" id="bulkClear">×</button>
+          </div>
+          <button class="btn sm" id="csvBtn">Exporter CSV</button>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="more" id="moreRows"></div>
+    </main>
+    <aside class="detail" id="detail">
+      <div class="placeholder"><b>Aucune fiche ouverte</b>Choisissez un contact dans la liste. Raccourcis : <span class="mono">/</span> recherche, <span class="mono">Échap</span> ferme la fiche.</div>
+    </aside>
+  </div>
+</section>
+
+<!-- ====================================================== INSCRITS
+     Les artisans qui se sont inscrits SUR LA PLATEFORME (table public.artisans),
+     par opposition aux 1 374 fiches de prospection (table public.contacts).
+     Deux populations, deux tables, deux ecrans : les melanger ferait un
+     compteur faux le jour ou on decidera d'ouvrir une ville.
+     La colonne de gauche liste, la colonne de droite montre la fiche complete.
+     Sous 860 px la fiche prend toute la place et un bouton « Retour » ramene
+     a la liste : la mise en page change, elle ne se comprime pas. -->
+<section class="view" id="view-inscrits">
+  <div class="ins" id="ins">
+    <div class="ins-liste" id="insListe">
+      <div class="ins-bar">
+        <div class="ins-bar-h">
+          <div>
+            <span class="sec-label">Arrivés sur la plateforme</span>
+            <h1>Nouveaux inscrits</h1>
+          </div>
+          <button class="btn sm" id="insRelire">Relire</button>
+        </div>
+        <p class="ins-sous" id="insSous"></p>
+        <div class="ins-outils">
+          <label class="ins-q">
+            <span class="sr">Chercher un inscrit</span>
+            <input id="insQ" type="search" placeholder="Nom, entreprise, commune, SIRET…" autocomplete="off">
+          </label>
+          <button class="btn sm ghost" id="insOrdre"></button>
+        </div>
+        <div class="ins-filtres" id="insFiltres" role="group" aria-label="Filtrer les inscrits"></div>
+      </div>
+      <div class="ins-rows" id="insRows"></div>
+    </div>
+    <!-- Pas d'aria-live sur ce panneau : il est entierement redessine a chaque
+         ouverture, et une zone vivante ferait relire mille mots a voix haute.
+         A la place, le focus part sur le titre de la fiche : le lecteur d'ecran
+         annonce le nom, puis la personne lit ce qu'elle veut. -->
+    <div class="ins-fiche" id="insFiche" role="region" aria-label="Fiche de l'inscrit"></div>
+  </div>
+</section>
+
+<!-- ====================================================== PIPELINE -->
+<section class="view" id="view-pipeline">
+  <div class="kb-wrap">
+    <div class="kb-head">
+      <span class="sec-label">Glisser une carte pour changer de statut</span>
+      <select id="kbResp" class="btn sm"><option value="">Tout le monde</option></select>
+      <select id="kbDept" class="btn sm"><option value="">Tous les départements</option></select>
+      <label class="chk" style="margin-left:auto"><input type="checkbox" id="kbHideEntree"> Masquer « À contacter »</label>
+    </div>
+    <div class="kb" id="kanban"></div>
+  </div>
+</section>
+
+<!-- ====================================================== RELANCES -->
+<section class="view" id="view-relances">
+  <div class="page">
+    <div class="page-head"><div><span class="sec-label">Ne rien laisser filer</span><h1 style="margin-top:12px">Relances</h1><p>Toutes les fiches avec une date de relance ou une prochaine action. Cliquez pour ouvrir la fiche.</p></div></div>
+    <div class="rel-groups" id="relGroups"></div>
+  </div>
+</section>
+
+<!-- ====================================================== RÉGLAGES -->
+<section class="view" id="view-reglages">
+  <div class="page settings">
+    <div class="page-head"><div><span class="sec-label">Sauvegarde et données</span><h1 style="margin-top:12px">Réglages</h1></div></div>
+    <div class="card"><h3>Où vivent les données <span class="muted" id="modeLabel"></span></h3><p id="modeExpl"></p><div class="code" id="modeCode"></div></div>
+    <div class="card"><h3>Sauvegarde</h3><p>Le fichier JSON contient tout le travail de prospection (statuts, notes, historique, corrections). En ligne, la base garde tout ; la sauvegarde sert de copie de sécurité mensuelle. L'import remplace le travail en cours par celui du fichier, fiche par fiche.</p>
+      <div class="actions"><button class="btn primary" id="expJson">Télécharger la sauvegarde JSON</button><button class="btn" id="impJson">Importer une sauvegarde</button><input type="file" id="impFile" accept="application/json" class="hidden"><button class="btn" id="expCsvAll">Exporter toute la base en CSV</button></div></div>
+    <div class="card"><h3>Ta session <span class="muted" id="sessionQui"></span></h3><p id="usersExpl"></p><div class="actions" id="usersList"></div></div>
+    <div class="card hidden" id="cardPresence"><h3>Qui travaille en ce moment <span class="muted" id="presenceCompte"></span></h3>
+      <p class="muted" id="presenceExpl"></p>
+      <div id="presenceListe" class="mini"></div>
+    </div>
+    <div class="card hidden" id="cardAdmin"><h3>Administration <span class="muted">comptes et accès</span></h3>
+      <p id="adminExpl"></p>
+      <div id="adminListe" class="mini"></div>
+      <div class="actions" id="adminActions"></div>
+      <p class="muted" id="adminNote" style="margin-top:12px;font-size:12.5px"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== MODALES -->
+<div class="overlay" id="ovUser">
+  <div class="modal">
+    <h2>Qui travaille ?</h2>
+    <p>Ton prénom signe les appels, notes et changements de statut. Il est gardé sur ce navigateur.</p>
+    <div class="choices" id="userChoices"></div>
+    <input id="userInput" placeholder="Ou un autre prénom…">
+    <div class="foot"><button class="btn primary" id="userOk">C'est parti</button></div>
+  </div>
+</div>
+<div class="overlay" id="ovLogin">
+  <div class="modal">
+    <span class="sec-label">CRM artisans</span>
+    <h2 style="margin-top:12px">Connexion</h2>
+    <p>Ton travail est enregistré en ligne et te suit sur tous tes appareils. Connecte-toi avec ton e-mail.</p>
+    <div class="frm">
+      <label class="full">E-mail<input id="loginEmail" type="email" autocomplete="username" placeholder="prenom@exemple.fr"></label>
+      <label class="full">Mot de passe<input id="loginPwd" type="password" autocomplete="current-password"></label>
+    </div>
+    <div id="loginErr" style="min-height:20px;margin-top:10px;font-size:13px;color:var(--rouge)"></div>
+    <div class="foot" style="justify-content:space-between;align-items:center"><button class="btn ghost sm" id="loginMagic">Recevoir un lien de connexion par e-mail</button><button class="btn primary" id="loginOk">Se connecter</button></div>
+  </div>
+</div>
+<div class="overlay" id="ovCode">
+  <div class="modal">
+    <h2>Code d'accès</h2>
+    <p>Cet outil contient des coordonnées professionnelles. Entre le code partagé par l'équipe.</p>
+    <input id="codeInput" type="password" placeholder="Code">
+    <div class="foot"><button class="btn primary" id="codeOk">Entrer</button></div>
+  </div>
+</div>
+<div class="overlay" id="ovAdd">
+  <div class="modal wide">
+    <h2>Nouveau contact</h2>
+    <p>Un artisan rencontré ailleurs que dans la base Pipedrive.</p>
+    <div class="frm" id="addForm">
+      <label class="full">Société ou nom commercial *<input id="aOrg" placeholder="ex. Menuiserie Dupont"></label>
+      <label>Contact (nom)<input id="aNom" placeholder="ex. DUPONT Marc"></label>
+      <label>Métier<select id="aMetier"></select></label>
+      <label>E-mail<input id="aEmail" type="email"></label>
+      <label>Téléphone<input id="aTel" type="tel"></label>
+      <label>Code postal<input id="aCp" maxlength="5"></label>
+      <label>Ville<input id="aVille"></label>
+      <label class="full">Source<input id="aSource" placeholder="ex. salon, bouche à oreille, site web"></label>
+    </div>
+    <div class="foot"><button class="btn" id="addCancel">Annuler</button><button class="btn primary" id="addOk">Créer la fiche</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/*__CONFIG__*/
+</script>
+<script>
+/*__DATA__*/
+</script>
+<script>
+/*__APP__*/
+</script>
+</body>
+</html>
