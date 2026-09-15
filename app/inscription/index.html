@@ -36,7 +36,7 @@
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   /* --- LES 16 VARIABLES DE LA CHARTE, MEMES NOMS, VALEURS CLAIRES ---
@@ -49,22 +49,22 @@
      theme sombre repeint les champs et toute mesure devient fausse. */
   color-scheme:light;
 
-  --bg:#F6F3EC;--bg-2:#FFFFFF;--surface:#FBF8F2;--surface-2:#EFEADF;
-  --cream:#0C1421;--cream-mut:#3C4A62;--cream-dim:#546279;
-  --accent:#E8B93E;--accent-2:#D9A72E;--accent-soft:rgba(232,185,62,.22);
-  --vert:#196740;--vert-soft:rgba(79,208,138,.16);
-  --alerte:#A93C24;--alerte-soft:rgba(240,160,138,.16);
-  --line:rgba(12,20,33,.14);
-  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre */
+  --bg:#F8F4EC;--bg-2:#FEFCF8;--surface:#EEEBE3;--surface-2:#EAE6DC;
+  --cream:#191512;--cream-mut:#5E5A56;--cream-dim:#686561;
+  --accent:#E12154;--accent-2:#C41A47;--accent-soft:rgba(225,33,84,.13);
+  --vert:#116B40;--vert-soft:rgba(21,127,76,.12);
+  --alerte:#9A3208;--alerte-soft:rgba(194,65,12,.12);
+  --line:#D8D4CC;
+  --accent-texte:#890026;    /* l'ambre quand il doit etre une lettre */
   --gut:clamp(1.1rem,4.5vw,3rem);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 460px) no-repeat,var(--bg);
-  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  color:var(--cream);font-family:"DM Sans",system-ui,-apple-system,sans-serif;
   font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:560px;margin:0 auto;padding:clamp(30px,7vw,72px) var(--gut) 80px}
-h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:clamp(27px,5.5vw,38px);line-height:1.14}
 h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
   background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
@@ -72,14 +72,14 @@ h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
 .lead{color:var(--cream-mut);font-size:clamp(15.5px,2.2vw,17px);margin:13px 0 0}
 .pastille{display:inline-flex;align-items:center;gap:8px;font-family:"JetBrains Mono",monospace;
   font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-texte);
-  background:var(--accent-soft);border:1px solid rgba(232,185,62,.3);
+  background:var(--accent-soft);border:1px solid rgba(225,33,84,.3);
   padding:5px 13px;border-radius:999px;margin-bottom:18px}
 .pastille i{width:7px;height:7px;border-radius:50%;background:var(--vert);display:block}
 
 form{margin:28px 0 0;display:grid;gap:15px}
-label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:14px;
+label{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:14px;
   margin-bottom:5px}
-label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:13px}
+label .opt{font-family:"DM Sans",sans-serif;font-weight:400;color:var(--cream-dim);font-size:13px}
 input,select{width:100%;font:inherit;color:var(--cream);background:var(--surface);
   border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none;
   -webkit-appearance:none;appearance:none}
@@ -97,9 +97,9 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
    robot : `display:none` est repere par les robots un peu serieux. */
 .piege{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
-button{font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:16px;
+button{font:inherit;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:16px;
   border:none;border-radius:999px;padding:15px 26px;background:var(--accent);
-  color:var(--cream);cursor:pointer;margin-top:5px}   /* l'encre sur l'ambre, 8,3 */
+  color:#fff;cursor:pointer;margin-top:5px}   /* l'encre sur l'ambre, 8,3 */
 button:disabled{opacity:.55;cursor:not-allowed}
 button:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
 
@@ -107,11 +107,11 @@ button:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
 
 .etat{border-radius:14px;padding:18px 21px;margin:24px 0 0;display:none;font-size:15px}
 .etat.vu{display:block}
-.etat h2{font-family:"Signika",sans-serif;font-size:18px;margin:0 0 6px}
+.etat h2{font-family:"Space Grotesk",sans-serif;font-size:18px;margin:0 0 6px}
 .etat p{margin:.45rem 0;color:var(--cream-mut)}
 .etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35)}
 .etat.ok h2{color:var(--vert)}
-.etat.deja{background:var(--accent-soft);border:1px solid rgba(232,185,62,.35)}
+.etat.deja{background:var(--accent-soft);border:1px solid rgba(225,33,84,.35)}
 .etat.deja h2{color:var(--accent-texte)}
 .etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35)}
 .etat.ko h2{color:var(--alerte)}

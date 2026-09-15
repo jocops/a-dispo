@@ -44,13 +44,13 @@
   LA CHARTE CLAIRE. Les seize variables ont garde leurs noms et change de
   valeurs : le bleu nuit devient l'encre, et L'AMBRE PASSE DU TEXTE AU
   REMPLISSAGE, parce qu'en lettre sur du papier clair il vaut 1,84 : 1. Quand
-  un accent doit etre LU, c'est --accent-texte #765A0E. Mesure sur les pages
+  un accent doit etre LU, c'est --accent-texte #890026. Mesure sur les pages
   RENDUES, a sept largeurs : aucune paire de texte sous 4,5 : 1, aucun
   debordement horizontal, et six tailles de police rendues, pas une de plus.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   /* On verrouille les controles natifs, l'ascenseur et le remplissage
@@ -59,36 +59,36 @@
   color-scheme:light;
 
   /* --- LES 16 VARIABLES DE LA CHARTE, MEMES NOMS, VALEURS CLAIRES --- */
-  --bg:#F6F3EC;              /* le sol : la page */
-  --bg-2:#FFFFFF;            /* la carte posee dessus, et le haut du degrade */
-  --surface:#FBF8F2;         /* les champs, les tags, les cases du calendrier */
-  --surface-2:#EFEADF;       /* le puits : pastilles et elements enfonces */
+  --bg:#F8F4EC;              /* le sol : la page */
+  --bg-2:#FEFCF8;            /* la carte posee dessus, et le haut du degrade */
+  --surface:#EEEBE3;         /* les champs, les tags, les cases du calendrier */
+  --surface-2:#EAE6DC;       /* le puits : pastilles et elements enfonces */
 
-  --cream:#0C1421;           /* l'encre principale.   18,46 sur carte, 15,39 au pire */
-  --cream-mut:#3C4A62;       /* le secondaire.         8,94 sur carte,  7,46 au pire */
-  --cream-dim:#546279;       /* le terne.              6,18 sur carte,  5,15 au pire */
+  --cream:#191512;           /* l'encre principale.   18,46 sur carte, 15,39 au pire */
+  --cream-mut:#5E5A56;       /* le secondaire.         8,94 sur carte,  7,46 au pire */
+  --cream-dim:#686561;       /* le terne.              6,18 sur carte,  5,15 au pire */
 
   /* L'ambre ne change pas de valeur, il change d'emploi : REMPLISSAGE. */
-  --accent:#E8B93E;
-  --accent-2:#D9A72E;
-  --accent-soft:rgba(232,185,62,.22);
+  --accent:#E12154;
+  --accent-2:#C41A47;
+  --accent-soft:rgba(225,33,84,.13);
 
-  --vert:#196740;            /* reussite.  6,87 sur carte, 5,73 au pire */
-  --vert-soft:rgba(79,208,138,.16);
-  --alerte:#A93C24;          /* alerte.    6,25 sur carte, 5,21 au pire */
-  --alerte-soft:rgba(240,160,138,.16);
+  --vert:#116B40;            /* reussite.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(21,127,76,.12);
+  --alerte:#9A3208;          /* alerte.    6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(194,65,12,.12);
 
-  --line:rgba(12,20,33,.14);
+  --line:#D8D4CC;
   --gut:clamp(1.1rem,4.5vw,3rem);
 
   /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
-  --encre:#0C1421;           /* l'encre posee SUR un aplat de couleur. 10,06 sur l'ambre */
-  --accent-texte:#765A0E;    /* l'ambre quand il doit etre une lettre ou un trait */
-  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+  --encre:#191512;           /* l'encre posee SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#890026;    /* l'ambre quand il doit etre une lettre ou un trait */
+  --agenda-fond:#DCD7CC;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
 
-  --ombre-1:0 1px 2px rgba(12,20,33,.05);
-  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
-  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+  --ombre-1:0 1px 2px rgba(25,21,18,.05);
+  --ombre-2:0 4px 12px rgba(25,21,18,.08), 0 1px 3px rgba(25,21,18,.05);
+  --ombre-3:0 16px 40px rgba(25,21,18,.14), 0 3px 8px rgba(25,21,18,.07);
 
   /* --- SIX TAILLES DE POLICE RENDUES, PAS UNE DE PLUS ---
      Un ecran qui en compte quatorze n'a plus de hierarchie : tout se vaut, et
@@ -103,7 +103,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-repeat,var(--bg);
-  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  color:var(--cream);font-family:"DM Sans",system-ui,-apple-system,sans-serif;
   font-size:var(--t3);line-height:1.6;-webkit-font-smoothing:antialiased}
 .wrap{max-width:660px;margin:0 auto;padding:clamp(24px,5vw,48px) var(--gut) 96px}
 /* L'espace termine respire plus large que les formulaires : une grille de mois
@@ -118,7 +118,7 @@ body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-
 
 .haut{display:flex;justify-content:space-between;align-items:center;gap:16px;
   flex-wrap:wrap;margin-bottom:26px}
-.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Space Grotesk",sans-serif;
   font-weight:700;font-size:var(--t2);line-height:1}
 /* Le mot-marque suppose un fond fonce : le 'a' ambre donne 1,66 sur ce papier.
    Il passe donc en ambre de texte, mesure a 5,85 : 1. */
@@ -137,7 +137,7 @@ body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-
 .reste{font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-dim);
   margin:0 0 26px;letter-spacing:.02em}
 
-h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:var(--t1);line-height:1.08;letter-spacing:-.015em}
 /* L'ambre ne peut pas etre une lettre sur du clair (1,84 : 1). Il devient le
    trait pose SOUS le mot : l'encre reste a 18,46 sur le papier et a 10,06 sur
@@ -146,12 +146,12 @@ h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
   background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
   padding:0 .05em}
 .lead{color:var(--cream-mut);font-size:var(--t3);margin:12px 0 0;max-width:46ch}
-h2{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t2);margin:34px 0 0;
+h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t2);margin:34px 0 0;
   line-height:1.2}
 
 .champ{margin:18px 0 0}
-label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);margin:0 0 6px}
-label .opt{font-family:"Karla",sans-serif;font-weight:400;color:var(--cream-dim);font-size:var(--t5)}
+label{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:var(--t4);margin:0 0 6px}
+label .opt{font-family:"DM Sans",sans-serif;font-weight:400;color:var(--cream-dim);font-size:var(--t5)}
 input,select,textarea{width:100%;font:inherit;font-size:var(--t3);color:var(--cream);
   background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:13px 15px;outline:none;-webkit-appearance:none;appearance:none}
@@ -174,11 +174,11 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .aide b{color:var(--cream-mut)}
 
 .bouton{display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t3);
+  font:inherit;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t3);
   border-radius:999px;padding:0 26px;min-height:48px;cursor:pointer;
   border:1px solid transparent;transition:background .15s,color .15s}
 /* Un seul bouton plein par ecran. C'est lui qu'on cherche du regard. */
-.bouton.plein{background:var(--accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.bouton.plein{background:var(--accent);color:#fff;box-shadow:var(--ombre-1)}
 .bouton.plein:hover{background:var(--accent-2)}
 .bouton.creux{background:var(--bg-2);color:var(--cream);border-color:var(--line)}
 .bouton.creux:hover{border-color:var(--cream-dim)}
@@ -220,7 +220,7 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
   padding:17px 19px;margin:12px 0 0;box-shadow:var(--ombre-1)}
 /* « Eteinte » se dit par la texture, pas par l'opacite. */
 .carte.eteinte{background:var(--surface-2);border-style:dashed;box-shadow:none}
-.carte h3{font-family:"Signika",sans-serif;font-size:var(--t2);font-weight:700;margin:0 0 4px;
+.carte h3{font-family:"Space Grotesk",sans-serif;font-size:var(--t2);font-weight:700;margin:0 0 4px;
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.25}
 .carte p{margin:.35rem 0;font-size:var(--t4);color:var(--cream-mut)}
 .carte p.mono{font-family:"JetBrains Mono",monospace;font-size:var(--t5)}
@@ -232,7 +232,7 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .etat.vu{display:block}
 .etat.ok{background:var(--vert-soft);border:1px solid rgba(25,103,64,.35);color:var(--cream)}
 .etat.ko{background:var(--alerte-soft);border:1px solid rgba(169,60,36,.35);color:var(--cream)}
-.etat b{font-family:"Signika",sans-serif;display:block}
+.etat b{font-family:"Space Grotesk",sans-serif;display:block}
 .etat.ok b{color:var(--vert)} .etat.ko b{color:var(--alerte)}
 .etat a{color:var(--accent-texte)}
 
@@ -242,9 +242,9 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .onglets{display:flex;gap:4px;margin:0 0 26px;border-bottom:1px solid var(--line);
   overflow-x:auto;-webkit-overflow-scrolling:touch}
 .onglet{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-mut);
-  font:inherit;font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);
+  font:inherit;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:var(--t4);
   padding:12px 14px;cursor:pointer;white-space:nowrap;margin-bottom:-1px;min-height:44px}
-.onglet.ici{color:var(--cream);border-bottom-color:var(--accent);border-bottom-width:3px}
+.onglet.ici{color:var(--cream);border-bottom-color:var(--accent-texte);border-bottom-width:3px}
 .onglet:focus-visible{outline:2px solid var(--accent-texte);outline-offset:-2px}
 
 /* ==========================================================================
@@ -275,7 +275,7 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 @media(min-width:1100px){.bilan{position:sticky;top:22px;order:2}}
 .bilan-n{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:var(--t1);
   line-height:1;color:var(--cream);display:block;letter-spacing:-.02em}
-.bilan-quoi{font-family:"Signika",sans-serif;font-weight:600;font-size:var(--t4);
+.bilan-quoi{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:var(--t4);
   margin:6px 0 0;color:var(--cream)}
 .bilan-sous{font-size:var(--t5);color:var(--cream-dim);margin:3px 0 0}
 .jauge{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;
@@ -293,7 +293,7 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 
 .agenda-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;
   flex-wrap:wrap;margin:0 0 12px}
-.agenda-quand{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t2);
+.agenda-quand{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t2);
   line-height:1.2}
 .nav-mois{display:flex;gap:8px;align-items:center}
 .rond{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
@@ -346,14 +346,14 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .date{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
   font-family:"JetBrains Mono",monospace;font-size:var(--t6);color:var(--cream-mut);
   line-height:1.25;padding-left:2px}
-.date b{font-size:var(--t4);font-family:"Signika",sans-serif;color:var(--cream)}
+.date b{font-size:var(--t4);font-family:"Space Grotesk",sans-serif;color:var(--cream)}
 .ligne.auj .date b{background:var(--cream);color:var(--bg-2);border-radius:999px;
   padding:0 8px}
 
 /* La demi-journee. Elle DIT son etat : l'aplat seul vaudrait 1,84 sur du
    blanc, il est donc double d'un libelle, d'une graisse et d'une hachure. */
 .demi{border:1px solid var(--line);border-radius:10px;background:var(--surface);
-  color:var(--cream-mut);font:inherit;font-family:"Karla",sans-serif;font-size:var(--t6);
+  color:var(--cream-mut);font:inherit;font-family:"DM Sans",sans-serif;font-size:var(--t6);
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
   padding:0 5px;min-height:34px;text-align:center;line-height:1.15;min-width:0;
   transition:background .12s,border-color .12s}
@@ -362,17 +362,17 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .demi:hover{border-color:var(--accent-texte);background:var(--bg-2)}
 .demi:focus-visible{outline:3px solid var(--accent-texte);outline-offset:2px;position:relative;z-index:2}
 /* Occupe, pose a la main : aplat ambre, encre dessus. 10,06 : 1. */
-.demi.pris{background:var(--accent);border-color:var(--accent-2);color:var(--encre);font-weight:700}
+.demi.pris{background:var(--accent);border-color:var(--accent-2);color:#fff;font-weight:700}
 .demi.pris:hover{background:var(--accent-2)}
 /* Occupe, venu de l'agenda : l'ambre est reserve a ce qu'on peut defaire.
    Aplat neutre mesure a 12,23, plus une hachure, parce que la couleur seule
    ne doit jamais porter l'information. */
-.demi.ext{background:var(--agenda-fond);border-color:rgba(12,20,33,.22);color:var(--encre);font-weight:700;
+.demi.ext{background:var(--agenda-fond);border-color:rgba(25,21,18,.22);color:var(--encre);font-weight:700;
   cursor:not-allowed;
-  background-image:repeating-linear-gradient(45deg,rgba(12,20,33,.13) 0 3px,transparent 3px 8px)}
+  background-image:repeating-linear-gradient(45deg,rgba(25,21,18,.13) 0 3px,transparent 3px 8px)}
 /* Deja passe. Ce n'est plus une offre : ca se lit, ca ne se vise pas. Eteint
    par des couleurs mesurees et non par une opacite, comme le reste de l'ecran :
-   #546279 sur #EFEADF vaut 5,15 : 1, au-dessus des 4,5 exiges. */
+   #686561 sur #EAE6DC vaut 5,15 : 1, au-dessus des 4,5 exiges. */
 .demi.passe{background:var(--surface-2);border-color:var(--line);color:var(--cream-dim);
   font-weight:400;cursor:not-allowed}
 .demi.passe:hover{background:var(--surface-2);border-color:var(--line)}
@@ -390,7 +390,7 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
   align-items:center;flex-wrap:wrap}
 .barre[hidden]{display:none}
 .barre-txt{flex:1 1 190px;min-width:0}
-.barre-quoi{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t4);
+.barre-quoi{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t4);
   color:var(--cream);margin:0}
 .barre-suite{font-size:var(--t5);color:var(--cream-mut);margin:2px 0 0}
 .barre .bouton{flex:0 0 auto}
@@ -410,8 +410,8 @@ input[aria-invalid="true"]{border-color:var(--alerte)}
 .legende-cal i{display:inline-block;width:14px;height:14px;border-radius:4px;
   border:1px solid var(--line);margin-right:7px;vertical-align:-3px;background:var(--surface)}
 .legende-cal i.pris{background:var(--accent);border-color:var(--accent-2)}
-.legende-cal i.ext{background:var(--agenda-fond);border-color:rgba(12,20,33,.22);
-  background-image:repeating-linear-gradient(45deg,rgba(12,20,33,.13) 0 3px,transparent 3px 8px)}
+.legende-cal i.ext{background:var(--agenda-fond);border-color:rgba(25,21,18,.22);
+  background-image:repeating-linear-gradient(45deg,rgba(25,21,18,.13) 0 3px,transparent 3px 8px)}
 
 input[type=file]{font-size:var(--t5);padding:12px;background:var(--surface);
   border:1px dashed var(--line);border-radius:10px;width:100%;color:var(--cream-mut)}
@@ -428,7 +428,7 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
 .nav-app a:hover{background:var(--surface-2);color:var(--cream)}
 /* L'ecran courant est un APLAT ambre avec l'encre dessus : 10,06 : 1. En
    lettre ambre sur le papier, il serait tombe a 1,84. */
-.nav-app a[aria-current="page"]{background:var(--accent);color:var(--encre)}
+.nav-app a[aria-current="page"]{background:var(--accent);color:#fff}
 .nav-app a[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none;
   border:1px dashed var(--line)}
 .nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}

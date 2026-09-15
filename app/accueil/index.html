@@ -7,15 +7,15 @@
      de la page d'aide deja marquees. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Signika:wght@600;700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 
 <style>
 /* ============================================================
    À dispo - maquette site v0.3
    CHARTE CLAIRE, relevée le 14/09/2026. Le fond passe au papier chaud,
    l'encre devient le bleu nuit de la marque, et l'ambre quitte le texte
-   pour le remplissage : #E8B93E en lettre sur blanc vaut 1,84 : 1, le même
-   ambre en aplat sous une encre #0C1421 vaut 10,06 : 1. L'identité n'est pas
+   pour le remplissage : #E12154 en lettre sur blanc vaut 1,84 : 1, le même
+   ambre en aplat sous une encre #191512 vaut 10,06 : 1. L'identité n'est pas
    perdue, elle est inversée.
    Aucune couleur ci-dessous n'est estimée : toutes sont mesurées.
    ============================================================ */
@@ -35,55 +35,55 @@
 
   /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque.
      Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais teinte nulle). */
-  --bg:#F6F3EC;              /* le sol : la page */
-  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
-  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
-  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+  --bg:#F8F4EC;              /* le sol : la page */
+  --bg-2:#FEFCF8;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#EEEBE3;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EAE6DC;       /* le puits : pastilles et éléments enfoncés */
 
   /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
-  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
-  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
-  --cream-dim:#546279;       /* terne : sources, légendes.         6,18 sur carte,  5,15 au pire */
+  --cream:#191512;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#5E5A56;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#686561;       /* terne : sources, légendes.         6,18 sur carte,  5,15 au pire */
 
   /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
      REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
-  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
-  --accent-2:#D9A72E;        /* survol, bas de dégradé */
-  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait) */
+  --accent:#E12154;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#C41A47;        /* survol, bas de dégradé */
+  --accent-soft:rgba(225,33,84,.13);  /* fond d'étiquette (.14 disparaissait) */
 
   /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
      #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
-  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
-  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
-  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
-  --alerte-soft:rgba(240,160,138,.16);
+  --vert:#116B40;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(21,127,76,.12);    /* le vert vif ne survit que comme voile */
+  --alerte:#9A3208;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(194,65,12,.12);
 
   /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
-  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol */
+  --line:#D8D4CC; /* 1,35 sur la carte, 1,34 sur le sol */
 
   --gut:clamp(1.1rem,4.5vw,3rem);
 
   /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
-  --encre:#0C1421;           /* l'encre POSEE SUR un aplat de couleur. 10,06 sur l'ambre */
-  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
-  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+  --encre:#191512;           /* l'encre POSEE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#890026;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#DCD7CC;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
 
   /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit. --- */
-  --ombre-1:0 1px 2px rgba(12,20,33,.05);
-  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
-  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+  --ombre-1:0 1px 2px rgba(25,21,18,.05);
+  --ombre-2:0 4px 12px rgba(25,21,18,.08), 0 1px 3px rgba(25,21,18,.05);
+  --ombre-3:0 16px 40px rgba(25,21,18,.14), 0 3px 8px rgba(25,21,18,.07);
 
   /* --- LES JETONS PROPRES A CETTE PAGE --- */
   /* --surface-hi ne peut plus être « une marche au-dessus » : --surface-2 est
      déjà la surface claire la plus foncée, celle sur laquelle tout se mesure.
      Il lui est donc égalé plutôt qu'inventé. */
-  --surface-hi:#EFEADF;
-  --occupe:#546279;          /* « pas dispo » : la même encre terne, doublée d'une date */
-  --line-2:rgba(12,20,33,.07);
+  --surface-hi:#EAE6DC;
+  --occupe:#686561;          /* « pas dispo » : la même encre terne, doublée d'une date */
+  --line-2:rgba(25,21,18,.07);
   --r:16px;--r-lg:24px;--r-pill:999px;
   --maxw:1160px;
   --ease:cubic-bezier(.22,1,.36,1);
-  --grad-accent:linear-gradient(180deg,#F0C75A,#D9A72E);
+  --grad-accent:linear-gradient(180deg,#E12154,#C41A47);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
@@ -112,7 +112,7 @@ img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
 h1,h2,h3,h4{font-family:"Signika",Karla,"Arial Black",sans-serif;font-weight:700;line-height:1.04;letter-spacing:-.025em;text-wrap:balance}
-::selection{background:var(--accent);color:var(--encre)}
+::selection{background:var(--accent);color:#fff}
 
 /* LE FOCUS. Il n'était signalé nulle part : au clavier, la page était muette.
    L'ambre plein plafonne à 1,84 : 1 et aucun de ses voiles n'atteint les 3,0
@@ -126,7 +126,7 @@ h1,h2,h3,h4{font-family:"Signika",Karla,"Arial Black",sans-serif;font-weight:700
 section{position:relative}
 
 /* eyebrow pill */
-.pill{display:inline-block;max-width:100%;line-height:1.45;text-align:center;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:var(--t-1);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-texte);border:1px solid rgba(118,90,14,.28);background:var(--accent-soft);padding:.4rem .85rem;border-radius:var(--r-pill)}
+.pill{display:inline-block;max-width:100%;line-height:1.45;text-align:center;font-family:"JetBrains Mono",ui-monospace,monospace;font-size:var(--t-1);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-texte);border:1px solid rgba(137,0,38,.28);background:var(--accent-soft);padding:.4rem .85rem;border-radius:var(--r-pill)}
 .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-texte);display:inline-block;vertical-align:.12em;margin-right:.5rem}
 
 .lead{font-size:clamp(1.03rem,1.4vw,1.16rem);color:var(--cream-mut);line-height:1.62}
@@ -135,7 +135,7 @@ section{position:relative}
 .btn{display:inline-flex;min-height:44px;align-items:center;justify-content:center;gap:.5rem;padding:.85rem 1.5rem;border-radius:var(--r-pill);font-weight:600;font-size:var(--t-4);transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s;white-space:nowrap}
 .btn svg{width:18px;height:18px}
 /* L'aplat ambre porte l'encre, jamais du blanc : 10,06 : 1 contre 1,84 : 1. */
-.btn-primary{background:var(--grad-accent);color:var(--encre);box-shadow:var(--ombre-2)}
+.btn-primary{background:var(--grad-accent);color:#fff;box-shadow:var(--ombre-2)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--ombre-3)}
 .btn-ghost{border:1px solid var(--line);color:var(--cream);background:var(--bg-2);box-shadow:var(--ombre-1)}
 .btn-ghost:hover{background:var(--surface);transform:translateY(-2px)}
@@ -155,9 +155,9 @@ section{position:relative}
 /* ---------- NAV ---------- */
 header.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.80);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:1rem}
-.brand{min-height:44px;font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-6);letter-spacing:-.03em;display:inline-flex;align-items:baseline;color:var(--cream)}
+.brand{min-height:44px;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-6);letter-spacing:-.03em;display:inline-flex;align-items:baseline;color:var(--cream)}
 /* LE MOT-MARQUE. Le « à » ambre vaut 9,31 : 1 sur le nuit et 1,66 : 1 sur le
-   papier. Sur fond clair il prend --accent-texte : 5,85 : 1. Le logo n'est pas
+   papier. Sur fond clair il prend --accent-texte : #890026
    une exception à la règle de l'ambre, il en est le cas le plus visible. */
 .brand .pre{color:var(--accent-texte);margin-right:.3em}
 .brand .brand-clock{width:1.02em;height:1.02em;color:var(--accent-texte);margin-right:.34em;align-self:center;flex:0 0 auto}/* .brand est en inline-flex : flexbox supprime l espace entre items, donc c est la marge qui porte tout l ecart. L espace reste dans le balisage pour le texte accessible (« a dispo », pas « adispo ») */
@@ -192,7 +192,7 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.80);bac
 .shf .l{font-family:"JetBrains Mono",monospace;font-size:var(--t-1);letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim)}
 .shf .v{font-size:var(--t-3);font-weight:600;color:var(--cream);margin-top:.15rem;white-space:nowrap}
 .searchhero .sep{width:1px;height:34px;background:var(--line);flex:0 0 auto}
-.searchhero .go{min-height:44px;background:var(--grad-accent);color:var(--encre);border-radius:14px;padding:.85rem 1.3rem;font-weight:600;font-size:var(--t-3);display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--ombre-1);flex:0 0 auto}
+.searchhero .go{min-height:44px;background:var(--grad-accent);color:#fff;border-radius:14px;padding:.85rem 1.3rem;font-weight:600;font-size:var(--t-3);display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--ombre-1);flex:0 0 auto}
 .searchhero .go svg{width:17px;height:17px}
 @media(max-width:700px){.searchhero{flex-direction:column;align-items:stretch}.searchhero .sep{display:none}.shf~.shf{border-top:1px solid var(--line-2)}.searchhero .go{width:100%;justify-content:center;margin-top:.5rem}}
 .hero-note{margin-top:1.2rem;font-size:var(--t-3);color:var(--cream-dim);display:inline-flex;align-items:flex-start;gap:.5rem;text-align:left}
@@ -205,7 +205,7 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.80);bac
    trou. Elle reste donc fixe, et complete. */
 html:not(.js) .marquee-track{animation:none}
 .marquee:hover .marquee-track{animation-play-state:paused}
-.marquee .mi{display:inline-flex;align-items:center;gap:.6rem;color:var(--cream-mut);font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-4);white-space:nowrap}
+.marquee .mi{display:inline-flex;align-items:center;gap:.6rem;color:var(--cream-mut);font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-4);white-space:nowrap}
 .marquee .mi .d{width:5px;height:5px;border-radius:50%;background:var(--accent-texte);flex:0 0 auto}
 @keyframes scroll-x{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
@@ -221,13 +221,13 @@ html:not(.js) .marquee-track{animation:none}
    .trust, .feat-lg, .res, .fiche-main, .rate-card et .cal : sur fond clair une
    carte se distingue par le filet et l'ombre portee, JAMAIS par un aplat plus
    fonce, qui salirait le papier chaud. Elle est donc plus CLAIRE que le sol :
-   --bg-2 blanc sur --bg #F6F3EC, plus --line et --ombre-1. */
+   --bg-2 blanc sur --bg #F8F4EC, plus --line et --ombre-1. */
 
 /* ---------- aperçu produit ---------- */
 .demo-frame-wrap{margin-top:2.6rem;position:relative}
 .tabs{display:inline-flex;gap:.3rem;background:var(--surface-2);padding:.32rem;border-radius:var(--r-pill);border:1px solid var(--line);flex-wrap:wrap;position:relative;z-index:1}
 .tab{min-height:44px;display:inline-flex;align-items:center;padding:.55rem 1.1rem;border-radius:var(--r-pill);font-weight:600;font-size:var(--t-3);color:var(--cream-mut);transition:color .25s,background .25s}
-.tab[aria-selected="true"]{background:var(--grad-accent);color:var(--encre)}
+.tab[aria-selected="true"]{background:var(--grad-accent);color:#fff}
 .frame{position:relative;z-index:1;margin-top:1.8rem;background:var(--bg-2);color:var(--cream);border-radius:16px;box-shadow:var(--ombre-3);overflow:hidden;border:1px solid var(--line)}
 .frame h2,.frame h3,.frame h4{color:var(--cream)}
 .frame-bar{display:flex;align-items:center;gap:.55rem;padding:.7rem 1rem;background:var(--surface-2);border-bottom:1px solid var(--line)}
@@ -267,7 +267,7 @@ html:not(.js) .si-js{display:none}
 .res-list{display:grid;gap:.7rem}
 .res{display:flex;align-items:center;gap:1rem;background:var(--bg-2);border:1px solid var(--ln);border-radius:14px;padding:.95rem 1.1rem;box-shadow:var(--ombre-1);transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
 .res:hover{transform:translateY(-2px);box-shadow:var(--ombre-2)}
-.res .av{width:46px;height:46px;border-radius:12px;background:var(--sb);display:grid;place-items:center;font-family:"Signika",sans-serif;font-weight:700;color:var(--i);flex:0 0 auto}
+.res .av{width:46px;height:46px;border-radius:12px;background:var(--sb);display:grid;place-items:center;font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--i);flex:0 0 auto}
 .res .who{flex:1;min-width:0}
 .res .who .nm{font-weight:700;color:var(--i)}
 .res .who .mt{font-size:var(--t-3);color:var(--i55)}
@@ -276,7 +276,7 @@ html:not(.js) .si-js{display:none}
 .res .side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:.3rem}
 .res .side .rt{font-size:var(--t-3);font-weight:700;color:var(--i)}
 /* Sur fond clair le safran tombe à 1,84 : 1 : les étoiles prennent l'ambre
-   qui se lit, #765A0E, partout sur la page et plus seulement dans le cadre. */
+   qui se lit, #890026, partout sur la page et plus seulement dans le cadre. */
 .stars{color:var(--accent-texte);letter-spacing:1px;font-size:var(--t-2)}
 .res .cta-mini{font-size:var(--t-2);font-weight:600;color:var(--or);white-space:nowrap}
 @media(max-width:600px){.res .cta-mini{display:none}.sf{border-right:none}}
@@ -289,7 +289,7 @@ html:not(.js) .si-js{display:none}
 .co-logo{display:inline-flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
 .co-logo .mark{width:26px;height:26px;border-radius:7px;background:var(--cream);display:grid;place-items:center;flex:0 0 auto}
 .co-logo .mark svg{width:15px;height:15px;display:block}
-.co-logo .co-name{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-3);color:var(--i);line-height:1.05}
+.co-logo .co-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-3);color:var(--i);line-height:1.05}
 .co-logo .co-name small{display:block;font-family:Karla,sans-serif;font-weight:600;font-size:var(--t-1);letter-spacing:.09em;color:var(--i55);text-transform:uppercase;margin-top:3px}
 .fiche-top h3{font-size:var(--t-6)}
 .fiche-top .mt{color:var(--i55);font-size:var(--t-3);margin-top:.15rem}
@@ -302,7 +302,7 @@ html:not(.js) .si-js{display:none}
 .puce{background:var(--sb);border-radius:var(--r-pill);padding:.33rem .8rem;font-size:var(--t-3);font-weight:500;color:var(--i70)}
 .fiche-aside{display:grid;gap:.9rem;align-content:start}
 .rate-card{background:var(--bg-2);border:1px solid var(--ln);border-radius:var(--r-lg);padding:1.35rem}
-.rate-card .big{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-8);line-height:1;display:flex;align-items:baseline;gap:.4rem;color:var(--i)}
+.rate-card .big{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-8);line-height:1;display:flex;align-items:baseline;gap:.4rem;color:var(--i)}
 .rate-card .big small{font-size:var(--t-3);color:var(--i55);font-weight:600}
 .bar{margin-top:1rem}
 .bar .bl{display:flex;justify-content:space-between;font-size:var(--t-2);font-weight:600;color:var(--i);margin-bottom:.35rem}
@@ -310,14 +310,14 @@ html:not(.js) .si-js{display:none}
 .bar .fill{height:100%;border-radius:99px;background:var(--accent-2);width:0;transition:width 1s var(--ease)}
 html:not(.js) .bar .fill{width:var(--w,0)}
 .fiche .fbtn{width:100%;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.85rem;border-radius:var(--r-pill);font-weight:600;font-size:var(--t-4)}
-.fbtn.p{background:var(--accent-2);color:var(--encre)}
+.fbtn.p{background:var(--accent-2);color:#fff}
 .fbtn.s{background:var(--bg-2);border:1px solid var(--ln);color:var(--i)}
 @media(max-width:720px){.fiche{grid-template-columns:1fr}}
 
 .plan{display:grid;grid-template-columns:1fr .82fr;gap:1.4rem;align-items:start}
 .cal{background:var(--bg-2);border:1px solid var(--ln);border-radius:var(--r-lg);padding:1.35rem}
 .cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.cal-top .m{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-4);color:var(--i)}
+.cal-top .m{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-4);color:var(--i)}
 .cal-top .nb{display:flex;gap:.4rem}
 .cal-top .nb i{width:29px;height:29px;border-radius:8px;border:1px solid var(--ln);display:grid;place-items:center;color:var(--i55);font-style:normal;font-size:var(--t-3)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
@@ -337,7 +337,7 @@ html:not(.js) .bar .fill{width:var(--w,0)}
 .plan-card.dark{background:var(--cream);color:var(--bg-2)}
 .plan-card.dark h4{color:var(--bg-2)}
 .plan-card.light{background:var(--sb)}
-.plan-card h4{font-family:"Signika",sans-serif;font-size:var(--t-4);margin-bottom:.45rem;color:var(--i)}
+.plan-card h4{font-family:"Space Grotesk",sans-serif;font-size:var(--t-4);margin-bottom:.45rem;color:var(--i)}
 .plan-card p{font-size:var(--t-3);color:var(--i70)}
 .plan-card.dark p{color:var(--agenda-fond)}
 .calchips{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.85rem}
@@ -351,13 +351,13 @@ html:not(.js) .bar .fill{width:var(--w,0)}
 .prob .k{font-family:"JetBrains Mono",monospace;font-size:var(--t-1);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-dim)}
 .prob h3{font-size:var(--t-6);margin:.65rem 0 .55rem}
 .prob p{color:var(--cream-mut);font-size:var(--t-3)}
-.prob .em{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-7);color:var(--accent-texte);display:block;margin-top:1.1rem;line-height:1}
+.prob .em{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-7);color:var(--accent-texte);display:block;margin-top:1.1rem;line-height:1}
 
 /* ---------- steps / modes / cards grid ---------- */
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:2.6rem}
 @media(max-width:760px){.grid3{grid-template-columns:1fr}}
 .step{padding:1.7rem;border-radius:var(--r-lg);background:var(--bg-2);border:1px solid var(--line);box-shadow:var(--ombre-1)}
-.step .n{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-4);color:var(--encre);background:var(--grad-accent);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;box-shadow:var(--ombre-1)}
+.step .n{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-4);color:var(--encre);background:var(--grad-accent);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;box-shadow:var(--ombre-1)}
 .step h3{font-size:var(--t-5);margin:1rem 0 .45rem}
 .step p{color:var(--cream-mut);font-size:var(--t-3)}
 
@@ -377,7 +377,7 @@ html:not(.js) .bar .fill{width:var(--w,0)}
 .fcard{padding:1.25rem;border-radius:var(--r);background:var(--bg-2);border:1px solid var(--line);box-shadow:var(--ombre-1);transition:transform .3s var(--ease),border-color .3s,box-shadow .3s}
 .fcard:hover{transform:translateY(-4px);border-color:var(--accent-texte);box-shadow:var(--ombre-2)}
 .fcard .mini{display:flex;align-items:center;gap:.8rem}
-.fcard .av{width:44px;height:44px;border-radius:12px;background:var(--surface-hi);display:grid;place-items:center;font-family:"Signika",sans-serif;font-weight:700;color:var(--cream);flex:0 0 auto}
+.fcard .av{width:44px;height:44px;border-radius:12px;background:var(--surface-hi);display:grid;place-items:center;font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--cream);flex:0 0 auto}
 .fcard .nm{font-weight:700;font-size:var(--t-3)}
 .fcard .mt{font-size:var(--t-2);color:var(--cream-dim)}
 .fcard .tags{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.85rem}
@@ -393,10 +393,10 @@ html:not(.js) .bar .fill{width:var(--w,0)}
    L'étiquette « Une seule offre » porte le sens ; la couleur ne le porte pas
    seule, conformément à la règle du doublage. */
 .price.feat{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),var(--ombre-2)}
-.price .tag{position:absolute;top:1.5rem;right:1.5rem;font-size:var(--t-1);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--encre);background:var(--grad-accent);padding:.25rem .6rem;border-radius:var(--r-pill)}
-.price .p-name{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-5);position:relative;padding-right:8.5rem}
+.price .tag{position:absolute;top:1.5rem;right:1.5rem;font-size:var(--t-1);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--grad-accent);padding:.25rem .6rem;border-radius:var(--r-pill)}
+.price .p-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-5);position:relative;padding-right:8.5rem}
 .price .p-sub{font-size:var(--t-3);color:var(--cream-dim);margin-top:.25rem;min-height:2.6em;position:relative}
-.price .amount{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-8);line-height:1;margin:1.1rem 0 .2rem;display:flex;align-items:baseline;gap:.25rem;position:relative}
+.price .amount{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-8);line-height:1;margin:1.1rem 0 .2rem;display:flex;align-items:baseline;gap:.25rem;position:relative}
 .price .amount small{font-size:var(--t-3);font-weight:600;color:var(--cream-dim)}
 .price ul{list-style:none;margin:1.2rem 0;display:grid;gap:.55rem;flex:1;position:relative}
 .price li{display:flex;gap:.55rem;align-items:flex-start;font-size:var(--t-3);color:var(--cream-mut)}
@@ -404,7 +404,7 @@ html:not(.js) .bar .fill{width:var(--w,0)}
 .price li .ck svg{width:12px;height:12px;stroke:var(--vert)}
 .price .pbtn{width:100%;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:.8rem;border-radius:var(--r-pill);font-weight:600;position:relative;transition:transform .2s var(--ease)}
 .price .pbtn:hover{transform:translateY(-2px)}
-.pbtn.p{background:var(--grad-accent);color:var(--encre);box-shadow:var(--ombre-1)}
+.pbtn.p{background:var(--grad-accent);color:#fff;box-shadow:var(--ombre-1)}
 .pbtn.s{background:var(--bg-2);border:1px solid var(--line);color:var(--cream)}
 .price-note{text-align:center;margin-top:1.5rem;font-size:var(--t-3);color:var(--cream-dim)}
 
@@ -444,14 +444,14 @@ html:not(.js) .bar .fill{width:var(--w,0)}
 .stats .kt{font-family:"JetBrains Mono",monospace;font-size:var(--t-1);font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-texte);margin-bottom:2.2rem;display:block}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.2rem}
 @media(max-width:760px){.stats-grid{grid-template-columns:1fr;gap:2.2rem}}
-.stat .num{font-family:"Signika",sans-serif;font-weight:700;font-size:clamp(2.8rem,6.5vw,4.8rem);line-height:.95;color:var(--accent-texte);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat .num{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(2.8rem,6.5vw,4.8rem);line-height:.95;color:var(--accent-texte);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .stat .lbl{margin-top:.8rem;color:var(--cream-mut);font-size:var(--t-4);line-height:1.5;max-width:30ch}
 .stat .src{margin-top:.6rem;font-size:var(--t-1);color:var(--cream-dim)}
 
 /* ---------- FAQ ---------- */
 .faq{max-width:760px;margin:2.4rem auto 0}
 .qa{border-bottom:1px solid var(--line);padding:1.25rem 0}
-.qa summary{font-family:"Signika",sans-serif;font-weight:700;font-size:var(--t-4);cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;align-items:center;color:var(--cream);min-height:44px}
+.qa summary{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t-4);cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;align-items:center;color:var(--cream);min-height:44px}
 .qa summary::-webkit-details-marker{display:none}
 .qa summary .pm{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:0 0 auto;transition:transform .3s var(--ease),background .3s;color:var(--cream)}
 .qa[open] summary .pm{transform:rotate(45deg);background:var(--grad-accent);border-color:transparent;color:var(--encre)}
@@ -511,7 +511,7 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
    zone à une luminance de 137 alors que le papier est à 242.
    Trois corrections, mesurées sur le rendu, pas sur la CSS :
      · la trame devient un gris chaud très léger (l'encre à 5,5 %, qui sur le
-       papier #F6F3EC compose un (234,232,226) encore chaud, teinte 40 deg) ;
+       papier #F8F4EC compose un (234,232,226) encore chaud, teinte 40 deg) ;
      · les cases allumées gardent l'ambre mais culminent à 30 % au lieu de 85 % ;
      · le coeur du masque est élargi de 34 % à 38 % : la zone du titre reste du
        papier nu, donc claire et UNIFORME, ce que l'écart-type mesure. */
@@ -525,7 +525,7 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
   mask-image:radial-gradient(118% 92% at 50% 42%, transparent 0%, transparent 38%,
     rgba(0,0,0,.45) 60%, #000 80%, transparent 100%)}
 .scene svg{width:100%;height:100%;display:block}
-.trame rect{fill:rgba(12,20,33,.055)}
+.trame rect{fill:rgba(25,21,18,.055)}
 .vives rect{fill:var(--accent);opacity:0;
   animation:respire var(--v,12s) var(--d,0s) infinite cubic-bezier(.4,0,.2,1)}
 @keyframes respire{
@@ -547,7 +547,7 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
 /* Sous 720 px, la trame se calme : moins de contraste, et les arcs disparaissent.
    Sur un petit ecran ils passent derriere le texte et deviennent du bruit. */
 @media (max-width:720px){
-  .trame rect{fill:rgba(12,20,33,.04)}
+  .trame rect{fill:rgba(25,21,18,.04)}
   .liens{display:none}
   .scene{top:-2vh;height:calc(100% + 6vh)}}
 
@@ -587,8 +587,8 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
       <path d="M33 55l7 9 7-9z" fill="#223B47"/>
       <rect x="34" y="45" width="12" height="13" rx="5.5" fill="#D7A579"/>
       <circle cx="40" cy="34" r="15.5" fill="#E4B98F"/>
-      <path d="M26 33a14 14 0 0 1 28 0v1.5H26z" fill="#D9A72E"/>
-      <rect x="25" y="32.5" width="30" height="4" rx="2" fill="#765A0E"/>
+      <path d="M26 33a14 14 0 0 1 28 0v1.5H26z" fill="#C41A47"/>
+      <rect x="25" y="32.5" width="30" height="4" rx="2" fill="#890026"/>
       <path d="M27 38a13 13 0 0 0 26 0v4a13 9 0 0 1-26 0z" fill="#8A6440" opacity=".8"/>
       <circle cx="34.5" cy="34.5" r="1.7" fill="#3A2A1C"/><circle cx="45.5" cy="34.5" r="1.7" fill="#3A2A1C"/>
       <path d="M35.5 41q4.5 3.2 9 0" stroke="#6F4C30" stroke-width="1.6" fill="none" stroke-linecap="round"/>
@@ -761,8 +761,8 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
                     <path d="M33 56 L40 65 L47 56 Z" fill="#233b47"/>
                     <rect x="34" y="46" width="12" height="13" rx="5.5" fill="#D7A579"/>
                     <circle cx="40" cy="35" r="15.5" fill="#E4B98F"/>
-                    <path d="M26 34 a14 14 0 0 1 28 0 l0 1.5 -28 0 Z" fill="#D9A72E"/>
-                    <rect x="25" y="33.5" width="30" height="4" rx="2" fill="#765A0E"/>
+                    <path d="M26 34 a14 14 0 0 1 28 0 l0 1.5 -28 0 Z" fill="#C41A47"/>
+                    <rect x="25" y="33.5" width="30" height="4" rx="2" fill="#890026"/>
                     <path d="M27 39 a13 13 0 0 0 26 0 l0 4 a13 9 0 0 1 -26 0 Z" fill="#8a6440" opacity=".85"/>
                     <circle cx="34.5" cy="35.5" r="1.6" fill="#3a2a1c"/>
                     <circle cx="45.5" cy="35.5" r="1.6" fill="#3a2a1c"/>
@@ -771,7 +771,7 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
                 </div>
                 <div>
                   <div class="co-logo">
-                    <span class="mark"><svg viewBox="0 0 24 24" style="fill:#D9A72E"><path d="M12 3s-6.6 7.4-6.6 11.6a6.6 6.6 0 0 0 13.2 0C18.6 10.4 12 3 12 3z"/></svg></span>
+                    <span class="mark"><svg viewBox="0 0 24 24" style="fill:#C41A47"><path d="M12 3s-6.6 7.4-6.6 11.6a6.6 6.6 0 0 0 13.2 0C18.6 10.4 12 3 12 3z"/></svg></span>
                     <span class="co-name">Berthoud<small>Plomberie · Chauffage</small></span>
                   </div>
                   <h3>R. Berthoud</h3>
@@ -933,10 +933,10 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
                 <stop offset="0" stop-color="#E8E6E1"/><stop offset="1" stop-color="#A9A49B"/>
               </linearGradient>
               <linearGradient id="vStripe" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#F0C75A"/><stop offset="1" stop-color="#D9A72E"/>
+                <stop offset="0" stop-color="#E12154"/><stop offset="1" stop-color="#C41A47"/>
               </linearGradient>
               <radialGradient id="vShadow" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stop-color="#0C1421" stop-opacity=".28"/><stop offset="1" stop-color="#0C1421" stop-opacity="0"/>
+                <stop offset="0" stop-color="#191512" stop-opacity=".28"/><stop offset="1" stop-color="#191512" stop-opacity="0"/>
               </radialGradient>
               <clipPath id="vClip">
                 <path d="M64 140 L108 140 A32 32 0 0 1 172 140 L338 140 A32 32 0 0 1 402 140 L436 140 L436 122 C436 112 431 104 421 101 L404 96 L356 84 L300 52 L80 52 Q64 52 64 66 Z"/>
@@ -945,7 +945,7 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
 
             <!-- ombre au sol -->
             <ellipse cx="250" cy="180" rx="196" ry="12" fill="url(#vShadow)"/>
-            <line x1="46" y1="176" x2="454" y2="176" stroke="rgba(12,20,33,.16)" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="46" y1="176" x2="454" y2="176" stroke="rgba(25,21,18,.16)" stroke-width="2.5" stroke-linecap="round"/>
 
             <!-- logements de roue (ombre) -->
             <path d="M108 140 A32 32 0 0 1 172 140 Z" fill="#0C0B0A"/>
@@ -988,10 +988,10 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
             <!-- LIVRÉE (clippée à la caisse) -->
             <g clip-path="url(#vClip)">
               <rect x="64" y="104" width="372" height="12" fill="url(#vStripe)"/>
-              <rect x="64" y="116" width="372" height="3.5" fill="#0C1421" opacity=".28"/>
+              <rect x="64" y="116" width="372" height="3.5" fill="#191512" opacity=".28"/>
               <path d="M70 54 H310 l14 12 H70 Z" fill="#fff" opacity=".32"/>
               <text x="84" y="70" style="font-family:Karla,sans-serif;font-weight:600;font-size:9px;fill:#6B6257;letter-spacing:1.7px">PLOMBERIE · CHAUFFAGE</text>
-              <text x="92" y="98" style="font-family:'Signika',sans-serif;font-weight:800;font-size:var(--t-7);fill:#0C1421;letter-spacing:-1.4px"><tspan fill="#765A0E">à</tspan><tspan dx="9">dispo</tspan></text>
+              <text x="92" y="98" style="font-family:'Signika',sans-serif;font-weight:800;font-size:var(--t-7);fill:#191512;letter-spacing:-1.4px"><tspan fill="#890026">à</tspan><tspan dx="9">dispo</tspan></text>
             </g>
 
             <!-- VITRES -->

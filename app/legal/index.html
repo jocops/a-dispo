@@ -59,7 +59,7 @@
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
@@ -76,48 +76,48 @@
   /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
      (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
      teinte nulle). */
-  --bg:#F6F3EC;              /* le sol : la page */
-  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
-  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
-  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+  --bg:#F8F4EC;              /* le sol : la page */
+  --bg-2:#FEFCF8;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#EEEBE3;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EAE6DC;       /* le puits : pastilles et éléments enfoncés */
 
   /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
-  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
-  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
-  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+  --cream:#191512;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#5E5A56;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#686561;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
 
   /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
      REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
-  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
-  --accent-2:#D9A72E;        /* survol, bas de dégradé */
-  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+  --accent:#E12154;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#C41A47;        /* survol, bas de dégradé */
+  --accent-soft:rgba(225,33,84,.13);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
 
   /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
      #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
-  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
-  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
-  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
-  --alerte-soft:rgba(240,160,138,.16);
+  --vert:#116B40;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(21,127,76,.12);    /* le vert vif ne survit que comme voile */
+  --alerte:#9A3208;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(194,65,12,.12);
 
   /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
-  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+  --line:#D8D4CC; /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
 
   --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
 
   /* Les deux variables propres a cet ecran. Le filet secondaire suit le filet
-     principal : `rgba(242,234,216,.06)` pose sur du blanc donnait 1,01:1. */
-  --line-2:rgba(12,20,33,.08);
+     principal : `rgba(248,244,236,.06)` pose sur du blanc donnait 1,01:1. */
+  --line-2:rgba(25,21,18,.07);
   --r:16px;
 
   /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
-  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
-  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
-  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+  --encre:#191512;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#890026;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#DCD7CC;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
 
   /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
-  --ombre-1:0 1px 2px rgba(12,20,33,.05);
-  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
-  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+  --ombre-1:0 1px 2px rgba(25,21,18,.05);
+  --ombre-2:0 4px 12px rgba(25,21,18,.08), 0 1px 3px rgba(25,21,18,.05);
+  --ombre-3:0 16px 40px rgba(25,21,18,.14), 0 3px 8px rgba(25,21,18,.07);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
@@ -128,7 +128,7 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
 body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 420px) no-repeat,var(--bg);
-  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  color:var(--cream);font-family:"DM Sans",system-ui,-apple-system,sans-serif;
   font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
   overflow-wrap:break-word}
 img,svg{max-width:100%}
@@ -151,18 +151,18 @@ img,svg{max-width:100%}
 
 /* Le lien d'evitement. Invisible tant qu'on ne navigue pas au clavier, et la
    toute premiere chose atteinte des qu'on tabule. L'encre sur l'ambre : 10,06:1. */
-.saut{position:absolute;left:-9999px;top:0;background:var(--accent);color:var(--encre);
-  font-family:"Signika",sans-serif;font-weight:700;padding:11px 18px;border-radius:0 0 10px 0;z-index:50}
+.saut{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;
+  font-family:"Space Grotesk",sans-serif;font-weight:700;padding:11px 18px;border-radius:0 0 10px 0;z-index:50}
 .saut:focus{left:0}
 
-.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Space Grotesk",sans-serif;
   font-weight:700;font-size:20px;line-height:1;margin-bottom:22px;color:var(--cream)}
 /* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE : le `à` ambre donne 9,31:1 sur le
    nuit et 1,66:1 sur le papier. Il passe donc a l'ambre-lettre, 5,85:1. */
 .marque .a{color:var(--accent-texte)}
 .marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
 
-h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:clamp(27px,5.2vw,40px);line-height:1.12}
 /* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
    Le mot reste en encre (18,46:1), l'ambre passe dessous en surlignage, et la
@@ -171,11 +171,11 @@ h1 .em{color:var(--cream);
   background:linear-gradient(var(--accent),var(--accent)) 0 88%/100% .2em no-repeat}
 .lead{color:var(--cream-mut);font-size:clamp(15.5px,2.2vw,18px);margin:14px 0 0}
 
-h2{font-family:"Signika",sans-serif;font-weight:700;font-size:clamp(19px,2.8vw,24px);
+h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(19px,2.8vw,24px);
   margin:52px 0 6px;padding-top:20px;border-top:1px solid var(--line);scroll-margin-top:74px}
 h2 .n{font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:400;
   color:var(--cream-dim);display:block;margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase}
-h3{font-family:"Signika",sans-serif;font-weight:600;font-size:16.5px;margin:30px 0 2px}
+h3{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:16.5px;margin:30px 0 2px}
 
 p{margin:.6rem 0}
 .bloc{margin:0 0 4px}
@@ -195,7 +195,7 @@ li::marker{color:var(--accent-texte)}
 .clair{border-left:4px solid var(--accent-texte);background:var(--accent-soft);
   border-radius:0 10px 10px 0;padding:13px 17px;margin:14px 0 18px;
   font-size:15px;line-height:1.7;color:var(--cream-mut)}
-.clair b{color:var(--accent-texte);font-family:"Signika",sans-serif}
+.clair b{color:var(--accent-texte);font-family:"Space Grotesk",sans-serif}
 
 /* ---- LE MARQUEUR. Ce qui n'est pas connu se voit, et de loin. ----
    C'EST LE POSTE QUE LA BASCULE CHANGE LE PLUS. Sur le nuit, le marqueur etait
@@ -214,7 +214,7 @@ li::marker{color:var(--accent-texte)}
    `scroll-margin-top` : sans lui, un marqueur atteint depuis la liste se range
    SOUS le sommaire colle en haut, et on croit que le lien ne marche pas. Le
    sommaire mesure 71 px de haut sur telephone, on prend 86. */
-.tc{display:inline;background:var(--accent);color:var(--encre);
+.tc{display:inline;background:var(--accent);color:#fff;
   border:1px solid var(--accent-2);border-radius:6px;
   -webkit-box-decoration-break:clone;box-decoration-break:clone;
   font-family:"JetBrains Mono",monospace;font-size:12.6px;font-weight:600;
@@ -233,7 +233,7 @@ li::marker{color:var(--accent-texte)}
    cherchait. Les roles s'inversent, encre pleine et lettre ambre : 10,06:1,
    la seule paire de la charte ou l'ambre a le droit d'etre une lettre, parce
    que son fond est le bleu nuit et non le papier. */
-.tc:target{background:var(--cream);color:var(--accent);border-color:var(--cream)}
+.tc:target{background:var(--cream);color:var(--accent-texte);border-color:var(--cream)}
 /* La cible du lien d'evitement ne doit pas dessiner un cadre autour de toute
    la page : le focus y sert a poser le curseur, pas a designer un bouton. */
 #contenu:focus{outline:none}
@@ -248,7 +248,7 @@ li::marker{color:var(--accent-texte)}
    marque la-bas doit se reconnaitre ici du premier coup d'oeil. Les bordures
    sont reconstruites sur la couleur sombre correspondante : celles de la
    charte sombre valaient 1,23:1 a 1,28:1 sur du papier, c'est-a-dire rien. */
-.marqueur{display:inline-block;font-family:"Signika",sans-serif;font-size:9.5px;font-weight:700;
+.marqueur{display:inline-block;font-family:"Space Grotesk",sans-serif;font-size:9.5px;font-weight:700;
   text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:4px;margin:0 0 6px}
 .marqueur.avocat{background:var(--alerte-soft);color:var(--alerte);border:1px solid rgba(169,60,36,.35)}
 .marqueur.attente{background:var(--accent-soft);color:var(--accent-texte);border:1px solid rgba(118,90,14,.35)}
@@ -256,7 +256,7 @@ li::marker{color:var(--accent-texte)}
 .avis{border:1px solid rgba(169,60,36,.35);background:var(--alerte-soft);
   border-radius:var(--r);padding:17px 20px;margin:26px 0;font-size:15px;line-height:1.7;
   color:var(--cream-mut)}
-.avis b{color:var(--alerte);font-family:"Signika",sans-serif}
+.avis b{color:var(--alerte);font-family:"Space Grotesk",sans-serif}
 .avis p{margin:.5rem 0}
 /* La note porte la these juridique du projet : c'est le bloc le plus
    important de la page apres l'avertissement. Sur du papier elle se marque a
@@ -264,7 +264,7 @@ li::marker{color:var(--accent-texte)}
 .note{border:1px solid var(--line);background:var(--bg-2);border-left:4px solid var(--cream);
   border-radius:0 var(--r) var(--r) 0;padding:17px 20px;margin:22px 0;font-size:15px;
   line-height:1.7;color:var(--cream-mut);box-shadow:var(--ombre-1)}
-.note b{color:var(--cream);font-family:"Signika",sans-serif}
+.note b{color:var(--cream);font-family:"Space Grotesk",sans-serif}
 
 /* ---- Le sommaire. Sur telephone il se colle en haut et defile lateralement
    DANS SA BOITE : la page, elle, ne deborde jamais. Sur grand ecran il quitte
@@ -282,14 +282,14 @@ li::marker{color:var(--accent-texte)}
    sommaire se touche debout, d'une main, sur un telephone. */
 .sommaire a{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;
   border:1px solid var(--line);border-radius:999px;background:var(--bg-2);
-  color:var(--cream-mut);text-decoration:none;font-family:"Signika",sans-serif;
+  color:var(--cream-mut);text-decoration:none;font-family:"Space Grotesk",sans-serif;
   font-weight:600;font-size:13.5px;white-space:nowrap;box-shadow:var(--ombre-1)}
 .sommaire a:hover{border-color:var(--accent-texte);color:var(--accent-texte)}
 .sommaire a:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
 /* Le lien vers ce qui manque est le seul qui compte avant publication : il
    prend l'aplat ambre et l'encre, 10,06:1, la paire la plus forte de la page. */
-.sommaire a.manque{background:var(--accent);border-color:var(--accent-2);color:var(--encre)}
-.sommaire a.manque:hover{background:var(--accent-2);color:var(--encre)}
+.sommaire a.manque{background:var(--accent);border-color:var(--accent-2);color:#fff}
+.sommaire a.manque:hover{background:var(--accent-2);color:#fff}
 
 .cherche{margin:12px 0 0}
 /* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND : `--surface` posee
@@ -306,7 +306,7 @@ li::marker{color:var(--accent-texte)}
 .etat{border-radius:12px;padding:13px 17px;margin:16px 0 0;font-size:14.6px;
   color:var(--cream-mut);border:1px solid var(--line);background:var(--bg-2);
   box-shadow:var(--ombre-1)}
-.etat b{font-family:"Signika",sans-serif}
+.etat b{font-family:"Space Grotesk",sans-serif}
 .etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
 .etat.ok b{color:var(--vert)}
 .etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35)}
@@ -323,7 +323,7 @@ li::marker{color:var(--accent-texte)}
 .manque-liste li:first-child{border-top:none}
 .manque-liste .rang{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--accent-texte);
   flex:none;min-width:2.1em;padding-top:5px}
-.manque-liste .lib{display:block;color:var(--cream);font-family:"Signika",sans-serif;
+.manque-liste .lib{display:block;color:var(--cream);font-family:"Space Grotesk",sans-serif;
   font-weight:600;font-size:15px;line-height:1.35}
 .manque-liste .ou{display:block;font-family:"JetBrains Mono",monospace;font-size:11px;
   color:var(--cream-dim);margin-top:4px;letter-spacing:.03em}
@@ -336,15 +336,15 @@ li::marker{color:var(--accent-texte)}
 .manque-liste .ou a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px;border-radius:3px}
 
 .bouton{display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15px;
+  font:inherit;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15px;
   min-height:48px;border-radius:999px;padding:0 24px;cursor:pointer;
   border:1px solid var(--line);background:var(--bg-2);color:var(--cream);
   box-shadow:var(--ombre-1)}
-.bouton.plein{background:var(--accent);color:var(--encre);border-color:var(--accent-2)}
+.bouton.plein{background:var(--accent);color:#fff;border-color:var(--accent-2)}
 .bouton.plein:hover:enabled{background:var(--accent-2)}
 /* UN BOUTON ETEINT RESTE LISIBLE, ET L'OPACITE NE SERT PAS A L'OBTENIR : sur
-   fond clair une demi-opacite fait echouer jusqu'au noir. #546279 sur
-   #EFEADF = 5,15:1. */
+   fond clair une demi-opacite fait echouer jusqu'au noir. #686561 sur
+   #EAE6DC = 5,15:1. */
 .bouton:disabled{background:var(--surface-2);color:var(--cream-dim);
   border-color:var(--line);box-shadow:none;cursor:not-allowed}
 .bouton:focus-visible{outline:3px solid var(--cream);outline-offset:2px}
@@ -358,7 +358,7 @@ li::marker{color:var(--accent-texte)}
 table{width:100%;border-collapse:collapse;font-size:14.6px}
 th,td{text-align:left;padding:11px 14px 11px 0;border-bottom:1px solid var(--line-2);
   vertical-align:top;color:var(--cream-mut);line-height:1.6}
-th{font-family:"Signika",sans-serif;font-weight:600;color:var(--cream);font-size:13px;
+th{font-family:"Space Grotesk",sans-serif;font-weight:600;color:var(--cream);font-size:13px;
   text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line)}
 @media(max-width:560px){
   .tableau thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -373,7 +373,7 @@ th{font-family:"Signika",sans-serif;font-weight:600;color:var(--cream);font-size
 
 .pied{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
   font-size:13px;color:var(--cream-dim);line-height:1.7;max-width:70ch}
-.pied b{color:var(--cream-mut);font-family:"Signika",sans-serif}
+.pied b{color:var(--cream-mut);font-family:"Space Grotesk",sans-serif}
 .pied ul{padding-left:1.1rem}
 .pied code{font-family:"JetBrains Mono",monospace;font-size:11.5px}
 
@@ -417,30 +417,35 @@ th{font-family:"Signika",sans-serif;font-weight:600;color:var(--cream);font-size
    LES MARQUEURS RESTENT LES ELEMENTS LES PLUS VOYANTS DE LA FEUILLE, mais en
    creux et non en aplat : trente-neuf aplats ambre pleins sur un document de
    quinze pages coutent une cartouche. Mesure du marqueur imprime :
-   #765A0E sur #FFF6DD = 6,02:1, contre 4,70 pour l'ancien #8A6A00. */
+   #890026 sur #FFF6DD = 6,02:1, contre 4,70 pour l'ancien #8A6A00. */
 @media print{
-  body{background:#fff;color:#0C1421}
+  body{background:#fff;color:#191512}
   .sommaire,.cherche,.actions,.saut,#s-copie,.rail{display:none}
   .wrap{max-width:none;padding:0;display:block}
-  h1,h2,h3,.bloc b,.bloc strong,.manque-liste .lib,th{color:#0C1421}
-  h1 .em{background:none;color:#765A0E}
-  .bloc p,.bloc li,.lead,.pied,.clair,.avis,.note,.etat,td{color:#3C4A62}
-  .clair,.avis,.note,.etat,.tableau tr{background:#fff;border-color:rgba(12,20,33,.2);
+  h1,h2,h3,.bloc b,.bloc strong,.manque-liste .lib,th{color:#191512}
+  h1 .em{background:none;color:#890026}
+  .bloc p,.bloc li,.lead,.pied,.clair,.avis,.note,.etat,td{color:#5E5A56}
+  .clair,.avis,.note,.etat,.tableau tr{background:#fff;border-color:rgba(25,21,18,.2);
     box-shadow:none}
-  .clair{border-left-color:#765A0E}
-  .clair b,.avis b,.note b,.etat b,.manque-liste .rang,.manque-liste .ou a{color:#765A0E}
-  .note{border-left-color:#0C1421}
-  .note b{color:#0C1421}
-  .marque{color:#0C1421}
-  .marque .a,.marque svg{color:#765A0E}
-  .marqueur{background:#fff;border-color:rgba(12,20,33,.35);color:#765A0E}
-  .tc,.tc:target{border-color:#765A0E;color:#765A0E;background:#FFF6DD}
-  li::marker{color:#765A0E}
+  .clair{border-left-color:#890026}
+  .clair b,.avis b,.note b,.etat b,.manque-liste .rang,.manque-liste .ou a{color:#890026}
+  .note{border-left-color:#191512}
+  .note b{color:#191512}
+  .marque{color:#191512}
+  .marque .a,.marque svg{color:#890026}
+  .marqueur{background:#fff;border-color:rgba(25,21,18,.35);color:#890026}
+  .tc,.tc:target{border-color:#890026;color:#890026;background:#FFF6DD}
+  li::marker{color:#890026}
   h2{break-after:avoid}
   h3{break-after:avoid}
   .clair,.avis,.note,.tableau tr{break-inside:avoid}
   @page{size:A4 portrait;margin:14mm 13mm}
 }
+
+/* Le terne sur le voile d'alerte rend 4,47, juste sous le seuil de 4,5.
+   Sur ce fond precis c'est le secondaire qui porte, pas le terne : mesure
+   relevee sur `.avis .compte`, 11,5 px, rgb(104,101,97) sur rgb(242,223,209). */
+.avis .compte{color:var(--cream-mut)}
 </style>
 
 <a class="saut" href="#contenu">Aller au contenu</a>

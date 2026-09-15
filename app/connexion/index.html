@@ -26,7 +26,7 @@
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;600;700&family=Karla:ital,wght@0,400;0,600;0,700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   /* --- LES 16 VARIABLES DE LA CHARTE SOMBRE, MEMES NOMS, VALEURS CLAIRES ---
@@ -43,48 +43,48 @@
   /* Fonds. Blanc cassé chaud, teinte 42 deg : la teinte du crème de marque
      (41,5 deg). Le blanc pur a été mesuré et écarté (18,46 contre 16,66, mais
      teinte nulle). */
-  --bg:#F6F3EC;              /* le sol : la page */
-  --bg-2:#FFFFFF;            /* la carte posée dessus, et le haut du dégradé de body */
-  --surface:#FBF8F2;         /* les champs, les tags, les cases de calendrier */
-  --surface-2:#EFEADF;       /* le puits : pastilles et éléments enfoncés */
+  --bg:#F8F4EC;              /* le sol : la page */
+  --bg-2:#FEFCF8;            /* la carte posée dessus, et le haut du dégradé de body */
+  --surface:#EEEBE3;         /* les champs, les tags, les cases de calendrier */
+  --surface-2:#EAE6DC;       /* le puits : pastilles et éléments enfoncés */
 
   /* Texte. Le bleu nuit de la marque devient l'encre. Teinte 217 deg partout. */
-  --cream:#0C1421;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
-  --cream-mut:#3C4A62;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
-  --cream-dim:#546279;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
+  --cream:#191512;           /* principal : titres et corps.      18,46 sur carte, 15,39 au pire */
+  --cream-mut:#5E5A56;       /* secondaire : paragraphes.          8,94 sur carte,  7,46 au pire */
+  --cream-dim:#686561;       /* terne : sources, légendes, placeholder. 6,18 / 5,15 au pire */
 
   /* Accent. L'ambre ne change PAS de valeur : il change d'emploi.
      REMPLISSAGE UNIQUEMENT. Jamais une lettre en ambre sur du clair. */
-  --accent:#E8B93E;          /* l'aplat : boutons, pastilles, surlignage */
-  --accent-2:#D9A72E;        /* survol, bas de dégradé */
-  --accent-soft:rgba(232,185,62,.22);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
+  --accent:#E12154;          /* l'aplat : boutons, pastilles, surlignage */
+  --accent-2:#C41A47;        /* survol, bas de dégradé */
+  --accent-soft:rgba(225,33,84,.13);  /* fond d'étiquette (.14 disparaissait : 1,09 contre 1,14) */
 
   /* Fonctionnel. Recalculés pour le clair : les valeurs sombres y sont illisibles.
      #4FD08A donnait 1,96 en texte sur blanc, #F0A08A donnait 2,08. */
-  --vert:#196740;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
-  --vert-soft:rgba(79,208,138,.16);    /* le vert vif ne survit que comme voile */
-  --alerte:#A93C24;          /* alerte.                     6,25 sur carte, 5,21 au pire */
-  --alerte-soft:rgba(240,160,138,.16);
+  --vert:#116B40;            /* réussite et disponibilité.  6,87 sur carte, 5,73 au pire */
+  --vert-soft:rgba(21,127,76,.12);    /* le vert vif ne survit que comme voile */
+  --alerte:#9A3208;          /* alerte.                     6,25 sur carte, 5,21 au pire */
+  --alerte-soft:rgba(194,65,12,.12);
 
   /* Filet. Le filet crème sombre posé sur du blanc donne 1,018 : 1, soit rien. */
-  --line:rgba(12,20,33,.14); /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
+  --line:#D8D4CC; /* 1,35 sur la carte, 1,34 sur le sol : équilibré sur les deux */
 
   --gut:clamp(1.1rem,4.5vw,3rem);   /* inchangé */
 
   /* --- LES TROIS AJOUTS QUE LE FOND CLAIR REND OBLIGATOIRES --- */
-  --encre:#0C1421;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
-  --accent-texte:#765A0E;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
-  --agenda-fond:#CBD3DE;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
+  --encre:#191512;           /* l'encre POSÉE SUR un aplat de couleur. 10,06 sur l'ambre */
+  --accent-texte:#890026;    /* l'ambre quand il doit être une lettre. Même teinte (43,8 deg) */
+  --agenda-fond:#DCD7CC;     /* le seul aplat neutre qui accepte l'encre : 12,23 */
 
   /* --- ELEVATION : trois niveaux, pas quatre. Teintées au bleu nuit, jamais au noir. --- */
-  --ombre-1:0 1px 2px rgba(12,20,33,.05);
-  --ombre-2:0 4px 12px rgba(12,20,33,.08), 0 1px 3px rgba(12,20,33,.05);
-  --ombre-3:0 16px 40px rgba(12,20,33,.14), 0 3px 8px rgba(12,20,33,.07);
+  --ombre-1:0 1px 2px rgba(25,21,18,.05);
+  --ombre-2:0 4px 12px rgba(25,21,18,.08), 0 1px 3px rgba(25,21,18,.05);
+  --ombre-3:0 16px 40px rgba(25,21,18,.14), 0 3px 8px rgba(25,21,18,.07);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 480px) no-repeat,var(--bg);
-  color:var(--cream);font-family:"Karla",system-ui,-apple-system,sans-serif;
+  color:var(--cream);font-family:"DM Sans",system-ui,-apple-system,sans-serif;
   font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
   min-height:100vh;display:grid;place-items:center}
 img,svg{max-width:100%}
@@ -114,14 +114,14 @@ img,svg{max-width:100%}
   .b-google{margin-top:0}
 }
 
-.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Signika",sans-serif;
+.marque{display:inline-flex;align-items:center;gap:.34em;font-family:"Space Grotesk",sans-serif;
   font-weight:700;font-size:24px;line-height:1;margin-bottom:26px}
 /* LE MOT-MARQUE SUPPOSAIT UN FOND FONCE. Le `à` ambre donne 9,31:1 sur le nuit
    et 1,66:1 sur le papier : il passe donc à l'ambre-lettre, 5,85:1 sur le sol. */
 .marque .a{color:var(--accent-texte)}
 .marque svg{display:block;height:1.15em;width:auto;flex:none;color:var(--accent-texte)}
 
-h1{font-family:"Signika",sans-serif;font-weight:700;margin:0;
+h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:clamp(24px,5vw,31px);line-height:1.16}
 /* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
    Le mot reste en encre (18,46:1) et l'ambre passe DESSOUS, en surlignage.
@@ -132,13 +132,13 @@ h1 .em{color:var(--cream);
 .lead{color:var(--cream-mut);font-size:15.5px;margin:12px 0 0;max-width:36ch}
 
 .bouton{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;
-  font:inherit;font-family:"Signika",sans-serif;font-weight:700;font-size:15.5px;
+  font:inherit;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15.5px;
   border-radius:999px;padding:14px 22px;min-height:48px;cursor:pointer;
   border:1px solid transparent;text-decoration:none}
 /* UN BOUTON ETEINT RESTE LISIBLE, ET L'OPACITE EST ECARTEE POUR L'OBTENIR.
    Sur fond clair le sens de l'erreur s'inverse : `opacity:.55` posé sur
    l'encre tombe à 3,5:1 sur carte blanche, et sur un libellé terne à 2,2:1.
-   On pose donc des couleurs mesurées : #546279 sur #EFEADF = 5,15:1. */
+   On pose donc des couleurs mesurées : #686561 sur #EAE6DC = 5,15:1. */
 .bouton:disabled,.bouton[disabled]{background:var(--surface-2);color:var(--cream-dim);
   border-color:var(--line);box-shadow:none;cursor:not-allowed}
 .bouton:disabled svg,.bouton[disabled] svg{opacity:.45}
@@ -147,7 +147,7 @@ h1 .em{color:var(--cream);
 /* LE BOUTON GOOGLE SUR FOND CLAIR.
    Sur la charte sombre il se détachait par son aplat blanc : 18,46:1 contre le
    nuit. Sur du papier chaud, blanc sur blanc ne donne que 1,11:1, il disparaît.
-   Il est donc tenu par son FILET et non par son fond : `--cream-dim` #546279
+   Il est donc tenu par son FILET et non par son fond : `--cream-dim` #686561
    vaut 5,57:1 sur le sol et 6,18:1 sur le blanc, très au dessus des 3,0 exigés
    d'une limite de composant. Le libellé garde le gris 900 de Google, #1F1F1F,
    mesuré à 16,48:1 sur blanc, et le logo garde ses quatre couleurs de marque :
@@ -159,7 +159,7 @@ h1 .em{color:var(--cream);
 .note-google{margin:10px 0 0;font-size:.8125rem;line-height:1.5;color:var(--cream-mut)}
 
 /* LE CHEMIN PRINCIPAL : l'ambre en remplissage, l'encre dessus, 10,06:1. */
-.b-primaire{background:var(--accent);color:var(--encre);border-color:var(--accent-2);
+.b-primaire{background:var(--accent);color:#fff;border-color:var(--accent-2);
   box-shadow:var(--ombre-1);margin-top:6px}
 .b-primaire:hover:enabled{background:var(--accent-2);box-shadow:var(--ombre-2)}
 
@@ -167,7 +167,7 @@ h1 .em{color:var(--cream);
   color:var(--cream-dim);font-size:12.5px}
 .ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--line)}
 
-label{display:block;font-family:"Signika",sans-serif;font-weight:600;font-size:13.5px;
+label{display:block;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:13.5px;
   margin:0 0 5px}
 /* LE CHAMP EST IDENTIFIE PAR SON FILET, PAS PAR SON FOND. Mesure : `--surface`
    posé sur le sol ne donne que 1,02:1, et sur une carte blanche 1,03:1 : le
@@ -196,7 +196,7 @@ input[aria-invalid="true"]{border-color:var(--alerte);box-shadow:0 0 0 3px var(-
 .etat.vu{display:block}
 .etat.ok{background:var(--vert-soft);border-color:rgba(25,103,64,.35)}
 .etat.ko{background:var(--alerte-soft);border-color:rgba(169,60,36,.35);color:var(--cream-mut)}
-.etat b{font-family:"Signika",sans-serif}
+.etat b{font-family:"Space Grotesk",sans-serif}
 .etat.ok b{color:var(--vert)}
 .etat.ko b{color:var(--alerte)}
 
