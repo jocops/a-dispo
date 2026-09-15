@@ -433,6 +433,64 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
   border:1px dashed var(--line)}
 .nav-app a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
 .nav-note{margin:-12px 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
+
+/* ============================== LA COQUILLE ==============================
+   Menu a GAUCHE sur grand ecran, tiroir sur telephone.
+
+   L'ecran courant est un APLAT D'ENCRE, pas une lettre d'accent : le rouge de
+   marque vaut 4,21 sur le papier, sous le seuil de 4,5. L'aplat rend 16,54.
+
+   CORRIGE PAR RAPPORT A LA MAQUETTE : elle masquait simplement son menu sous
+   768 px et son bouton n'avait aucun gestionnaire de clic. On restait enferme
+   sur la vue affichee, sans aucun moyen d'en changer. Ici le tiroir s'ouvre
+   vraiment, se ferme a Echap et au clic sur le voile, et rend le focus. */
+@media (min-width:900px){ body{padding-left:248px} }
+.cote{display:none}
+@media (min-width:900px){
+  .cote{display:flex;flex-direction:column;gap:2px;position:fixed;inset:0 auto 0 0;
+    width:248px;padding:18px 14px;background:var(--bg-2);border-right:1px solid var(--line);
+    overflow-y:auto;z-index:20}
+}
+.menu-c .marque-c{display:flex;align-items:center;gap:.5em;text-decoration:none;color:var(--cream);
+  font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:17px;padding:2px 10px 0;margin-bottom:24px}
+.menu-c .marque-c .a{color:var(--accent-texte)}
+.menu-c .marque-c svg{height:1.2em;width:auto;color:var(--accent-texte);flex:none}
+.menu-c .titre-c{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--cream-dim);font-weight:700;padding:0 10px;margin:0 0 8px}
+.menu-c a.item{display:flex;align-items:center;gap:11px;min-height:44px;padding:0 11px;
+  border-radius:10px;font-size:14.5px;font-weight:500;color:var(--cream-mut);
+  text-decoration:none;transition:background .18s,color .18s}
+.menu-c a.item svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.menu-c a.item:hover{background:var(--surface);color:var(--cream)}
+.menu-c a.item[aria-current="page"]{background:var(--cream);color:var(--bg-2)}
+.menu-c a.item[aria-disabled="true"]{color:var(--cream-dim);pointer-events:none;opacity:.55}
+.menu-c a.item:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.menu-c .aide-c{margin-top:auto;background:var(--surface);border-radius:12px;padding:14px}
+.menu-c .aide-c b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--cream)}
+.menu-c .aide-c b i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.menu-c .aide-c p{margin:6px 0 0;font-size:12.5px;color:var(--cream-mut);line-height:1.5}
+.menu-c .aide-c a{color:var(--accent-texte)}
+
+.barre-app{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 var(--gut);
+  border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;z-index:19;
+  margin:0 calc(var(--gut)*-1)}
+@media (min-width:900px){ .barre-app{display:none} }
+.barre-app .ouvrir{min-width:44px;min-height:44px;display:grid;place-items:center;
+  background:none;border:1px solid var(--line);border-radius:10px;color:var(--cream);cursor:pointer}
+.barre-app .ouvrir:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.barre-app .ici{font-weight:600;font-size:14.5px}
+
+.voile{position:fixed;inset:0;background:rgba(25,21,18,.45);z-index:40;border:0;width:100%;padding:0}
+.tiroir{position:fixed;inset:0 auto 0 0;width:min(84vw,282px);z-index:41;background:var(--bg-2);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;padding:18px 14px;
+  overflow-y:auto;transform:translateX(-100%);transition:transform .22s ease}
+.tiroir.vu{transform:none}
+@media (prefers-reduced-motion:reduce){ .tiroir{transition:none} }
+.tiroir .fermer{position:absolute;top:14px;right:12px;min-width:40px;min-height:40px;
+  background:none;border:0;color:var(--cream-mut);font-size:22px;line-height:1;cursor:pointer;border-radius:8px}
+.tiroir .fermer:focus-visible{outline:2px solid var(--accent-texte);outline-offset:2px}
+.nav-note{margin:0 0 18px;font-size:var(--t5);line-height:1.5;color:var(--cream-mut)}
 </style>
 
 <div class="wrap">
@@ -453,13 +511,27 @@ input[type=file]:focus-visible{outline:2px solid var(--accent-texte);outline-off
        qui le renverraient tous vers la connexion. Et tant que le parcours n'est
        pas termine, les trois ecrans qui exigent une fiche publiee le DISENT,
        au lieu de mener sur du vide. -->
-  <nav class="nav-app" id="nav-app" data-ici="espace" aria-label="Mon espace" hidden>
-    <a href="/espace" data-ecran="espace">Mon espace</a>
-    <a href="/recherche" data-ecran="recherche" data-exige-fiche>Rechercher</a>
-    <a href="/demandes" data-ecran="demandes" data-exige-fiche>Mes demandes</a>
-    <a href="/messages" data-ecran="messages" data-exige-fiche>Messages</a>
-    <a href="/mes-donnees" data-ecran="mes-donnees">Mes données</a>
-  </nav>
+  <aside class="cote menu-c" id="cote" aria-label="Ton espace">
+  <a class="marque-c" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="19"/><path d="M32 20.6V32l8.6 5.3" stroke-linejoin="round"/></svg><span><span class="a">à</span> dispo</span></a>
+  <p class="titre-c">Ton espace</p>
+  <a class="item" href="/espace" data-ecran="espace" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Aujourd'hui</a>
+  <a class="item" href="/recherche" data-ecran="recherche" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>Chercher</a>
+  <a class="item" href="/demandes" data-ecran="demandes" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H7l-3 3z"/></svg>Tes demandes</a>
+  <a class="item" href="/messages" data-ecran="messages" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 12 13l9-6.5"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>Tes messages</a>
+  <a class="item" href="/mes-donnees" data-ecran="mes-donnees"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6.5v5c0 4.6 3.2 8.6 8 9.5 4.8-.9 8-4.9 8-9.5v-5z"/></svg>Tes données</a>
+  <div class="aide-c"><b><i></i>Une question&nbsp;?</b><p>Les vingt-cinq questions qui reviennent, et leurs réponses. <a href="/aide">Voir l'aide</a></p></div>
+</aside>
+<div class="barre-app"><button class="ouvrir" id="ouvrir-menu" type="button" aria-label="Ouvrir le menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><span class="ici">Aujourd'hui</span></div>
+<nav class="tiroir menu-c" id="tiroir" aria-hidden="true" aria-label="Ton espace"><button class="fermer" id="fermer-menu" type="button" aria-label="Fermer le menu">&times;</button>
+  <a class="marque-c" href="/"><svg viewBox="0 0 64 64" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"><circle cx="32" cy="32" r="19"/><path d="M32 20.6V32l8.6 5.3" stroke-linejoin="round"/></svg><span><span class="a">à</span> dispo</span></a>
+  <p class="titre-c">Ton espace</p>
+  <a class="item" href="/espace" data-ecran="espace" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Aujourd'hui</a>
+  <a class="item" href="/recherche" data-ecran="recherche" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>Chercher</a>
+  <a class="item" href="/demandes" data-ecran="demandes" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H7l-3 3z"/></svg>Tes demandes</a>
+  <a class="item" href="/messages" data-ecran="messages" data-exige-fiche><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 12 13l9-6.5"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>Tes messages</a>
+  <a class="item" href="/mes-donnees" data-ecran="mes-donnees"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6.5v5c0 4.6 3.2 8.6 8 9.5 4.8-.9 8-4.9 8-9.5v-5z"/></svg>Tes données</a>
+  <div class="aide-c"><b><i></i>Une question&nbsp;?</b><p>Les vingt-cinq questions qui reviennent, et leurs réponses. <a href="/aide">Voir l'aide</a></p></div>
+</nav>
   <p class="nav-note" id="nav-note" hidden></p>
 
   <div id="ecran"><p class="chargement">Un instant…</p></div>
@@ -2031,30 +2103,42 @@ function rendre() {
   }
 })();
 
-/* --------- La barre de l'espace ---------
-   Elle ne depend d'aucune autre piece de la page : elle lit la session
-   directement dans le stockage local, comme le fait deja le chargement
-   paresseux du client. Ainsi elle se pose a l'identique sur six ecrans sans
-   qu'aucun n'ait a lui preter ses fonctions. */
+/* La coquille. Elle lit la session directement dans le stockage local, comme
+   le reste du produit, pour ne dependre d'aucune autre piece de la page. */
 (function () {
-  var nav = document.getElementById("nav-app");
-  if (!nav || !window.localStorage) return;
+  var cote = document.getElementById("cote"), tiroir = document.getElementById("tiroir");
+  var ouvrir = document.getElementById("ouvrir-menu");
+  if (!cote || !tiroir || !ouvrir) return;
 
+  /* ---- le tiroir, sur telephone ---- */
+  var voile = null;
+  function fermer() {
+    tiroir.classList.remove("vu"); tiroir.setAttribute("aria-hidden", "true");
+    if (voile) { voile.remove(); voile = null; }
+    document.body.style.overflow = ""; ouvrir.focus();
+  }
+  ouvrir.addEventListener("click", function () {
+    voile = document.createElement("button");
+    voile.className = "voile"; voile.setAttribute("aria-label", "Fermer le menu");
+    voile.addEventListener("click", fermer);
+    document.body.appendChild(voile);
+    tiroir.classList.add("vu"); tiroir.removeAttribute("aria-hidden");
+    document.body.style.overflow = "hidden";
+    var p = tiroir.querySelector("a.item"); if (p) p.focus();
+  });
+  document.getElementById("fermer-menu").addEventListener("click", fermer);
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && tiroir.classList.contains("vu")) fermer();
+  });
+
+  /* ---- ce que la session autorise ---- */
+  if (!window.localStorage) return;
   var cle = null;
-  for (var i = 0; i < localStorage.length; i++) {
+  for (var i = 0; i < localStorage.length; i++)
     if (/^sb-.*-auth-token$/.test(localStorage.key(i))) { cle = localStorage.key(i); break; }
-  }
-  if (!cle) return;                       // pas de session : la barre n'existe pas
-  var sess;
-  try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
+  if (!cle) return;
+  var sess; try { sess = JSON.parse(localStorage.getItem(cle)); } catch (e) { return; }
   if (!sess || !sess.access_token || !sess.user) return;
-
-  var ici = nav.getAttribute("data-ici") || "";
-  var liens = nav.querySelectorAll("a");
-  for (var j = 0; j < liens.length; j++) {
-    if (liens[j].getAttribute("data-ecran") === ici) liens[j].setAttribute("aria-current", "page");
-  }
-  nav.hidden = false;
 
   /* Tant que la fiche n'est pas terminee, chercher et etre contacte ne menent a
      rien. On l'ecrit plutot que de laisser cliquer dans le vide. */
@@ -2063,17 +2147,13 @@ function rendre() {
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d[0] || d[0].etape === "fini") return;
-      var bloques = nav.querySelectorAll("a[data-exige-fiche]");
-      for (var k = 0; k < bloques.length; k++) {
-        bloques[k].setAttribute("aria-disabled", "true");
-        bloques[k].setAttribute("tabindex", "-1");
+      var b = document.querySelectorAll("a[data-exige-fiche]");
+      for (var k = 0; k < b.length; k++) {
+        b[k].setAttribute("aria-disabled", "true"); b[k].setAttribute("tabindex", "-1");
       }
-      var note = document.getElementById("nav-note");
-      if (note) {
-        note.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie.";
-        note.hidden = false;
-      }
+      var n = document.getElementById("nav-note");
+      if (n) { n.textContent = "Termine ta fiche pour ouvrir la recherche, les demandes et la messagerie."; n.hidden = false; }
     })
-    .catch(function () { /* reseau coupe : on ne punit pas, la barre reste ouverte */ });
+    .catch(function () { /* reseau coupe : on ne punit pas */ });
 })();
 </script>
