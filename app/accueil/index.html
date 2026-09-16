@@ -557,9 +557,51 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
 @media (prefers-reduced-motion:reduce){
   .vives rect{animation:none;opacity:.22}
   .liens path{animation:none;opacity:.35;stroke-dasharray:none;stroke-dashoffset:0}}
+
+/* ---------- les deux portes de l en-tete ---------- */
+.nav-portes{display:flex;align-items:center;gap:.5rem}
+.nav-btn{padding:.6rem 1.25rem;font-size:var(--t-3);min-height:44px;
+  display:inline-flex;align-items:center}
+@media(max-width:560px){ .nav-portes .btn-ghost{display:none} }
+
+/* ---------- le film ----------
+   Il occupe toute la largeur utile : c est la seule piece de la page qui
+   merite 1 920 px, parce que c est une image en mouvement et qu une image
+   rapetissee ne raconte rien. Le cadre garde son rapport 16:9 exact. */
+.sec-film{padding-block:clamp(3rem,7vw,6.5rem)}
+.wrap-film{max-width:1320px;margin:0 auto;padding:0 var(--gut)}
+.film-tete{max-width:46ch;margin:0 0 clamp(1.5rem,3vw,2.5rem)}
+.film-tete h2{margin:.9rem 0 .5rem}
+.film-cadre{position:relative;border-radius:clamp(14px,1.6vw,22px);overflow:hidden;
+  background:var(--i06);box-shadow:var(--ombre-3);aspect-ratio:16/9}
+.film-video{display:block;width:100%;height:100%;object-fit:cover;background:var(--bg-2)}
+.film-lire{position:absolute;inset:0;margin:auto;width:auto;height:auto;
+  display:inline-flex;align-items:center;gap:.6rem;
+  padding:.85rem 1.6rem;border:0;border-radius:999px;cursor:pointer;
+  background:var(--cream);color:var(--bg-2);font-family:inherit;font-weight:600;
+  font-size:var(--t-3);box-shadow:var(--ombre-2);
+  align-self:center;justify-self:center;max-width:max-content;max-height:max-content}
+.film-lire svg{width:20px;height:20px;flex:none}
+.film-lire:hover{transform:translateY(-1px)}
+.film-lire:focus-visible{outline:3px solid var(--accent-texte);outline-offset:3px}
+.film-cadre.lu .film-lire{display:none}
+.film-note{margin:.9rem 0 0;font-size:var(--t-2);color:var(--i55);
+  font-family:"JetBrains Mono",ui-monospace,monospace}
 </style>
 
-<script>document.documentElement.className+=' js';</script>
+<script>document.documentElement.className+=' js';
+/* Le film ne se charge qu au clic. 14 Mo pris sans qu on les demande, sur une
+   connexion de chantier, c est une page qu on quitte avant de l avoir vue. */
+(function () {
+  var b = document.getElementById("film-lire"), v = document.getElementById("film");
+  if (!b || !v) return;
+  b.addEventListener("click", function () {
+    v.preload = "auto";
+    v.play().then(function () { v.parentElement.classList.add("lu"); })
+            .catch(function () { v.controls = true; v.parentElement.classList.add("lu"); });
+  });
+})();
+</script>
 
 <!-- ===================== SPRITE (icônes métiers + avatars) ===================== -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">
@@ -661,7 +703,10 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
     <!-- LA PORTE D'ENTREE. Elle menait a l'ancre des tarifs : la maquette
          n'avait AUCUN lien vers la connexion, donc aucun moyen d'entrer dans
          l'espace. Un site sans porte est un site qu'on regarde. -->
-    <a href="/connexion" class="btn btn-encre" style="padding:.6rem 1.25rem;font-size:var(--t-3)">Créer mon compte</a>
+    <div class="nav-portes">
+      <a href="/connexion" class="btn btn-ghost nav-btn">Se connecter</a>
+      <a href="/connexion" class="btn btn-encre nav-btn">Créer mon compte</a>
+    </div>
   </div>
 </header>
 
@@ -705,6 +750,35 @@ footer .fn{font-size:var(--t-2);color:var(--cream-dim);max-width:46ch}
   </a>
   <div class="hero-note rv"><span class="dot-vert"></span>Ouverture à Lyon et Annecy. Les premiers inscrits sont prévenus en premier.</div>
 </section>
+
+<!-- ===================== LE FILM ===================== -->
+<section class="sec sec-film" id="film">
+  <div class="wrap-film">
+    <div class="film-tete rv">
+      <span class="pill"><span class="dot"></span>En 43 secondes</span>
+      <h2>Regarde comment ça marche.</h2>
+      <p class="lead">Un chantier, une date, un confrère qui a marqué ce jour-là.
+      Sans commentaire : tu vois le produit, pas une promesse.</p>
+    </div>
+    <div class="film-cadre rv">
+      <video id="film" class="film-video"
+             poster="/media/a-dispo-explainer-main.jpg"
+             preload="none" playsinline controls
+             width="1920" height="1080"
+             aria-label="Démonstration du fonctionnement d'à dispo, 43 secondes, sans parole">
+        <source src="/media/a-dispo-explainer-main.mp4" type="video/mp4">
+        Ton navigateur ne sait pas lire cette vidéo.
+        <a href="/media/a-dispo-explainer-main.mp4">Télécharge-la</a>.
+      </video>
+      <button class="film-lire" id="film-lire" type="button" aria-label="Lire le film, 43 secondes">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+        <span>Lire</span>
+      </button>
+    </div>
+    <p class="film-note">Sans son. 43 secondes. 14 Mo, qui ne se chargent qu'au clic.</p>
+  </div>
+</section>
+
 
 <!-- ===================== MARQUEE =====================
      LES QUATORZE METIERS SONT ECRITS ICI, dans le document. Ils etaient
