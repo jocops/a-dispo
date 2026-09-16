@@ -899,6 +899,51 @@ def controle_obligatoires(sources, constats):
             print(f"    {nom:26} ok")
 
 
+def controle_service(constats):
+    """Ce que Cloudflare fera vraiment des adresses que le build produit.
+
+    POURQUOI CE CONTROLE EXISTE. Les dix controles precedents lisent les
+    SOURCES. Aucun ne lisait le reglage qui decide de ce que l adresse rend une
+    fois en ligne. Mesure du 16/09/2026 sur le deploiement reel : l accueil
+    repondait 200, et les DOUZE autres ecrans un 307 vers la meme adresse avec
+    une barre finale. Cause : construire.mjs ecrit dist/<ecran>/index.html, et
+    le reglage par defaut de Cloudflare tient alors la forme avec barre pour la
+    seule canonique. Rien n etait casse, le navigateur suit. Mais la regle du
+    projet, posee le 13/09, est qu un lien envoye a la cliente ne passe pas par
+    une redirection. Ce defaut avait deja ete corrige sur l ancien depot ; il
+    est revenu avec le nouveau, parce que le filet ne regardait pas la.
+    """
+    print("\n  11. CE QUE LE SERVICE FERA DES ADRESSES\n")
+    fichier = RACINE / "wrangler.jsonc"
+    if not fichier.exists():
+        constats.append(Constat("service", "wrangler.jsonc", "bloquant",
+                                "fichier absent : le service n est pas decrit"))
+        print("    wrangler.jsonc             ABSENT")
+        return
+
+    brut = fichier.read_text(encoding="utf-8")
+    # Les commentaires de ce fichier contiennent les mots qu on cherche.
+    net = sans_commentaires(brut)
+
+    ecrit_des_dossiers = 'join(dest, "index.html")' in (
+        RACINE / "outils" / "construire.mjs").read_text(encoding="utf-8")
+    reglage = re.search(r'"html_handling"\s*:\s*"([^"]+)"', net)
+    valeur = reglage.group(1) if reglage else "auto-trailing-slash (defaut)"
+
+    print(f"    le build ecrit             " +
+          ("dist/<ecran>/index.html" if ecrit_des_dossiers else "des fichiers plats"))
+    print(f"    html_handling              {valeur}")
+
+    if ecrit_des_dossiers and not valeur.startswith("drop"):
+        constats.append(Constat(
+            "service", "wrangler.jsonc", "bloquant",
+            f"html_handling = {valeur} avec un build en dossiers : "
+            "chaque ecran repondra 307. Mettre drop-trailing-slash"))
+        print("    verdict                    ECHEC, chaque ecran redirigera")
+    else:
+        print("    verdict                    ok, aucune redirection attendue")
+
+
 def main(argv):
     demandees = [a for a in argv[1:] if not a.startswith("-")]
     toutes, gabarit = lire_build()
@@ -931,19 +976,21 @@ def main(argv):
     controle_liens(toutes, sources, constats)
     controle_libelles(sources, constats)
     controle_obligatoires(sources, constats)
+    controle_service(constats)
 
     bloquants = [c for c in constats if c.gravite == "bloquant"]
     signales = [c for c in constats if c.gravite == "signale"]
 
     print("\n  SYNTHESE\n")
-    noms = ("pages", "tirets", "prix", "emploi", "cles", "etats", "boutons", "liens", "libelles")
+    noms = ("pages", "tirets", "prix", "emploi", "cles", "etats", "boutons",
+            "liens", "libelles", "obligatoires", "service")
     for c in noms:
         b = len([x for x in bloquants if x.controle == c])
         s = len([x for x in signales if x.controle == c])
         verdict = "ok" if b == 0 and s == 0 else ("ECHEC" if b else "a relire")
         print(f"    {c:12} {verdict:10} {b} bloquant(s), {s} signale(s)")
 
-    print(f"\n    {len(sources)} page(s) controlee(s), 9 controles, "
+    print(f"\n    {len(sources)} page(s) controlee(s), 11 controles, "
           f"{len(bloquants)} bloquant(s), {len(signales)} signale(s)")
 
     if bloquants:

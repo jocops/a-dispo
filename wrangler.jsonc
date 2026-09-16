@@ -6,6 +6,11 @@
   "compatibility_date": "2026-09-15",
   "assets": {
     "directory": "./dist",
+    // Chaque ecran est un dossier avec son index.html. Sans cette ligne,
+    // Cloudflare tient "/espace/" pour la forme canonique et renvoie un 307
+    // sur "/espace" : les 12 ecrans passaient par une redirection. La regle
+    // du projet est qu'un lien envoye a la cliente ne redirige pas.
+    "html_handling": "drop-trailing-slash",
     // Une adresse inconnue rend la page d'accueil plutot qu'une erreur brute.
     "not_found_handling": "single-page-application"
   }
