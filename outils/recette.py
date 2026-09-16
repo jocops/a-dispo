@@ -78,12 +78,19 @@ PAGES_PRODUIT = {
 
 # Les pages annoncees par le chantier voisin. Tant qu'elles ne sont pas dans
 # construire.mjs, il n'y a rien a controler : on le dit, on ne l'invente pas.
-PAGES_DU_CHANTIER_VOISIN = ("recherche", "demandes", "admin")
+# Vide depuis le 16/09/2026 : les trois pages annoncees par le chantier voisin
+# (recherche, demandes, admin) sont declarees et controlees comme les autres.
+# Une liste d attente qui n attend plus rien fait douter du reste du rapport.
+PAGES_DU_CHANTIER_VOISIN = ()
 
 # Les prix d'abonnement ecartes le 06/09/2026, et le panier moyen qui en
 # derivait. Tant que le prix n'est pas arrete, aucun des quatre ne doit
 # apparaitre autrement que presente comme abandonne.
-MONTANTS_ABANDONNES = ("19,90", "29,90", "34,90", "27,65")
+# Le prix est arrete depuis le 15/09/2026 : 29,90 euros HT par mois. Ces
+# montants-la sont ceux des grilles ECARTEES, plus le panier moyen du modele
+# economique : aucun ne doit apparaitre comme un prix d abonnement.
+PRIX_ARRETE = "29,90"
+MONTANTS_ABANDONNES = ("19,90", "34,90", "27,65")
 
 # Ce qui autorise a citer un montant ecarte : le presenter comme passe.
 # Meme principe que `verifier-coherence.py`, qui tolere une valeur perimee
@@ -411,7 +418,8 @@ def controle_tirets(sources, constats):
 # --------------------------------------------- 3. les montants d'abonnement
 
 def controle_prix(sources, constats):
-    print("\n  3. MONTANTS D'ABONNEMENT (le prix n'est pas arrete)\n")
+    print("\n  3. MONTANTS D'ABONNEMENT (un seul prix : %s euros HT par mois)\n"
+          % PRIX_ARRETE)
     total = 0
     for nom, (page, brut) in sources.items():
         lu = texte_lu(brut)
@@ -440,6 +448,14 @@ def controle_prix(sources, constats):
         #    eux aussi et ne sont pas des prix.
         for m in MONTANT_MENSUEL.finditer(norme):
             proche = norme[max(0, m.start() - 80):m.end() + 80]
+            # LE PRIX ARRETE N'EST PAS UNE FAUTE. Ce controle est ne quand aucun
+            # prix n'existait : il signalait alors tout montant mensuel. Depuis
+            # le 15/09/2026 il y en a un, et un seul. Un controle qui demande de
+            # retirer la bonne valeur est pire qu'un controle absent : on
+            # s'habitue a passer outre, et le jour ou il a raison on passe outre
+            # aussi. Il ne cherche donc plus QUE les autres montants.
+            if PRIX_ARRETE in m.group(0):
+                continue
             if not (produit or re.search(r"\b(?:ht|ttc)\b", m.group(0))
                     or "abonnement" in proche):
                 continue
@@ -915,10 +931,8 @@ def main(argv):
             print(f"    .  {c.page:24} [{c.controle}] {c.message}")
 
     print("\n  A MESURER AILLEURS, CE SCRIPT N'Y TOUCHE PAS :")
-    print("    debordement lateral  python3 outils/check-mobile.py dist/index.html")
-    print("    contrastes WCAG      python3 outils/contrastes.py")
-    print("    concordance chiffres python3 outils/verifier-coherence.py")
-    print("    deploiement reel     ./outils/verifier-en-ligne.sh projet-dispo.pages.dev")
+    print("    debordement et contrastes  a mesurer au navigateur, aux dix largeurs")
+    print("    deploiement reel           curl sur a-dispo.strattonn-pilotage.workers.dev")
     print()
     if bloquants:
         print(f"  Verdict : {len(bloquants)} controle(s) bloquant(s) en echec. "
