@@ -875,6 +875,30 @@ def controle_libelles(sources, constats):
 
 # ------------------------------------------------------------ le compte
 
+def controle_obligatoires(sources, constats):
+    """Les liens que la loi ou l usage imposent sur chaque page.
+
+    POURQUOI CE CONTROLE EXISTE. Le controle 8 verifie qu aucun lien ne mene
+    nulle part. Il ne verifiait pas que les liens OBLIGATOIRES existent, et un
+    lien absent ne casse rien : il ne se voit pas. Mesure du 16/09/2026 : un
+    seul lien vers /legal dans tout le produit, perdu sous une ancre dans
+    « mes donnees ». Onze ecrans sur douze n offraient aucun chemin vers les
+    mentions legales, ce que l article 6-III de la loi pour la confiance dans
+    l economie numerique impose.
+    """
+    print("\n  10. LIENS OBLIGATOIRES SUR CHAQUE PAGE\n")
+    for nom, (page, brut) in sources.items():
+        if nom.endswith("legal"):
+            print(f"    {nom:26} (la page elle-meme)")
+            continue
+        if 'href="/legal' not in brut:
+            constats.append(Constat("obligatoires", nom, "bloquant",
+                                    "aucun lien vers /legal : obligation legale"))
+            print(f"    {nom:26} MANQUE  /legal")
+        else:
+            print(f"    {nom:26} ok")
+
+
 def main(argv):
     demandees = [a for a in argv[1:] if not a.startswith("-")]
     toutes, gabarit = lire_build()
@@ -906,6 +930,7 @@ def main(argv):
     controle_boutons(sources, constats)
     controle_liens(toutes, sources, constats)
     controle_libelles(sources, constats)
+    controle_obligatoires(sources, constats)
 
     bloquants = [c for c in constats if c.gravite == "bloquant"]
     signales = [c for c in constats if c.gravite == "signale"]

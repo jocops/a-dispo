@@ -446,6 +446,18 @@ th{font-family:"Space Grotesk",sans-serif;font-weight:600;color:var(--cream);fon
    Sur ce fond precis c'est le secondaire qui porte, pas le terne : mesure
    relevee sur `.avis .compte`, 11,5 px, rgb(104,101,97) sur rgb(242,223,209). */
 .avis .compte{color:var(--cream-mut)}
+
+/* Le pied commun. Il porte les trois choses qu'une page doit toujours offrir :
+   qui edite, ou trouver de l'aide, et comment revenir chez soi. Discret par
+   construction : il ne se dispute pas la hierarchie avec le contenu. */
+.pied-site{margin-top:clamp(2.5rem,6vw,4.5rem);padding:20px var(--gut) 34px;
+  border-top:1px solid var(--line);font-size:var(--t5);color:var(--cream-dim);
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px}
+.pied-site a{color:var(--cream-mut);text-decoration:none;min-height:44px;
+  display:inline-flex;align-items:center}
+.pied-site a:hover{color:var(--cream);text-decoration:underline}
+.pied-site a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px;border-radius:4px}
+.pied-site .sep{opacity:.45}
 </style>
 
 <a class="saut" href="#contenu">Aller au contenu</a>
@@ -1228,3 +1240,11 @@ function filtrer() {
 $('q').addEventListener('input', filtrer);
 $('compte').textContent = reposCompte;
 </script>
+
+<footer class="pied-site">
+  <span>&copy; à dispo</span>
+  <span class="sep">·</span>
+  <a href="/">Accueil</a>
+  <span class="sep">·</span>
+  <a href="/aide">Aide</a>
+</footer>

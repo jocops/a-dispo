@@ -626,6 +626,18 @@ button.carte:focus-visible{outline:3px solid var(--accent-texte);outline-offset:
 a.bouton{text-decoration:none}
 a.bouton.plein{color:#fff}
 a.bouton.creux{color:var(--cream)}
+
+/* Le pied commun. Il porte les trois choses qu'une page doit toujours offrir :
+   qui edite, ou trouver de l'aide, et comment revenir chez soi. Discret par
+   construction : il ne se dispute pas la hierarchie avec le contenu. */
+.pied-site{margin-top:clamp(2.5rem,6vw,4.5rem);padding:20px var(--gut) 34px;
+  border-top:1px solid var(--line);font-size:var(--t5);color:var(--cream-dim);
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px}
+.pied-site a{color:var(--cream-mut);text-decoration:none;min-height:44px;
+  display:inline-flex;align-items:center}
+.pied-site a:hover{color:var(--cream);text-decoration:underline}
+.pied-site a:focus-visible{outline:2px solid var(--accent-texte);outline-offset:3px;border-radius:4px}
+.pied-site .sep{opacity:.45}
 </style>
 
 <div class="wrap">
@@ -2650,3 +2662,13 @@ function pasRaccorde(nom, cause, issue) {
     .catch(function () { /* reseau coupe : on ne punit pas */ });
 })();
 </script>
+
+<footer class="pied-site">
+  <span>&copy; à dispo</span>
+  <span class="sep">·</span>
+  <a href="/legal">Mentions légales</a>
+  <span class="sep">·</span>
+  <a href="/legal#donnees">Données personnelles</a>
+  <span class="sep">·</span>
+  <a href="/aide">Aide</a>
+</footer>
