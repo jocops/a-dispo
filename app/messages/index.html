@@ -1029,10 +1029,9 @@ function sortirExemples() {
    en un seul morceau de texte, pour qu'elle se releve telle quelle dans le
    fichier comme dans la page. */
 function noteExemple(haut) {
-  return '<p class="exemple-note' + (haut ? " haut" : "") + '">'
-    + "<b>Écrans d'exemple. Les noms, les notes et les dates sont fictifs.</b> "
-    + "Dès qu'une vraie conversation s'ouvre, elle prend leur place et cette mention "
-    + "disparaît.</p>";
+  /* Mention retiree le 16/09/2026, a la demande de Joan. La fonction
+     reste en place : remettre la mention un jour tient en une chaine. */
+  return "";
 }
 
 /* --------------------------------------------------------- petites briques */

@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "node outils/construire.mjs",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "recette": "npm run build && python3 outils/recette.py",
+    "banc": "node outils/banc-sql.mjs",
+    "controle": "npm run recette && npm run banc"
   },
   "devDependencies": {
     "wrangler": "^4"

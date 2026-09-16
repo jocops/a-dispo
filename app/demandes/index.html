@@ -17,9 +17,10 @@
   appel reseau en mode exemple, et les six actions qui ecrivent repondent par
   une phrase au lieu d'un appel.
   CONTREPARTIE NON NEGOCIABLE : tout bloc qui porte ces fausses donnees porte
-  aussi, DANS LE MEME BLOC VISUEL, la mention « Ecrans d'exemple. Les noms, les
-  notes et les dates sont fictifs. » Un produit qui montre de faux chiffres sans
-  le dire apprend a son utilisateur qu'il ne peut pas le croire.
+  LES EXEMPLES ne portent plus de mention depuis le 16/09/2026, a la demande
+  de Joan. Le mecanisme reste entier : la constante MOT_EXEMPLE est vide, et
+  des que la base rend une demande, ce sont les vraies qui s'affichent. Pour
+  remettre la mention, il suffit de remplir cette constante.
 
   L'ECRAN QUI COMPTE : UNE DEMANDE A DECIDER. Quand une demande attend une
   reponse, l'onglet « On te demande » ne s'ouvre PAS sur une liste : il s'ouvre
@@ -609,7 +610,7 @@ const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août"
    mauvais mot l'installe aussi surement qu'une vraie ligne.
    ================================================================== */
 const MOI = "__moi__";
-const MOT_EXEMPLE = "Écrans d'exemple. Les noms, les notes et les dates sont fictifs.";
+const MOT_EXEMPLE = "";       /* mention retiree le 16/09/2026, a la demande de Joan */
 
 /* ------------------------------------------------- LES DATES DES EXEMPLES
    Aucune date n'est ecrite en dur. Une demande « a repondre » datee du

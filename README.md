@@ -14,12 +14,38 @@ on dit confrère, chantier, lot, devis. Jamais mission, intérim ni personnel.
 
 ```bash
 npm install
-npm run build     # construit dist/
-npm run deploy    # construit puis déploie
+npm run build      # construit dist/
+npm run controle   # la recette et le banc SQL
+npm run deploy     # construit puis déploie
 ```
 
-Une seule commande construit tout : les douze écrans et le CRM. Aucune
-dépendance autre que wrangler, aucun Python.
+Une seule commande construit tout : les douze écrans et le CRM.
+
+## Les contrôles
+
+`npm run controle` enchaîne les deux filets. Ils ne partent jamais en ligne.
+
+**La recette** (`outils/recette.py`) passe neuf contrôles sur les douze écrans :
+les pages déclarées existent et `dist/` correspond à la source, aucun tiret
+cadratin, aucun prix inventé, aucun vocabulaire d'emploi, aucune clé secrète,
+les quatre états d'interface présents, aucun bouton mort, aucun lien cassé,
+les libellés cohérents. Elle ne lit pas les commentaires comme du balisage :
+un contrôle qui signale sa propre documentation est un contrôle qu'on cesse de
+croire.
+
+**Le banc SQL** (`outils/banc-sql.mjs`) monte un vrai PostgreSQL en mémoire
+(PGlite), y pose ce que Supabase fournit, rejoue les quatorze migrations dans
+l'ordre, les rejoue une seconde fois pour vérifier qu'elles sont rejouables,
+puis vérifie qu'un artisan ne lit rien de ce qui appartient à un autre, ni le
+fichier de prospection du CRM, et que l'essai de trente jours s'ouvre bien à la
+fin du parcours. Il ne touche jamais à la base de production.
+
+PGlite pèse 25 Mo et n'est pas dans `package.json` : Cloudflare réinstallerait
+les dépendances à chaque construction. Une seule fois, en local :
+
+```bash
+npm install --no-save @electric-sql/pglite
+```
 
 ## Ce qu'il y a dedans
 
