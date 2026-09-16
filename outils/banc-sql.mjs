@@ -57,6 +57,9 @@ const MIGRATIONS = [
   'migration-cloison-crm.sql',
   'migration-essai-30-jours.sql',
   'migration-roles-evenements.sql',
+  'migration-taches-planifiees.sql',
+  'migration-cloison-profils.sql',
+  'migration-droits-taches.sql',
 ]
 
 // Les doublures de Supabase. Fideles en STRUCTURE, ce qui suffit a valider le
@@ -113,6 +116,15 @@ const AMONT = `
 const db = await PGlite.create()
 await db.exec(AMONT)
 
+// Ce que Supabase pose VRAIMENT : des droits par defaut, qui s'appliquent a
+// chaque objet cree ensuite. C'est ce qui rend un `revoke` ecrit dans une
+// migration efficace et durable, et c'est ce qu'il fallait reproduire pour que
+// le controle des taches d'entretien veuille dire quelque chose.
+await db.exec(`
+  alter default privileges in schema public grant execute on functions to anon, authenticated;
+  alter default privileges in schema public grant select, insert, update, delete on tables to anon, authenticated;
+  alter default privileges in schema public grant usage, select on sequences to anon, authenticated;`)
+
 let echecs = 0
 const dire = (bon, quoi, detail = '') => {
   if (!bon) echecs++
@@ -131,11 +143,18 @@ for (const f of MIGRATIONS.slice(5)) {
   catch (e) { dire(false, f + ' (2e passage)', String(e.message).split('\n')[0]) }
 }
 
-// Les droits par defaut que Supabase accorde sur le schema public.
+// Les tables et les sequences creees par les migrations : Supabase accorde ces
+// droits-la par defaut, et les politiques de securite par ligne decident
+// ensuite ce qui sort vraiment.
+//
+// LES FONCTIONS NE SONT PLUS TRAITEES ICI. Elles le sont AVANT les migrations,
+// par `alter default privileges`, comme Supabase le fait reellement. Les
+// accorder ici, apres coup et sur toutes les fonctions, annulait chaque revoke
+// ecrit dans une migration : le banc declarait alors ouvert ce qui est ferme en
+// production. Un banc infidele est pire qu'aucun banc.
 await db.exec(`
   grant select, insert, update, delete on all tables in schema public to anon, authenticated;
-  grant usage, select on all sequences in schema public to anon, authenticated;
-  grant execute on all functions in schema public to anon, authenticated;`)
+  grant usage, select on all sequences in schema public to anon, authenticated;`)
 
 const A = '11111111-1111-4111-8111-111111111111'
 const B = '22222222-2222-4222-8222-222222222222'
@@ -177,13 +196,26 @@ const sensibles = ['telephone', 'siret', 'nom', 'code_postal'].filter(x => new R
 dire(sensibles.length === 0, 'la fiche publique n expose aucune colonne sensible',
      sensibles.length ? 'exposees : ' + sensibles.join(', ') : '')
 
-console.log('\n4. CLOISON DU CRM : un artisan lit-il le fichier de prospection ?\n')
+console.log('\n4. LES TACHES D ENTRETIEN : un artisan peut-il les declencher ?\n')
+// Elles sont SECURITY DEFINER : la securite par ligne ne les arrete pas. Si un
+// artisan peut les appeler, il fait expirer les demandes de tout le monde,
+// publie prematurement toutes les notes, et perime toutes les pieces.
+// Mesure du 16/09/2026 : les trois passaient. `revoke ... from public` ne retire
+// QUE le pseudo-role public, jamais anon ni authenticated.
+for (const fn of ['expirer_demandes', 'publier_evaluations_echues', 'marquer_pieces_expirees']) {
+  let ferme = false
+  try { await comme(B, `select public.${fn}()`) }
+  catch (e) { ferme = /permission denied|denied for function/i.test(e.message) }
+  dire(ferme, `${fn}() est fermee a un artisan connecte`)
+}
+
+console.log('\n5. CLOISON DU CRM : un artisan lit-il le fichier de prospection ?\n')
 await db.exec(`insert into public.contacts (id, base) values
   (1,'{"nom":"Dupont"}'::jsonb),(2,'{"nom":"Martin"}'::jsonb),(3,'{"nom":"Bernard"}'::jsonb)`)
 dire(await compte(B, 'select count(*)::int n from public.contacts') === 0,
      'un artisan ne lit aucune fiche de prospection')
 
-console.log('\n5. L ESSAI DE 30 JOURS S OUVRE-T-IL A LA FIN DU PARCOURS ?\n')
+console.log('\n6. L ESSAI DE 30 JOURS S OUVRE-T-IL A LA FIN DU PARCOURS ?\n')
 const q = async (sql) => (await db.query(sql)).rows[0]
 
 // Alice a termine son parcours a la section precedente : l essai doit exister.

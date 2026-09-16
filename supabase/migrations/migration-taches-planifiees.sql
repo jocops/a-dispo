@@ -74,23 +74,49 @@ $$;
 -- journaux d'une base. Cette fonction rend l'etat des trois taches et leur
 -- dernier resultat, pour qu'un controle humain prenne dix secondes.
 
-create or replace function public.controle_taches()
-returns table (tache text, planification text, active boolean, dernier_statut text, derniere_fin timestamptz)
-language sql
-security definer
-set search_path = public, cron
-as $$
-  select j.jobname::text,
-         j.schedule::text,
-         j.active,
-         (select d.status from cron.job_run_details d
-           where d.jobid = j.jobid order by d.start_time desc limit 1)::text,
-         (select d.end_time from cron.job_run_details d
-           where d.jobid = j.jobid order by d.start_time desc limit 1)
-    from cron.job j
-   where j.jobname in ('expirer-demandes', 'publier-evaluations', 'marquer-pieces-expirees')
-   order by j.jobname
-$$;
+-- POURQUOI CETTE FONCTION EST CREEE PAR EXECUTE, et pas directement.
+-- Une fonction `language sql` voit son corps VALIDE A LA CREATION par
+-- PostgreSQL. Celle-ci lit `cron.job` : sans pg_cron, sa creation echoue, et la
+-- migration entiere tombe. Le banc d'essai hors production, qui n'a pas
+-- l'extension, ne pouvait donc pas jouer ce fichier du tout, et il n'etait
+-- eprouve nulle part.
+--
+-- On la cree donc a l'interieur d'une garde. Quand pg_cron est absent, on pose
+-- une version qui le DIT, plutot que rien : un appel a une fonction inexistante
+-- rend une erreur technique, un appel a celle-ci rend une phrase lisible.
+
+do $g$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    execute $f$
+      create or replace function public.controle_taches()
+      returns table (tache text, planification text, active boolean,
+                     dernier_statut text, derniere_fin timestamptz)
+      language sql security definer set search_path = public, cron as $c$
+        select j.jobname::text, j.schedule::text, j.active,
+               (select d.status from cron.job_run_details d
+                 where d.jobid = j.jobid order by d.start_time desc limit 1)::text,
+               (select d.end_time from cron.job_run_details d
+                 where d.jobid = j.jobid order by d.start_time desc limit 1)
+          from cron.job j
+         where j.jobname in ('expirer-demandes', 'publier-evaluations',
+                             'marquer-pieces-expirees')
+         order by j.jobname
+      $c$;
+    $f$;
+  else
+    execute $f$
+      create or replace function public.controle_taches()
+      returns table (tache text, planification text, active boolean,
+                     dernier_statut text, derniere_fin timestamptz)
+      language sql security definer set search_path = public as $c$
+        select 'pg_cron absent'::text, '(aucune planification)'::text,
+               false, 'l extension n est pas installee'::text, null::timestamptz
+      $c$;
+    $f$;
+  end if;
+end
+$g$;
 
 revoke all on function public.controle_taches() from public, anon, authenticated;
 grant execute on function public.controle_taches() to service_role;

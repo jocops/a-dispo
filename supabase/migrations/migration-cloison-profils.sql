@@ -40,7 +40,12 @@
 -- Rejouable : `drop policy if exists` avant `create policy`.
 -- ============================================================
 
+-- On supprime les DEUX noms : l ancien, qui est la fuite qu on ferme, et le
+-- nouveau, sans quoi un second passage echoue sur « policy already exists ».
+-- Ce fichier se disait rejouable et ne l etait pas : le banc l a trouve le
+-- 16/09/2026, au second passage.
 drop policy if exists "profils lecture connectes" on public.profils;
+drop policy if exists "profils lecture cloisonnee" on public.profils;
 
 create policy "profils lecture cloisonnee" on public.profils
   for select to authenticated
