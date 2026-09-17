@@ -200,10 +200,9 @@ h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   overflow-wrap:anywhere}
 h1:focus{outline:none}
 h1:focus-visible{outline:3px solid var(--accent-texte);outline-offset:4px;border-radius:6px}
-/* L'ambre SOUS le mot, jamais DANS le mot : 1,84:1 en lettre contre 16,66:1
-   pour l'encre posee sur un surlignage ambre. */
-h1 .em{color:var(--cream);padding:0 .06em;
-  background:linear-gradient(180deg,transparent 62%,var(--accent) 62%)}
+/* Le mot reste en encre pure, 18,46 : 1. Le soulignement ambre a ete retire
+   le 17/09 sur tous les ecrans : l'ambre ne souligne plus de texte. */
+h1 .em{color:var(--cream)}
 .sous-titre{color:var(--cream-mut);font-size:15.5px;margin:8px 0 0;overflow-wrap:anywhere;
   max-width:52ch}
 /* UN SEUL ACCENT DE COULEUR SUR LA FICHE, et il porte un mot : l'aplat ambre

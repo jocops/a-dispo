@@ -196,10 +196,9 @@ code{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cream-dim
 h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:clamp(30px,6vw,44px);line-height:1.02;letter-spacing:-.022em;
   overflow-wrap:anywhere}
-/* L'ambre SOUS le mot, jamais DANS le mot : 1,84:1 en lettre contre 16,66:1
-   pour l'encre posee sur un surlignage ambre. */
-h1 .em{color:var(--cream);padding:0 .06em;
-  background:linear-gradient(180deg,transparent 62%,var(--accent) 62%)}
+/* Le mot reste en encre pure, 18,46 : 1. Le soulignement ambre a ete retire
+   le 17/09 sur tous les ecrans : l'ambre ne souligne plus de texte. */
+h1 .em{color:var(--cream)}
 h1:focus{outline:none}
 h1:focus-visible{outline:3px solid var(--accent-texte);outline-offset:4px;border-radius:6px}
 .lead{color:var(--cream-mut);font-size:16px;margin:14px 0 0;max-width:62ch}

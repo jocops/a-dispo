@@ -139,12 +139,9 @@ body{margin:0;background:linear-gradient(180deg,var(--bg-2),var(--bg) 520px) no-
 
 h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:var(--t1);line-height:1.08;letter-spacing:-.015em}
-/* L'ambre ne peut pas etre une lettre sur du clair (1,84 : 1). Il devient le
-   trait pose SOUS le mot : l'encre reste a 18,46 sur le papier et a 10,06 sur
-   la bande ambre. L'accent est garde, la lisibilite aussi. */
-h1 .em{background-image:linear-gradient(var(--accent),var(--accent));
-  background-repeat:no-repeat;background-size:100% .28em;background-position:0 86%;
-  padding:0 .05em}
+/* Le mot reste en encre pure, 18,46 : 1. Le soulignement ambre a ete retire
+   le 17/09 sur tous les ecrans : l'ambre ne souligne plus de texte. */
+h1 .em{color:var(--cream)}
 .lead{color:var(--cream-mut);font-size:var(--t3);margin:12px 0 0;max-width:46ch}
 h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:var(--t2);margin:34px 0 0;
   line-height:1.2}

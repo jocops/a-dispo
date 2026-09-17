@@ -164,11 +164,9 @@ img,svg{max-width:100%}
 
 h1{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;
   font-size:clamp(27px,5.2vw,40px);line-height:1.12}
-/* LA SIGNATURE DE LA CHARTE CLAIRE : l'ambre passe du texte au REMPLISSAGE.
-   Le mot reste en encre (18,46:1), l'ambre passe dessous en surlignage, et la
-   ou la barre couvre la lettre l'encre sur l'ambre vaut 10,06:1. */
-h1 .em{color:var(--cream);
-  background:linear-gradient(var(--accent),var(--accent)) 0 88%/100% .2em no-repeat}
+/* Le mot reste en encre pure, 18,46 : 1. Le soulignement ambre a ete retire
+   le 17/09 sur tous les ecrans : l'ambre ne souligne plus de texte. */
+h1 .em{color:var(--cream)}
 .lead{color:var(--cream-mut);font-size:clamp(15.5px,2.2vw,18px);margin:14px 0 0}
 
 h2{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:clamp(19px,2.8vw,24px);
