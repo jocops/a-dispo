@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Sauvegarde quotidienne de la base a dispo, et epreuve du retour.
+
+  A INSTALLER AVEC :
+    cp outils/sauvegarde.plist ~/Library/LaunchAgents/org.alpvalley.adispo-base.plist
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/org.alpvalley.adispo-base.plist
+
+  A RETIRER AVEC :
+    launchctl bootout gui/$(id -u)/org.alpvalley.adispo-base
+    rm ~/Library/LaunchAgents/org.alpvalley.adispo-base.plist
+
+  CE QU'IL REMPLACE. Il existe deja org.alpvalley.adispo-sauvegarde, qui lance
+  `sauvegarde-crm.py` a 19 h 30 et ne copie QU'UNE table sur 33 (`contacts`),
+  dans un format que rien ne sait relire. Cet agent-ci copie les 33 et sait
+  prouver leur retour. Les deux peuvent cohabiter le temps d'une transition ;
+  l'ancien devrait etre retire une fois celui-ci eprouve quelques jours.
+
+  /usr/bin/python3 et non le python du framework : son magasin de certificats
+  fonctionne, il est toujours present, et il ne bouge pas avec les mises a jour
+  de Homebrew ou de python.org. Verifie le 17/09/2026 : 3.9.6, requests 2.28.2,
+  les trois modes du script y tournent.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>org.alpvalley.adispo-base</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>/Users/joanaglave/a-dispo/outils/sauvegarde.py</string>
+    <string>--sauver</string>
+  </array>
+
+  <!-- 19 h 45, apres l'agent du CRM, pour ne pas lire la base en meme temps.
+       Si le Mac dort a cette heure, launchd lance la tache au reveil. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>19</integer>
+    <key>Minute</key><integer>45</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/joanaglave/Library/Logs/adispo-base.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/joanaglave/Library/Logs/adispo-base.log</string>
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

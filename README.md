@@ -25,13 +25,49 @@ Une seule commande construit tout : les douze écrans et le CRM.
 
 `npm run controle` enchaîne les deux filets. Ils ne partent jamais en ligne.
 
-**La recette** (`outils/recette.py`) passe neuf contrôles sur les douze écrans :
+**La recette** (`outils/recette.py`) passe onze contrôles sur les douze écrans :
 les pages déclarées existent et `dist/` correspond à la source, aucun tiret
 cadratin, aucun prix inventé, aucun vocabulaire d'emploi, aucune clé secrète,
 les quatre états d'interface présents, aucun bouton mort, aucun lien cassé,
-les libellés cohérents. Elle ne lit pas les commentaires comme du balisage :
+les libellés cohérents, un lien vers `/legal` sur chaque page, et le réglage du
+service accordé à la forme de sortie du build. Elle ne lit pas les commentaires comme du balisage :
 un contrôle qui signale sa propre documentation est un contrôle qu'on cesse de
 croire.
+
+## La sauvegarde
+
+`outils/sauvegarde.py` copie **les 33 tables** du schéma `public`, pas une, et
+sait prouver qu'elles reviennent.
+
+```bash
+python3 outils/sauvegarde.py --sauver      # copier, sceller, faire tourner sur 30 jours
+python3 outils/sauvegarde.py --verifier    # le fichier est-il intact et complet ?
+python3 outils/sauvegarde.py --eprouver    # LA PREUVE : est-ce que ça revient ?
+```
+
+`--eprouver` est la raison d'être de l'outil. Le devis signé dit qu'« une
+sauvegarde qu'on n'a jamais restaurée n'est pas une sauvegarde ». Il restaure
+donc le fichier dans un schéma jetable, relit chaque table, compare les
+empreintes SHA-256, puis supprime le schéma. **Il n'écrit jamais dans
+`public`** : prouver une restauration en écrasant la production ferait courir
+exactement le risque contre lequel la sauvegarde existe.
+
+Relevé du 17/09/2026 : 33 tables sur 33 reviennent à l'identique, 1 444 lignes,
+78 Ko. Une table refusait de revenir, `inscriptions` : sa colonne `email_norme`
+est générée, et PostgreSQL interdit d'y écrire. L'outil nomme désormais ses
+colonnes au lieu d'insérer par `select *`.
+
+`--restaurer` est un blanc par défaut : il dit ce qu'il écrirait puis s'arrête.
+Il faut `--vraiment` **et** une table nommée pour qu'une ligne de production
+bouge. On ne restaure pas 33 tables d'un geste : chaque table est une décision.
+
+Les fichiers vont dans `~/Sauvegardes/adispo/`, hors du dépôt, en 600. Ils
+contiennent les 1 374 fiches de prospection : ils ne doivent jamais être
+commités ni transmis.
+
+Pour la quotidienne : `outils/sauvegarde.plist`, qui porte sa commande
+d'installation. Il ne remplace pas encore `org.alpvalley.adispo-sauvegarde`,
+qui copie une seule table dans un format que rien ne sait relire.
 
 **Le banc SQL** (`outils/banc-sql.mjs`) monte un vrai PostgreSQL en mémoire
 (PGlite), y pose ce que Supabase fournit, rejoue les quatorze migrations dans
