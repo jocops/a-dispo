@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light"><meta name="robots" content="noindex, nofollow">
+<title>a dispo : BNP Axepta ou Stripe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F8F4EC;--bg-2:#FEFCF8;--surface:#EEEBE3;--surface-2:#EAE6DC;
+--cream:#191512;--cream-mut:#5E5A56;--cream-dim:#686561;--accent:#E12154;--accent-texte:#890026;
+--vert:#116B40;--vert-voile:rgba(17,107,64,.10);--alerte:#9A3208;--alerte-voile:rgba(154,50,8,.10);
+--line:#D8D4CC;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:"DM Sans",system-ui,sans-serif;
+font-size:13.5px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding:26px 22px 40px}
+h1,h2,h3{font-family:"Space Grotesk",sans-serif;font-weight:700;margin:0;line-height:1.12}
+h1{font-size:clamp(23px,3.2vw,32px);letter-spacing:-.02em}
+h2{font-size:14px;letter-spacing:.01em;margin:0 0 9px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:5px;height:15px;border-radius:2px;background:var(--accent);flex:none}
+.kt{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+color:var(--accent-texte);margin:0 0 9px}
+table{width:100%;border-collapse:collapse;font-size:12.2px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:"Space Grotesk",sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
+color:var(--cream-mut);border-bottom:1.5px solid var(--cream);font-weight:700}
+td.n,th.n{text-align:right;font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.carte{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;margin-bottom:12px}
+.grille{display:grid;gap:12px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+.verdict{background:var(--cream);color:var(--bg-2);border-radius:var(--r);padding:18px 20px;margin:16px 0 18px}
+.verdict h2{color:var(--bg-2);font-size:15px}.verdict h2::before{background:var(--accent)}
+.verdict p{margin:0 0 7px}.verdict p:last-child{margin:0}
+.verdict b{color:#fff}
+.verdict .cle{background:var(--accent);color:#fff;font-weight:700;padding:1px 6px;border-radius:4px}
+.gagne{background:var(--vert-voile)}
+.perd{background:var(--alerte-voile)}
+.eti{display:inline-block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+border-radius:99px;padding:2px 7px;color:#fff}
+.e-v{background:var(--vert)}.e-a{background:var(--alerte)}.e-n{background:var(--cream-dim)}
+ul{margin:0;padding-left:17px}li{margin-bottom:4px}
+.q{background:var(--alerte-voile);border-left:3px solid var(--alerte);border-radius:0 8px 8px 0;
+padding:11px 14px;margin-bottom:9px}
+.q b{display:block;font-family:"Space Grotesk",sans-serif;font-size:12.5px}
+.q span{display:block;color:var(--cream-mut);font-size:11.8px;margin-top:2px}
+.note{color:var(--cream-dim);font-size:11px;line-height:1.4}
+.phase{border-left:3px solid var(--line);padding:2px 0 2px 13px;margin-bottom:11px}
+.phase b{font-family:"Space Grotesk",sans-serif;display:block;font-size:12.8px}
+.phase span{color:var(--cream-mut);font-size:11.8px}
+.phase.a{border-color:var(--vert)}.phase.b{border-color:var(--alerte)}.phase.c{border-color:var(--accent)}
+footer{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);color:var(--cream-dim);font-size:10.5px}
+@media print{body{background:#fff;font-size:9.4px}.page{padding:0;max-width:none}
+ .carte{break-inside:avoid;padding:10px 12px;margin-bottom:8px}table{font-size:9px}
+ h1{font-size:20px}.verdict{background:#191512 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body><div class="page">
+
+<p class="kt">Etude comparative &middot; 20 septembre 2026 &middot; abonnement a dispo 29,90 &euro; HT/mois</p>
+<h1>BNP Paribas Axepta ou Stripe&nbsp;?</h1>
+
+<div class="verdict">
+<h2>Ce que le calcul dit</h2>
+<p>La vraie question n'est pas <b>BNP ou Stripe</b>. C'est <b>carte ou prelevement SEPA</b>, et <b>acheter le moteur d'abonnement ou l'ecrire</b>.</p>
+<p>Axepta est une <b>passerelle de paiement</b>, pas un moteur d'abonnement : ni recurrence geree, ni facturation, ni relance d'impaye, ni coupon. Tout cela est a ecrire. Stripe Billing le vend deja fait, pour 0,7&nbsp;% du volume.</p>
+<p>Sur 5 ans et une croissance a 4&nbsp;000 abonnes : <span class="cle">Stripe SEPA sans Billing 41&nbsp;070 &euro;</span> &nbsp; BNP Axepta 48&nbsp;252 &euro; &nbsp; Stripe SEPA + Billing 56&nbsp;042 &euro; &nbsp; Stripe carte + Billing 106&nbsp;541 &euro;. <b>Le choix du moyen de paiement pese 2,5 fois plus lourd que le choix du prestataire.</b></p>
+</div>
+
+<div class="grille g2">
+<div class="carte"><h2>Le besoin</h2>
+<p style="margin:0 0 7px">Abonnement B2B mensuel de <b>29,90 &euro; HT</b>, artisans du batiment, France, une seule devise. Renouvellement automatique, changement d'offre, remboursement au prorata, gestion des impayes, facture, premier mois offert, codes de parrainage.</p>
+<p class="note"><b>Consequences :</b> pas de TVA multi-pays a gerer (B2B France, 20&nbsp;% simple), donc aucun besoin de Merchant of Record. Panier faible et recurrent, donc <b>le frais FIXE par transaction pese plus que le pourcentage</b> : 0,25 &euro; sur 29,90 &euro; vaut deja 0,84&nbsp;%.</p></div>
+
+<div class="carte"><h2>Ce qui manque pour affiner</h2>
+<ul class="note" style="margin:0;padding-left:16px">
+<li><b>La part de cartes professionnelles</b> chez tes artisans. C'est le parametre le plus sensible de toute l'etude : il double le cout BNP.</li>
+<li>Accepteras-tu le <b>prelevement SEPA</b> en moyen par defaut ? (mandat a signer une fois, puis plus rien)</li>
+<li>Facturation a l'annee envisagee&nbsp;? Elle divise par 12 le nombre de transactions.</li>
+<li>Le taux d'impaye vise, qui pilote le cout des relances.</li>
+</ul></div>
+</div>
+
+<div class="carte"><h2>Cout reel d'une transaction de 29,90 &euro; HT</h2>
+<table>
+<tr><th>Solution</th><th>Detail du calcul</th><th class="n">&euro; / transaction</th><th class="n">% du CA</th><th>Moteur d'abonnement</th></tr>
+<tr class="gagne"><td><b>Stripe SEPA</b>, sans Billing</td><td>0,35 &euro; forfaitaire, aucun pourcentage</td><td class="n"><b>0,350</b></td><td class="n"><b>1,17 %</b></td><td><span class="eti e-a">a ecrire</span></td></tr>
+<tr><td><b>BNP Axepta</b> &middot; cartes perso</td><td>0,295 % acquisition + 0,22 &euro; passerelle</td><td class="n">0,308</td><td class="n">1,03 %</td><td><span class="eti e-a">a ecrire</span></td></tr>
+<tr><td><b>BNP Axepta</b> &middot; mix B2B realiste</td><td>0,682 % acquisition + 0,22 &euro; passerelle</td><td class="n">0,424</td><td class="n">1,42 %</td><td><span class="eti e-a">a ecrire</span></td></tr>
+<tr><td>GoCardless SEPA Standard</td><td>1 % + 0,20 &euro;, plafond 2 &euro;</td><td class="n">0,499</td><td class="n">1,67 %</td><td><span class="eti e-n">partiel</span></td></tr>
+<tr><td>Stripe SEPA + Billing</td><td>0,35 &euro; + 0,7 % du volume recurrent</td><td class="n">0,559</td><td class="n">1,87 %</td><td><span class="eti e-v">inclus</span></td></tr>
+<tr class="perd"><td>Stripe carte + Billing &middot; cartes perso</td><td>1,5 % + 0,25 &euro; + 0,7 %</td><td class="n">0,908</td><td class="n">3,04 %</td><td><span class="eti e-v">inclus</span></td></tr>
+<tr class="perd"><td>Stripe carte + Billing &middot; mix B2B</td><td>40 % de cartes pro a 2,8 % + 0,25 &euro; + 0,7 %</td><td class="n">1,063</td><td class="n">3,56 %</td><td><span class="eti e-v">inclus</span></td></tr>
+</table>
+<p class="note" style="margin-top:8px">Mix B2B realiste retenu : 45 % debit perso, 15 % credit perso, 25 % carte pro CB, 10 % pro Visa, 5 % pro Mastercard. Chez Stripe, une carte professionnelle bascule au tarif &laquo;&nbsp;premium&nbsp;&raquo; a 2,8 %. Chez BNP elle passe de 0,27 % a 1,97 % selon le reseau. <b>Les deux sont punis par la carte pro, BNP moins fort.</b></p></div>
+
+<div class="grille g2">
+<div class="carte"><h2>Cout mensuel par palier</h2>
+<table>
+<tr><th class="n">Abonnes</th><th class="n">CA/mois</th><th class="n">BNP mix B2B</th><th class="n">Stripe SEPA seul</th><th class="n">Stripe carte+Billing</th></tr>
+<tr><td class="n">100</td><td class="n">2 990 &euro;</td><td class="n">38 &euro; &middot; 1,28 %</td><td class="n">35 &euro; &middot; 1,17 %</td><td class="n">106 &euro; &middot; 3,56 %</td></tr>
+<tr><td class="n">500</td><td class="n">14 950 &euro;</td><td class="n">208 &euro; &middot; 1,39 %</td><td class="n">175 &euro; &middot; 1,17 %</td><td class="n">532 &euro; &middot; 3,56 %</td></tr>
+<tr><td class="n">1 000</td><td class="n">29 900 &euro;</td><td class="n">420 &euro; &middot; 1,40 %</td><td class="n">350 &euro; &middot; 1,17 %</td><td class="n">1 063 &euro; &middot; 3,56 %</td></tr>
+<tr><td class="n">5 000</td><td class="n">149 500 &euro;</td><td class="n">2 116 &euro; &middot; 1,42 %</td><td class="n">1 750 &euro; &middot; 1,17 %</td><td class="n">5 316 &euro; &middot; 3,56 %</td></tr>
+<tr><td class="n">10 000</td><td class="n">299 000 &euro;</td><td class="n">4 237 &euro; &middot; 1,42 %</td><td class="n">3 500 &euro; &middot; 1,17 %</td><td class="n">10 633 &euro; &middot; 3,56 %</td></tr>
+</table>
+<p class="note" style="margin-top:7px">BNP inclut 18 &euro;/mois d'abonnement (offert 6 mois) et 100 operations. <b>Des 100 abonnes le forfait est sature</b> : chaque abonne suivant coute 0,22 &euro; de passerelle en plus de l'acquisition.</p></div>
+
+<div class="carte"><h2>Seuils de bascule</h2>
+<p style="margin:0 0 8px">Avec BNP, le moteur d'abonnement est a ecrire. Compte <b>20 jours, soit 6 000 &euro;</b> a 300 &euro;/jour : recurrence, relances d'impaye, factures, prorata, coupons, webhooks.</p>
+<table>
+<tr><th>Comparaison</th><th class="n">Abonnes pour rentrer</th></tr>
+<tr><td>BNP <b>vs</b> Stripe carte + Billing, sur 12 mois</td><td class="n">810</td></tr>
+<tr><td>BNP <b>vs</b> Stripe carte + Billing, sur 24 mois</td><td class="n">419</td></tr>
+<tr><td>BNP <b>vs</b> Stripe carte + Billing, sur 36 mois</td><td class="n">289</td></tr>
+<tr class="perd"><td>BNP <b>vs</b> Stripe SEPA sans Billing</td><td class="n"><b>jamais</b></td></tr>
+</table>
+<p class="note" style="margin-top:8px"><b>La ligne qui decide.</b> Face a Stripe SEPA sans Billing, BNP au mix B2B realiste est plus cher de 0,074 &euro; par transaction, plus 18 &euro;/mois. Comme le moteur d'abonnement est a ecrire <b>dans les deux cas</b>, l'ecart de developpement s'annule et BNP ne rattrape jamais.</p></div>
+</div>
+
+<div class="grille g2">
+<div class="carte"><h2>Projection 5 ans</h2>
+<table>
+<tr><th></th><th class="n">Abon.</th><th class="n">CA annuel</th><th class="n">BNP</th><th class="n">Stripe SEPA</th><th class="n">Stripe carte+B</th></tr>
+<tr><td>Annee 1</td><td class="n">150</td><td class="n">53 820 &euro;</td><td class="n">715 &euro;</td><td class="n">630 &euro;</td><td class="n">1 914 &euro;</td></tr>
+<tr><td>Annee 2</td><td class="n">500</td><td class="n">179 400 &euro;</td><td class="n">2 496 &euro;</td><td class="n">2 100 &euro;</td><td class="n">6 380 &euro;</td></tr>
+<tr><td>Annee 3</td><td class="n">1 200</td><td class="n">430 560 &euro;</td><td class="n">6 059 &euro;</td><td class="n">5 040 &euro;</td><td class="n">15 311 &euro;</td></tr>
+<tr><td>Annee 4</td><td class="n">2 500</td><td class="n">897 000 &euro;</td><td class="n">12 674 &euro;</td><td class="n">10 500 &euro;</td><td class="n">31 898 &euro;</td></tr>
+<tr><td>Annee 5</td><td class="n">4 000</td><td class="n">1 435 200 &euro;</td><td class="n">20 307 &euro;</td><td class="n">16 800 &euro;</td><td class="n">51 037 &euro;</td></tr>
+<tr style="border-top:2px solid var(--cream)"><td><b>Cumul</b><br><span class="note">moteur inclus</span></td><td></td><td></td><td class="n"><b>48 252 &euro;</b></td><td class="n"><b>41 070 &euro;</b></td><td class="n"><b>106 541 &euro;</b></td></tr>
+</table></div>
+
+<div class="carte"><h2>Ecarts fonctionnels qui comptent</h2>
+<table>
+<tr><th>Brique</th><th>BNP Axepta</th><th>Stripe</th></tr>
+<tr><td>Abonnements recurrents</td><td><span class="eti e-a">a ecrire</span></td><td><span class="eti e-v">Billing</span></td></tr>
+<tr><td>Facturation, avoirs, prorata</td><td><span class="eti e-n">non</span></td><td><span class="eti e-v">Invoicing</span></td></tr>
+<tr><td>Relance d'impaye</td><td><span class="eti e-n">non</span></td><td><span class="eti e-v">inclus</span></td></tr>
+<tr><td>Coupons, parrainage</td><td><span class="eti e-n">non</span></td><td><span class="eti e-v">inclus</span></td></tr>
+<tr><td>Prelevement SEPA</td><td><span class="eti e-a">a verifier</span></td><td><span class="eti e-v">0,35 &euro;</span></td></tr>
+<tr><td>Apple Pay / Google Pay</td><td><span class="eti e-v">oui</span></td><td><span class="eti e-v">oui</span></td></tr>
+<tr><td>3DS / DSP2, PCI-DSS</td><td><span class="eti e-v">oui</span></td><td><span class="eti e-v">oui</span></td></tr>
+<tr><td>Environnement de test</td><td><span class="eti e-v">oui</span></td><td><span class="eti e-v">excellent</span></td></tr>
+<tr><td>Modules CMS prets</td><td><span class="eti e-v">5 modules</span></td><td><span class="eti e-n">sans objet</span></td></tr>
+<tr><td>Documentation, SDK</td><td><span class="eti e-n">sommaire</span></td><td><span class="eti e-v">reference</span></td></tr>
+</table>
+<p class="note" style="margin-top:7px">Les modules CMS d'Axepta (WooCommerce, PrestaShop, Magento) ne servent a rien ici : le produit est une application sur mesure, pas une boutique.</p></div>
+</div>
+
+<div class="grille g3">
+<div class="carte"><h2>Recommandation par phase</h2>
+<div class="phase a"><b>Demarrage, 0 a 300 abonnes</b><span>Stripe, carte + Billing. Zero developpement de facturation, en ligne en 2 a 3 jours. A 100 abonnes le surcout est de <b>70 &euro;/mois</b> : le prix d'arriver au marche 3 semaines plus tot.</span></div>
+<div class="phase b"><b>Croissance, 300 a 1 500</b><span>Basculer le moyen par defaut sur le <b>prelevement SEPA</b>. Le cout tombe de 3,56 % a 1,87 % sans toucher l'architecture, et l'impaye involontaire s'effondre : un mandat n'expire pas, une carte si.</span></div>
+<div class="phase c"><b>Volume, au-dela de 1 500</b><span>Ecrire son moteur et quitter Billing : 1,17 %. C'est aussi le moment ou renegocier BNP a du sens, avec un volume reel en main.</span></div>
+</div>
+
+<div class="carte"><h2>A negocier avec BNP</h2>
+<div class="q"><b>Ces taux sont-ils tout compris&nbsp;?</b><span>0,27 % en debit est le plafond d'interchange europeen +0,07 %. Si l'interchange s'ajoute au lieu d'etre inclus, <b>toute l'etude bascule</b>. Question n&deg;1, par ecrit.</span></div>
+<div class="q"><b>Le recurrent est-il supporte&nbsp;?</b><span>Jeton de carte, paiement sans presence du porteur, exemption DSP2. La proposition n'en dit rien.</span></div>
+<div class="q"><b>Le prelevement SEPA est-il propose, et a quel prix&nbsp;?</b><span>Absent de la proposition. C'est le poste qui decide.</span></div>
+<div class="q"><b>Cout d'un impaye et d'un litige&nbsp;?</b><span>Non chiffre. Chez Stripe c'est 20 &euro;.</span></div>
+<div class="q"><b>Le forfait de 100 operations</b><span>Sature a 100 abonnes. Existe-t-il un palier superieur moins cher que 0,22 &euro;&nbsp;?</span></div>
+</div>
+
+<div class="carte"><h2>A verifier chez Stripe &amp; risques</h2>
+<div class="q"><b>Part reelle de cartes &laquo;&nbsp;premium&nbsp;&raquo;</b><span>2,8 % au lieu de 1,5 %. Mesurable seulement en production : prevoir de le relever au bout de 100 paiements.</span></div>
+<div class="q"><b>Billing facture 0,7 % du volume</b><span>Y compris sur les paiements SEPA. C'est un abonnement deguise, a reevaluer chaque annee.</span></div>
+<div class="q"><b>Delai de mandat SEPA</b><span>Un prelevement n'est pas instantane et peut etre rejete jusqu'a 8 semaines apres. A integrer dans la logique d'acces.</span></div>
+<p class="note" style="margin-top:9px"><b>Risques communs.</b> Dependance au prestataire : rester sur les standards (jeton, webhook signe, table d'abonnements a soi) pour pouvoir changer. Ne jamais stocker un numero de carte. Les mandats SEPA sont <b>portables</b> d'un prestataire a l'autre, les jetons de carte beaucoup moins : c'est un argument de plus pour le SEPA.</p>
+</div>
+</div>
+
+<footer>
+<b>Sources et hypotheses.</b> BNP : proposition commerciale Axepta transmise, taux VADS releves sur la capture. Stripe : stripe.com/fr/pricing, releve le 20/09/2026 (carte EEE 1,5 % + 0,25 &euro;, premium 2,8 % + 0,25 &euro;, SEPA 0,35 &euro;, Billing 0,7 %, Invoicing 0,4 %, litige 20 &euro;). GoCardless : gocardless.com/fr-fr/tarifs, plan Standard. Tous montants HT.
+&mdash; <b>Hypotheses assumees :</b> 29,90 &euro; HT, 1 transaction par abonne et par mois, 100 % France, mix de cartes H2 decrit plus haut, moteur d'abonnement estime a 20 jours a 300 &euro;. Croissance 150 / 500 / 1 200 / 2 500 / 4 000 abonnes moyens.
+&mdash; <b>Non chiffre faute de donnee :</b> taux d'impaye, taux de litige, part reelle de cartes professionnelles, cout d'un eventuel changement de prestataire.
+</footer>
+
+</div></body></html>
