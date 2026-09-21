@@ -2,6 +2,9 @@
   "name": "a-dispo",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
   "scripts": {
     "build": "node outils/construire.mjs",
     "deploy": "npm run build && wrangler deploy",

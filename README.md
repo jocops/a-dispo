@@ -21,6 +21,35 @@ npm run deploy     # construit puis déploie
 
 Une seule commande construit tout : les douze écrans et le CRM.
 
+## Le déploiement se fait tout seul
+
+Pousser sur `main` construit, joue la recette et le banc SQL, puis déploie sur
+Cloudflare. Une recette rouge ne déploie rien : le travail de déploiement dépend
+du travail de contrôle, ce n'est pas une intention mais une dépendance déclarée
+dans `.github/workflows/controle-et-deploiement.yml`.
+
+```bash
+git push            # et c'est tout
+```
+
+La dernière étape recontrôle que la production rend bien 200, cinq essais
+espacés de six secondes. Un déploiement qui passe mais ne répond pas est un
+échec, pas un succès.
+
+`npm run deploy` reste utilisable depuis le poste, pour une publication hors
+chaîne. Les deux visent le même Worker.
+
+**Les deux secrets à poser une fois**, dans GitHub, Settings puis Secrets and
+variables puis Actions :
+
+| Secret | Ce que c'est |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | jeton avec la permission « Edit Cloudflare Workers » |
+| `CLOUDFLARE_ACCOUNT_ID` | identifiant du compte, lu dans le tableau de bord |
+
+Tant qu'ils ne sont pas posés, le contrôle passe et le déploiement échoue en le
+disant. Il ne déploie jamais à moitié.
+
 ## Les contrôles
 
 `npm run controle` enchaîne les deux filets. Ils ne partent jamais en ligne.

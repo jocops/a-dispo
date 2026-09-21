@@ -1,0 +1,106 @@
+# Le contrôle, puis le déploiement. Dans cet ordre, et jamais l'inverse.
+#
+# POURQUOI UN SEUL FICHIER À DEUX TRAVAUX. Deux fichiers séparés se déclenchent
+# en parallèle : la production partirait pendant que la recette tourne encore,
+# et un échec arriverait après coup. Ici `deploiement` dépend de `controle` :
+# une recette rouge ne déploie rien, c'est la garantie et non l'intention.
+#
+# CE QU'IL FAUT POSER UNE FOIS, côté GitHub, dans Settings puis Secrets and
+# variables puis Actions :
+#   CLOUDFLARE_API_TOKEN    jeton avec la permission « Edit Cloudflare Workers »
+#   CLOUDFLARE_ACCOUNT_ID   identifiant du compte, lu dans le tableau de bord
+# Sans ces deux secrets, le travail de déploiement échoue en le disant, il ne
+# déploie pas à moitié.
+
+name: Contrôle et déploiement
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Deux poussées rapprochées ne se déploient pas l'une par-dessus l'autre.
+# La plus récente gagne, la précédente est annulée avant d'avoir publié.
+concurrency:
+  group: deploiement-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  controle:
+    name: Recette et banc SQL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Construire
+        run: npm run build
+
+      # Les trois contrôles tournent hors réseau et sans aucun secret : mesuré
+      # le 21/09/2026. Si l'un d'eux se met un jour à demander un jeton, il
+      # échouera ici plutôt que de laisser passer une production non vérifiée.
+      - name: Recette, 12 pages et 11 contrôles
+        run: python3 outils/recette.py
+
+      - name: Banc SQL
+        run: node outils/banc-sql.mjs
+
+  deploiement:
+    name: Publier sur Cloudflare
+    needs: controle
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://a-dispo.strattonn-pilotage.workers.dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # On reconstruit ici plutôt que de transporter le dossier construit entre
+      # les deux travaux : la sortie est déterministe, et un artefact transporté
+      # est une occasion de plus de publier autre chose que ce qui a été mesuré.
+      - name: Construire
+        run: npm run build
+
+      - name: Déployer
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: Vérifier que la production répond
+        run: |
+          set -euo pipefail
+          adresse=https://a-dispo.strattonn-pilotage.workers.dev
+          for essai in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$adresse/") || code=000
+            echo "essai $essai : $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 6
+          done
+          echo "la production ne rend pas 200 après le déploiement"
+          exit 1
